@@ -47,3 +47,19 @@ def build_docs(ctx: Context) -> None:
 def serve_docs(ctx: Context) -> None:
     """Serve documentation."""
     ctx.run("uv run mkdocs serve --config-file docs/mkdocs.yaml", echo=True, pty=not WINDOWS)
+
+
+# Git helpers
+@task
+def git(ctx, message):
+    ctx.run(f"git add .")
+    ctx.run(f"git commit -m '{message}'")
+    ctx.run(f"git push")
+
+
+# uv helpers
+@task 
+def uvp(ctx: Context) -> None:
+    """Install lib and add to uv project."""
+    ctx.run(f"uv pip install --python {PYTHON_VERSION} --no-deps {PROJECT_NAME}")
+    ctx.run("uv add .")
