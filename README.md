@@ -6,11 +6,13 @@ mlops project - automatic bird call classifier
 
 **Overall goal of the project** 
 
-Classify bird species from their call.
+Classify bird species from 5 seconds of their call.
 
 **Data** 
+The dataset consists of 2161 bird "voices" recorded recorded before 2023, which includes both calls, songs and other sounds made by birds. The dataset can be found from kaggle at https://www.kaggle.com/code/dima806/bird-species-by-sound-detection/input.
 
-https://huggingface.co/datasets/tglcourse/5s_birdcall_samples_top20
+114 different bird sepcies are present, with each species having 3-30 audio recordings assigned. The audio recordings range from a couple of seconds in length to almost half an hour. 
+
 
 **Models** 
 
