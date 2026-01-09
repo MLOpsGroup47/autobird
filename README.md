@@ -8,7 +8,7 @@ mlops project - automatic bird call classifier
 
 Classify bird species from 5 seconds of their call.
 
-**Framworks**
+**Frameworks**
 
 **Data** 
 
