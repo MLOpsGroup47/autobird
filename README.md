@@ -9,6 +9,7 @@ mlops project - automatic bird call classifier
 Classify bird species from 5 seconds of their call.
 
 **Data** 
+
 The dataset consists of 2161 bird "voices" recorded recorded before 2023, which includes both calls, songs and other sounds made by birds. The dataset can be found from kaggle at https://www.kaggle.com/code/dima806/bird-species-by-sound-detection/input.
 
 114 different bird sepcies are present, with each species having 3-30 audio recordings assigned. The audio recordings range from a couple of seconds in length to almost half an hour. 
@@ -28,6 +29,7 @@ The directory structure of the project looks like this:
 │   └── workflows/
 │       └── tests.yaml
 ├── configs/                  # Configuration files
+|   ├── .gitkeep
 ├── data/                     # Data directory
 │   ├── processed
 │   └── raw
@@ -41,9 +43,11 @@ The directory structure of the project looks like this:
 ├── models/                   # Trained models
 ├── notebooks/                # Jupyter notebooks
 ├── reports/                  # Reports
-│   └── figures/
+|   ├── figures/
+|   ├── README.md
+│   └── report.py
 ├── src/                      # Source code
-│   ├── project_name/
+│   ├── call_of_birds_autobird/
 │   │   ├── __init__.py
 │   │   ├── api.py
 │   │   ├── data.py
