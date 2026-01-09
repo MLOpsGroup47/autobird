@@ -35,7 +35,7 @@ The preprocessing step is designed to be extended to: segment long recordings in
 
 **Models** 
 
-Transformer-based architecture. 
+The model is based on a transformer based architecture for audio classification and uses a pretrained Wav2Vec2 backbone. It takes raw audio recordings as input, which are resampled to 16 kHz and split into fixed length segments. A classification layer is trained on top of the pretrained model to predict bird species from their calls. The pretrained model has learned general patterns in sound from large collections of audio recordings, which helps the system perform well even with limited labeled bird data. This makes the approach effective, scalable, and suitable for real world use.
 
 
 ## Project structure
