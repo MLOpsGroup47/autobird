@@ -6,9 +6,7 @@ mlops project - automatic bird call classifier
 
 **Overall goal of the project** 
 
-Classify bird species from 5 seconds of their call.
-
-**Frameworks**
+Classify bird species from their call.
 
 **Data** 
 
@@ -16,7 +14,7 @@ https://huggingface.co/datasets/tglcourse/5s_birdcall_samples_top20
 
 **Models** 
 
-Transformer
+Transformer-based architecture. 
 
 
 ## Project structure
