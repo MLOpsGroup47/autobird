@@ -3,6 +3,7 @@
 mlops project - automatic bird call classifier
 
 ## Project Description
+This project aims to build a production ready machine learning model for classifying bird species from 5 seconds of their call using a transformer based model. Bird vocalizations give critical insights for biodiversity assessment and ecological monitoring, but manual classification is very time consuming and requires expert knowledge. By combining state of the art machine learning techniques with MLOps best practices our goal is to make a robust, scalable, maintainable, and reproducible solution for classifying bird species from their calls that can operate reliably in production settings.  
 
 **Overall goal of the project** 
 
