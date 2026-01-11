@@ -47,6 +47,7 @@ class Model(nn.Module):
     
 
 if __name__ == "__main__":
-    model = Model()
-    x = torch.rand(1)
-    print(f"Output shape of model: {model(x).shape}")
+    model = Model(n_classes=10)
+    x = torch.randn(4, 1, 64, 128)  # [B, 1, Mels, Frames]
+    y = model(x)
+    print(y.shape)  # should be [4, 10]
