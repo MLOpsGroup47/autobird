@@ -63,3 +63,9 @@ def uvp(ctx: Context) -> None:
     """Install lib and add to uv project."""
     ctx.run(f"uv pip install --python {PYTHON_VERSION} --no-deps {PROJECT_NAME}")
     ctx.run("uv add .")
+
+# docker helpers
+@task 
+def docker_build(ctx: Context, entrypoint: str) -> None:
+    """Build multi-platform docker image."""
+    ctx.run(f"docker build --platform linux/amd64,linux/arm64 -f {entrypoint}.dockerfile . -t {entrypoint}:latest")
