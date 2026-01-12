@@ -24,10 +24,13 @@ dependencies = [
     "matplotlib>=3.10.8",
     "numpy<2",
     "pandas>=2.3.3",
+    "ruff>=0.1.3",
     "soundfile>=0.13.1",
     "torch<=2.2.2",
+    "click<8.1",
     "typer==0.15.1",
     "uvicorn==0.34.0",
+    "torchaudio>=2.2.2",
 ]
 
 [dependency-groups]
@@ -44,6 +47,7 @@ dev = [
 
 [project.scripts]
 preprocess = "call_of_birds_autobird.data:preprocess"
+train = "call_of_birds_autobird.train:train"
 
 
 [tool.uv.sources]
@@ -61,6 +65,10 @@ explicit = true
 
 [tool.ruff]
 line-length = 120
+lint.select = ["I" , "D"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 [tool.coverage.run]
 omit = ["tests/*"]
