@@ -46,9 +46,9 @@ dev = [
 ]
 
 [project.scripts]
-preprocess = "call_of_birds_autobird.data:preprocess"
+data = "call_of_birds_autobird.data:app"
 train = "call_of_birds_autobird.train:train"
-
+test_train ="call_of_birds_autobird.test:app"
 
 [tool.uv.sources]
 torch = [

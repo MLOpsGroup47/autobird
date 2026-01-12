@@ -66,6 +66,8 @@ class PreConfig:
     fq_max: int = 8000  # max frequency
     train_split: float = 0.8  # train/val split
     seed: int = 4  # random seed
+    min_rms: float = 0.005  # min rms for valid audio
+    min_mel_std: float = 0.10  # min mel std for valid audio
 
 
 def _index_dataset(raw_dir: Path) -> Tuple[List[Tuple[Path, int]], List[str]]:
@@ -199,8 +201,8 @@ def _log_mel(
 
 def _compute_global_norm_stats(X: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
     """Compute mean and std over dataset tensor X: shape [N, 1, Mels, Time]."""
-    mean = X.mean()  # [1, 1, Mels, 1]
-    std = X.std().clamp_min(1e-8)  # [1, 1, Mels, 1]
+    mean = X.mean(dim=(0, 1, 3), keepdim=True)  # [1, 1, Mels, 1]
+    std = X.std(dim=(0, 1, 3), keepdim=True).clamp_min(1e-8)  # [1, 1, Mels, 1]
     return mean, std
 
 
@@ -347,7 +349,14 @@ def preprocess(
                 )
 
                 for chunk, start_sample in chunks:
+                    if float(np.sqrt(np.mean(chunk**2))) < cfg.min_rms:
+                        continue  # skip low rms
+                    
                     S = _log_mel(chunk, sr=cfg.sr, cfg=cfg)  # [n_mels, time]
+
+                    if float(S.std()) < cfg.min_mel_std:
+                        continue  # skip low mel std
+
                     X.append(torch.from_numpy(S).unsqueeze(0))  # [1, n_mels, time]
                     y.append(label_id)
                     group.append(rid)
@@ -363,8 +372,14 @@ def preprocess(
 
         x_tensor = torch.stack(X, dim=0)  # [N, 1, n_mels, time]
         y_tensor = torch.tensor(y, dtype=torch.long)  # [N]
+        if split_name == "train":
+            mean, std = _compute_global_norm_stats(x_tensor)  # compute mean/std
+            torch.save(mean, processed_dir / "train_mean.pt")  # save mean
+            torch.save(std, processed_dir / "train_std.pt")    # save std
+        else:
+            mean = torch.load(processed_dir / "train_mean.pt")  # load train mean
+            std = torch.load(processed_dir / "train_std.pt")    # load train std
 
-        mean, std = _compute_global_norm_stats(x_tensor)  # compute mean/std
         x_tensor = (x_tensor - mean) / std  # normalize
 
         torch.save(x_tensor, processed_dir / f"{split_name}_x.pt")  # save tensors
@@ -380,7 +395,6 @@ def preprocess(
         save_split(split_name, split_items)  # process and save each split
 
 
-@app.command()
 def load_data(processed_dir: Path = Path("data/processed")):
     """Load processed data tensors from disk.
     Args:

@@ -6,6 +6,8 @@ WINDOWS = os.name == "nt"
 PROJECT_NAME = "call_of_birds_autobird"
 PYTHON_VERSION = "3.12"
 
+def _pty() -> bool:
+    return not WINDOWS
 # Project commands
 @task
 def preprocess_data(ctx: Context) -> None:
@@ -69,3 +71,24 @@ def uvp(ctx: Context) -> None:
 def docker_build(ctx: Context, entrypoint: str) -> None:
     """Build multi-platform docker image."""
     ctx.run(f"docker build --platform linux/amd64,linux/arm64 -f {entrypoint}.dockerfile . -t {entrypoint}:latest")
+
+
+# data and training tasks
+@task
+def preprocess(ctx, raw_dir="data/voice_of_birds", processed_dir="data/processed"):
+    """Preprocess audio into tensors (local, using uv)."""
+    ctx.run(
+        f"uv run python -m {PROJECT_NAME}.data preprocess {raw_dir} {processed_dir}",
+        echo=True,
+        pty=_pty(),
+    )
+
+@task
+def train(ctx, data_dir="data/processed", epochs=5, batch_size=32, lr=1e-3):
+    """Train model (local, using uv)."""
+    ctx.run(
+        f"uv run python -m {PROJECT_NAME}.train "
+        f"--data-path {data_dir} --epochs {epochs} --batch-size {batch_size} --lr {lr}",
+        echo=True,
+        pty=_pty(),
+    )
