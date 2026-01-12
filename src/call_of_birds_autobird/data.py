@@ -380,5 +380,37 @@ def preprocess(
         save_split(split_name, split_items)  # process and save each split
 
 
+@app.command()
+def load_data(processed_dir: Path = Path("data/processed")):
+    """Load processed data tensors from disk.
+    Args:
+        processed_dir: Path to processed data directory.
+    returns:
+        x_train, y_train, x_val, y_val, classes, train_chunk_starts, val_chunk_starts
+    """
+    processed_dir = Path(processed_dir).expanduser().resolve()
+
+    # classes
+    with open(processed_dir / "labels.json", "r", encoding="utf8") as fh:
+        classes = json.load(fh)
+
+    # tensors
+    x_train = torch.load(processed_dir / "train_x.pt")
+    y_train = torch.load(processed_dir / "train_y.pt")
+    x_val   = torch.load(processed_dir / "val_x.pt")
+    y_val   = torch.load(processed_dir / "val_y.pt")
+
+    # json lists (if you still want them)
+    with open(processed_dir / "train_group.json", "r", encoding="utf8") as fh:
+        train_group = json.load(fh)
+    with open(processed_dir / "val_group.json", "r", encoding="utf8") as fh:
+        val_group = json.load(fh)
+
+    # chunk starts are tensors (binary)
+    train_chunk_starts = torch.load(processed_dir / "train_chunk_starts.pt")
+    val_chunk_starts   = torch.load(processed_dir / "val_chunk_starts.pt")
+
+    return x_train, y_train, x_val, y_val, classes, train_group, val_group, train_chunk_starts, val_chunk_starts
+
 if __name__ == "__main__":
     app()
