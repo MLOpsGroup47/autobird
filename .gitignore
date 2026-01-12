@@ -19,7 +19,6 @@ manual_test/
 # data
 *.mp3
 *.zip
-*.pt
 
 
 # Byte-compiled / optimized / DLL files

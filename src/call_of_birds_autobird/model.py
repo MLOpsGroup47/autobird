@@ -11,14 +11,19 @@ class CNNTransformer(nn.Module):
 
         self.cnn = nn.Sequential(
             nn.Conv2d(1, 32, 3, padding=1),
+            nn.BatchNorm2d(32),
             nn.ReLU(),
+            nn.Dropout2d(0.25),
             nn.MaxPool2d(2),
             nn.Conv2d(32, 64, 3, padding=1),
+            nn.BatchNorm2d(64),
             nn.ReLU(),
+            nn.Dropout2d(0.25),
             nn.MaxPool2d(2),
         )
 
         self.proj = nn.Linear(64, d_model)
+        self.layernorm = nn.LayerNorm(d_model)
 
         encoder_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=n_heads, batch_first=True)
         self.transformer = nn.TransformerEncoder(encoder_layer, n_layers)
