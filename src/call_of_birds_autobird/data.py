@@ -1,8 +1,10 @@
+import os
 import json
 import random
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Tuple
+from collections import Counter
 
 import numpy as np
 import typer
@@ -11,7 +13,8 @@ import soundfile as sf
 import librosa
 import torch
 
-
+os.chdir(Path(__file__).parent)
+print(f"Current working directory: {Path.cwd()}")
 app = typer.Typer()
 audio_exts = {".mp3", ".wav", ".flac", ".ogg", ".m4a"}
 
@@ -295,11 +298,12 @@ def preprocess(
         raw_dir = Path("data/voice_of_birds")
     else:
         raw_dir = raw_dir.expanduser().resolve()
-
+    print(f"Raw data dir: {raw_dir}")
     if not isinstance(processed_dir, Path):
         processed_dir = Path("data/processed")
     else:
-        processed_dir = processed_dir.expanduser().resolve()
+        ROOT = Path(__file__).resolve().parents[2]  # project root
+        processed_dir = (ROOT / processed_dir).resolve()  
     processed_dir.mkdir(parents=True, exist_ok=True)
     items, classes = _index_dataset(raw_dir)
 
@@ -402,7 +406,11 @@ def load_data(processed_dir: Path = Path("data/processed")):
     returns:
         x_train, y_train, x_val, y_val, classes, train_chunk_starts, val_chunk_starts
     """
-    processed_dir = Path(processed_dir).expanduser().resolve()
+    
+    ROOT = Path(__file__).resolve().parents[2]  # /app
+    processed_dir = Path(processed_dir)
+    if not processed_dir.is_absolute():
+        processed_dir = (ROOT / processed_dir).resolve()
 
     # classes
     with open(processed_dir / "labels.json", "r", encoding="utf8") as fh:

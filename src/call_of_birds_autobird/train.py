@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from call_of_birds_autobird.model import Model
 from call_of_birds_autobird.data import load_data
+from call_of_func.train_helper import rm_rare_classes
 
 app = typer.Typer()
 
@@ -18,7 +19,7 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 
 @dataclass(frozen=True)
 class hyperparams:
-    epochs: int = 10
+    epochs: int = 100
     batch_size: int = 32
     learning_rate: float = 0.001
 
@@ -27,7 +28,9 @@ def train(
     data_path: str = "data/processed", 
     epochs: int = hyperparams.epochs, 
     lr: float = hyperparams.learning_rate, 
-    batch_size: int = hyperparams.batch_size):
+    batch_size: int = hyperparams.batch_size,
+    sample_min: int = 100
+    ):
     """Train the model.
     Args:
         data_path (str): Path to the processed data.
@@ -40,7 +43,12 @@ def train(
     fq_mask = torchaudio.transforms.FrequencyMasking(freq_mask_param=8) # freq mask
     time_mask = torchaudio.transforms.TimeMasking(time_mask_param=20) # time mask
 
-    x_train, y_train, x_val, y_val, classes, train_group, val_group, train_chunk_starts, val_chunk_starts = load_data(Path(data_path))
+    x_train, y_train, x_val, y_val, classes, *_ = load_data(Path(data_path))
+    print(f"Loaded data: train={len(y_train)}, val={len(y_val)}, classes={len(classes)}")
+    x_train, y_train, x_val, y_val, classes = rm_rare_classes( # remove rare classes
+        x_train, y_train, x_val, y_val, classes, 
+        min_samples=sample_min
+    )
     model = Model(n_classes=len(classes)).to(device)
     
     # balanced sampler
