@@ -1,20 +1,18 @@
-import os
 import json
+import os
 import random
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Tuple
-from collections import Counter
 
+import librosa
 import numpy as np
+import soundfile as sf
+import torch
 import typer
 
-import soundfile as sf
-import librosa
-import torch
-
-os.chdir(Path(__file__).parent)
-print(f"Current working directory: {Path.cwd()}")
+root = Path(__file__).resolve().parents[2]  # project root
 app = typer.Typer()
 audio_exts = {".mp3", ".wav", ".flac", ".ogg", ".m4a"}
 
@@ -212,7 +210,7 @@ def _compute_global_norm_stats(X: torch.Tensor) -> Tuple[torch.Tensor, torch.Ten
 ### Main preprocessing pipeline
 @app.command()
 def preprocess(
-    raw_dir: Path = typer.Argument("data/voice_of_birds", exists=True),
+    raw_dir: Path = typer.Argument("data/voice_of_birds"),
     processed_dir: Path = typer.Argument("data/processed"),
     target_sr: int = typer.Option(16000, help="Target sampling rate"),
     clip_sec: float = typer.Option(5.0, help="Clip length in seconds"),
@@ -226,6 +224,7 @@ def preprocess(
     renamed_files: bool = False,
 ) -> None:
     """Process raw audio data and save processed tensors.
+
     Args:
         raw_dir: Raw data directory
         processed_dir: Processed data save directory
@@ -240,11 +239,12 @@ def preprocess(
         seed: Random seed
         renamed_files: Whether to rename files and directories to replace spaces with underscores
 
-    returns:
+    Returns:
         None
     """
     def _coerce(val, typ, fallback):
         """Check if input type is correct, else try to cast or use fallback.
+
         Args:
             val: input value
             typ: desired type
@@ -294,17 +294,23 @@ def preprocess(
     )
 
     # check paths
-    if not isinstance(raw_dir, Path):
-        raw_dir = Path("data/voice_of_birds")
-    else:
-        raw_dir = raw_dir.expanduser().resolve()
-    print(f"Raw data dir: {raw_dir}")
-    if not isinstance(processed_dir, Path):
-        processed_dir = Path("data/processed")
-    else:
-        ROOT = Path(__file__).resolve().parents[2]  # project root
-        processed_dir = (ROOT / processed_dir).resolve()  
+    raw_dir = Path(raw_dir).expanduser()
+    if not raw_dir.is_absolute():
+        raw_dir = (root / raw_dir).resolve()
+
+    processed_dir = Path(processed_dir).expanduser()
+    if not processed_dir.is_absolute():
+        processed_dir = (root / processed_dir).resolve()
+
+    # validate and create
+    if not raw_dir.exists() or not raw_dir.is_dir():
+        raise typer.BadParameter(f"Raw data directory does not exist: {raw_dir}")
     processed_dir.mkdir(parents=True, exist_ok=True)
+
+    print(f"Raw data directory: {raw_dir}")
+    print(f"Processed data directory: {processed_dir}")
+
+    # index dataset
     items, classes = _index_dataset(raw_dir)
 
     # For convenience, rename files and directories to replace spaces with underscores
@@ -401,12 +407,13 @@ def preprocess(
 
 def load_data(processed_dir: Path = Path("data/processed")):
     """Load processed data tensors from disk.
+
     Args:
         processed_dir: Path to processed data directory.
-    returns:
+
+    Returns:
         x_train, y_train, x_val, y_val, classes, train_chunk_starts, val_chunk_starts
     """
-    
     ROOT = Path(__file__).resolve().parents[2]  # /app
     processed_dir = Path(processed_dir)
     if not processed_dir.is_absolute():
