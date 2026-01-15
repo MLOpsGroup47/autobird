@@ -1,9 +1,11 @@
+"""Tests for data-related components."""
+
 from torch.utils.data import Dataset
 
-from call_of_birds_autobird.data import MyDataset
+from tests import _PATH_PREPROCESSING
 
 
-def test_my_dataset():
-    """Test the MyDataset class."""
-    dataset = MyDataset("data/raw")
-    assert isinstance(dataset, Dataset)
+def test_data_config():
+    """Test the DataConfig class."""
+    dataset = _PATH_PREPROCESSING.DataConfig()
+    assert isinstance(dataset, DataConfig)

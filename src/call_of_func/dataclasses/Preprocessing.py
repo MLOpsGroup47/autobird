@@ -1,9 +1,13 @@
+"""Dataclasses for preprocessing configuration."""
+
 from dataclasses import dataclass, field
 from typing import FrozenSet
+
 
 @dataclass(frozen=True)
 class PreConfig:
     """Preprocessing configuration."""
+
     sr: int = 16000  # sampling rate
     clip_sec: float = 5.0  # clip length in seconds
     n_fft: int = 1024  # fft window
@@ -16,13 +20,12 @@ class PreConfig:
     min_mel_std: float = 0.10  # min mel std for valid audio
 
 
-
 @dataclass(frozen=True)
 class DataConfig:
     train_split: float = 0.8
     seed: int = 4
 
-    # chunking behavior 
+    # chunking behavior
     clip_sec: float = 5.0
     stride_sec: float = 2.5
     pad_last: bool = True
