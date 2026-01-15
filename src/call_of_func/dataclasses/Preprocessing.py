@@ -1,5 +1,8 @@
+"""Dataclasses for preprocessing configuration."""
+
 from dataclasses import dataclass, field
 from typing import FrozenSet
+
 
 @dataclass(frozen=True)
 class PreConfig:
@@ -13,7 +16,6 @@ class PreConfig:
     fq_max: int  # max frequency
     min_rms: float  # min rms for valid audio
     min_mel_std: float  # min mel std for valid audio
-
 
 
 @dataclass(frozen=True)
