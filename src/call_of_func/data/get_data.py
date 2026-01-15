@@ -1,19 +1,19 @@
 import json
-import torch
 import random
-import librosa
-import numpy as np
-import soundfile as sf
-
 from pathlib import Path
 from typing import List, Tuple
+
+import librosa
+import numpy as np
+import soundfile as sf  # type: ignore
+import torch
+
 from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
 
+audio_exts = {".mp3", ".wav", ".flac", ".ogg", ".m4a"}
 
-def _index_dataset(
-        raw_dir: Path,
-        cfg: DataConfig,
-    ) -> Tuple[List[Tuple[Path, int]], List[str]]:
+
+def _index_dataset(raw_dir: Path) -> Tuple[List[Tuple[Path, int]], List[str]]:
     """Return list of (filepath, label_id) and class names."""
     # find class subfolders
     class_dirs = sorted([p for p in raw_dir.iterdir() if p.is_dir()])
@@ -27,7 +27,7 @@ def _index_dataset(
     items: List[Tuple[Path, int]] = []
     for cdir in class_dirs:
         for f in cdir.rglob("*"):
-            if f.is_file() and f.suffix.lower() in cfg.audio_exts:
+            if f.is_file() and f.suffix.lower() in audio_exts:
                 items.append((f, class_to_id[cdir.name]))
 
     # check if any audio files found
@@ -35,6 +35,7 @@ def _index_dataset(
         raise ValueError(f"No audio files found under: {raw_dir}")
 
     return items, classes
+
 
 def _load_audio(path: Path) -> Tuple[np.ndarray, int]:
     """Load audio, return mono float32 array and sample rate."""
@@ -47,6 +48,7 @@ def _load_audio(path: Path) -> Tuple[np.ndarray, int]:
         # fallback: librosa
         y, sr = librosa.load(str(path), sr=None, mono=True)
         return y.astype(np.float32), int(sr)
+
 
 def _chunk_audio(
     x: np.ndarray,
@@ -136,8 +138,8 @@ def load_data(processed_dir: Path = Path("data/processed")):
     # tensors
     x_train = torch.load(processed_dir / "train_x.pt")
     y_train = torch.load(processed_dir / "train_y.pt")
-    x_val   = torch.load(processed_dir / "val_x.pt")
-    y_val   = torch.load(processed_dir / "val_y.pt")
+    x_val = torch.load(processed_dir / "val_x.pt")
+    y_val = torch.load(processed_dir / "val_y.pt")
 
     # json list
     with open(processed_dir / "train_group.json", "r", encoding="utf8") as fh:
@@ -147,6 +149,6 @@ def load_data(processed_dir: Path = Path("data/processed")):
 
     # chunk starts are tensors (binary)
     train_chunk_starts = torch.load(processed_dir / "train_chunk_starts.pt")
-    val_chunk_starts   = torch.load(processed_dir / "val_chunk_starts.pt")
+    val_chunk_starts = torch.load(processed_dir / "val_chunk_starts.pt")
 
     return x_train, y_train, x_val, y_val, classes, train_group, val_group, train_chunk_starts, val_chunk_starts
