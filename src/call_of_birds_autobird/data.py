@@ -31,6 +31,7 @@ PATHS = PathConfig(
     ckpt_dir=Path("models/checkpoins"),
 )
 
+
 def _log_mel(x: np.ndarray, cfg: PreConfig) -> np.ndarray:
     """Compute log-mel spectrogram: shape [n_mels, time]."""
     # mel power spectrogram
@@ -59,7 +60,7 @@ def _compute_global_norm_stats(X: torch.Tensor) -> Tuple[torch.Tensor, torch.Ten
 ### Main preprocessing pipeline
 @app.command()
 def preprocess(
-    config: str = typer.Option("default", help ="Hydra config name"),
+    config: str = typer.Option("default", help="Hydra config name"),
     o: List[str] = typer.Option(None, "--o", help="Hydra overrides"),
     raw_dir: Path = typer.Option(None, help="Override raw_dir over config"),
     processed_dir: Path = typer.Option(None, help="Override processed_dir"),
@@ -68,25 +69,16 @@ def preprocess(
     """Process raw audio data and save processed tensors.
 
     Args:
+        config: Hydra config name
+        o: Hydra overrides
         raw_dir: Raw data directory
         processed_dir: Processed data save directory
-        target_sr: Target sampling rate
-        clip_sec: Clip length in seconds
-        stride_sec: Stride length in secounds
-        n_fft: FFT window size
-        hop_length: Hop length
-        n_mels: Number of mel bands
-        fq_min: Min frequency
-        fq_max: Max frequency
-        train_split: Train/validation split
-        seed: Random seed
-        pad_last: Whether to pad the last chunk
         renamed_files: Whether to rename files and directories to replace spaces with underscores
 
     Returns:
         None
     """
-      # load config
+    # load config
     cfg = _load_cfg(config_name="config", overrides=o or [])
 
     paths = PathConfig(
@@ -94,7 +86,7 @@ def preprocess(
         raw_dir=Path(cfg.paths.raw_dir),
         processed_dir=Path(cfg.paths.processed_dir),
         reports_dir=Path(cfg.paths.reports_dir),
-        ckpt_dir=Path(cfg.paths.ckpt_dir)
+        ckpt_dir=Path(cfg.paths.ckpt_dir),
     )
     if raw_dir is not None or processed_dir is not None:
         paths = PathConfig(
@@ -104,7 +96,7 @@ def preprocess(
             reports_dir=paths.reports_dir,
             ckpt_dir=paths.ckpt_dir,
         ).resolve()
-  
+
     pre_cfg = PreConfig(
         sr=cfg.preprocessing.sr,
         clip_sec=cfg.preprocessing.clip_sec,
@@ -119,10 +111,10 @@ def preprocess(
 
     data_cfg = DataConfig(
         train_split=cfg.data.train_split,
-        seed = cfg.data.seed,
+        seed=cfg.data.seed,
         clip_sec=cfg.data.clip_sec,
         stride_sec=cfg.data.stride_sec,
-        pad_last= True,
+        pad_last=True,
     )
 
     print(f"Project root: {paths.root}")
