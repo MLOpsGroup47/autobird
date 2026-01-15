@@ -81,3 +81,6 @@ convention = "google"
 
 [tool.coverage.run]
 omit = ["tests/*"]
+
+[tool.mypy]
+disable_error_code = ["import-untyped"]
