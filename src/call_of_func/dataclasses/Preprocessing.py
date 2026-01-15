@@ -18,7 +18,6 @@ class PreConfig:
     min_mel_std: float  # min mel std for valid audio
 
 
-
 @dataclass(frozen=True)
 class DataConfig:
     train_split: float 
