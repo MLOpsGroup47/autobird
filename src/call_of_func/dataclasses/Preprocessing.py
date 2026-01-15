@@ -11,7 +11,6 @@ class PreConfig:
     n_mels: int = 64  # number of mel bands
     fq_min: int = 20  # min frequency
     fq_max: int = 8000  # max frequency
-    train_split: float = 0.8  # train/val split
     seed: int = 4  # random seed
     min_rms: float = 0.005  # min rms for valid audio
     min_mel_std: float = 0.10  # min mel std for valid audio
@@ -20,9 +19,6 @@ class PreConfig:
 
 @dataclass(frozen=True)
 class DataConfig:
-    audio_exts: FrozenSet[str] = field(
-        default_factory=lambda: frozenset({".mp3", ".wav", ".flac", ".ogg", ".m4a"})
-    )
     train_split: float = 0.8
     seed: int = 4
 

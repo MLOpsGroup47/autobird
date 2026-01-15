@@ -4,9 +4,9 @@ from call_of_func.dataclasses.pathing import PathConfig
 
 root = Path(__file__).resolve().parents[2]  # project root
 
-cfg = PathConfig(
-    root=root
-)
+#cfg = PathConfig(
+#    root=root
+#)
 
 def rn_dir(root: Path = typer.Argument("data/voice_of_birds", exists=True)) -> None:
     """Rename directories to replace spaces with underscores.
