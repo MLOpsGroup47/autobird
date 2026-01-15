@@ -100,3 +100,9 @@ def train(ctx, data_dir="data/processed", epochs=5, batch_size=32, lr=1e-3):
         echo=True,
         pty=_pty(),
     )
+
+@task
+def tests(ctx):
+    """Run tests (local, using uv)."""
+    ctx.run("uv run coverage run -m pytest tests/")
+    ctx.run("uv run coverage report -m")
