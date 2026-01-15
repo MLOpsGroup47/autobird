@@ -1,7 +1,9 @@
 from collections import Counter
-import torch
-from typing import List, Tuple
 from pathlib import Path
+from typing import List, Tuple
+
+import torch
+
 
 def rm_rare_classes(
     x_train: torch.Tensor,

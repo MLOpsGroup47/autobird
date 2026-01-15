@@ -1,8 +1,7 @@
-from torch import nn
 import torch
-
 import torch.nn as nn
 import torchaudio
+from torch import nn
 
 
 class CNNTransformer(nn.Module):
@@ -42,9 +41,9 @@ class CNNTransformer(nn.Module):
 
 
 class Model(nn.Module):
-    def __init__(self, n_classes: int = 10):
+    def __init__(self, n_classes: int = 10, d_model: int = 128, n_heads: int = 4, n_layers: int = 2):
         super().__init__()
-        self.model = CNNTransformer(n_classes=n_classes)
+        self.model = CNNTransformer(n_classes=n_classes, d_model=d_model, n_heads=n_heads, n_layers=n_layers)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.model(x)
