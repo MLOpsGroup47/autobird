@@ -1,0 +1,5 @@
+hyperparameters:
+  epochs: 50
+  lr: 0.0003
+  batch_size: 32
+  sample_min: 50
