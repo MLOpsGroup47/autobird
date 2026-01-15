@@ -14,14 +14,15 @@ from call_of_birds_autobird.model import Model
 
 app = typer.Typer()
 
-ROOT = Path(__file__).resolve().parents[2] 
+ROOT = Path(__file__).resolve().parents[2]
 os.chdir(ROOT)
 print(f"Real current working directory: {Path.cwd()}")
 config_dir = ROOT / "configs"
 print(f"Config directory: {config_dir}")
 
+
 @app.command()
-@hydra.main(config_path= str(config_dir), config_name="config", version_base=None)
+@hydra.main(config_path=str(config_dir), config_name="config", version_base=None)
 def overfit(cfg: DictConfig, data_path: str = "data/processed"):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -71,5 +72,6 @@ def overfit(cfg: DictConfig, data_path: str = "data/processed"):
         if i % 25 == 0 or i == 1:
             print(f"step {i:4d}/{steps}  loss={loss.item():.4f}  acc={acc:.4f}")
 
+
 if __name__ == "__main__":
-    overfit()   
+    overfit()

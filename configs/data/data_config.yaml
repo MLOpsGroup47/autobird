@@ -1,0 +1,12 @@
+dataconfig:
+  sr: int
+  clip_sec: float
+  n_fft: int
+  hop_legnth: int
+  n_mels: int
+  fq_min: int
+  fq_max: int
+  train_split: float
+  seed: int 
+  min_rms: float 0.005
+  min_rms_std: float

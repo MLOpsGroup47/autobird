@@ -27,19 +27,19 @@ def rm_rare_classes(
 
     # filter train/val to kept classes
     train_mask = torch.tensor([int(int(y) in keep_set) for y in y_train], dtype=torch.bool)
-    val_mask   = torch.tensor([int(int(y) in keep_set) for y in y_val], dtype=torch.bool)
+    val_mask = torch.tensor([int(int(y) in keep_set) for y in y_val], dtype=torch.bool)
 
     x_train2 = x_train[train_mask]
     y_train2 = y_train[train_mask]
-    x_val2   = x_val[val_mask]
-    y_val2   = y_val[val_mask]
+    x_val2 = x_val[val_mask]
+    y_val2 = y_val[val_mask]
 
     # remap old labels -> new contiguous labels
     keep_sorted = sorted(keep_set)
     old_to_new = {old: new for new, old in enumerate(keep_sorted)}
 
     y_train2 = torch.tensor([old_to_new[int(y)] for y in y_train2], dtype=torch.long)
-    y_val2   = torch.tensor([old_to_new[int(y)] for y in y_val2], dtype=torch.long)
+    y_val2 = torch.tensor([old_to_new[int(y)] for y in y_val2], dtype=torch.long)
 
     new_classes = [classes[old] for old in keep_sorted]
 
