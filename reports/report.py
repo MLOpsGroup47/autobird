@@ -3,6 +3,8 @@
 # or
 # uv add typer markdown pydantic loguru
 
+"""Script to convert report to html and check constraints on answers."""
+
 import re
 from pathlib import Path
 

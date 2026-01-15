@@ -1,5 +1,8 @@
+"""Dataclasses for preprocessing configuration."""
+
 from dataclasses import dataclass, field
 from typing import FrozenSet
+
 
 @dataclass(frozen=True)
 class PreConfig:

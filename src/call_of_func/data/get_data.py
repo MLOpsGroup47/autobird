@@ -1,14 +1,16 @@
 import json
-import torch
 import random
+from pathlib import Path
+from typing import List, Tuple
+
 import librosa
 import numpy as np
 import soundfile as sf
-
-from pathlib import Path
-from typing import List, Tuple
+import torch
 from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
+
 audio_exts = {".mp3", ".wav", ".flac", ".ogg", ".m4a"}
+
 
 def _index_dataset(
         raw_dir: Path
@@ -35,6 +37,7 @@ def _index_dataset(
 
     return items, classes
 
+
 def _load_audio(path: Path) -> Tuple[np.ndarray, int]:
     """Load audio, return mono float32 array and sample rate."""
     try:
@@ -46,6 +49,7 @@ def _load_audio(path: Path) -> Tuple[np.ndarray, int]:
         # fallback: librosa
         y, sr = librosa.load(str(path), sr=None, mono=True)
         return y.astype(np.float32), int(sr)
+
 
 def _chunk_audio(
     x: np.ndarray,
@@ -135,8 +139,8 @@ def load_data(processed_dir: Path = Path("data/processed")):
     # tensors
     x_train = torch.load(processed_dir / "train_x.pt")
     y_train = torch.load(processed_dir / "train_y.pt")
-    x_val   = torch.load(processed_dir / "val_x.pt")
-    y_val   = torch.load(processed_dir / "val_y.pt")
+    x_val = torch.load(processed_dir / "val_x.pt")
+    y_val = torch.load(processed_dir / "val_y.pt")
 
     # json list
     with open(processed_dir / "train_group.json", "r", encoding="utf8") as fh:
@@ -146,6 +150,6 @@ def load_data(processed_dir: Path = Path("data/processed")):
 
     # chunk starts are tensors (binary)
     train_chunk_starts = torch.load(processed_dir / "train_chunk_starts.pt")
-    val_chunk_starts   = torch.load(processed_dir / "val_chunk_starts.pt")
+    val_chunk_starts = torch.load(processed_dir / "val_chunk_starts.pt")
 
     return x_train, y_train, x_val, y_val, classes, train_group, val_group, train_chunk_starts, val_chunk_starts
