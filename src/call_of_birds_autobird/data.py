@@ -3,17 +3,11 @@ from pathlib import Path
 from typing import List, Tuple
 
 import hydra
-from hydra import compose, initialize_config_dir
-from omegaconf import OmegaConf
-
 import librosa
 import numpy as np
 import torch
 import typer
 from call_of_func.data.data_helpers import rn_dir, rn_mp3
-from call_of_func.dataclasses.pathing import PathConfig
-from call_of_func.dataclasses.Preprocessing import PreConfig, DataConfig
-from call_of_func.utils.get_configs import _load_cfg
 from call_of_func.data.get_data import (
     _chunk_audio,
     _index_dataset,
@@ -23,6 +17,9 @@ from call_of_func.data.get_data import (
 )
 from call_of_func.dataclasses.pathing import PathConfig
 from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
+from call_of_func.utils.get_configs import _load_cfg
+from hydra import compose, initialize_config_dir
+from omegaconf import OmegaConf
 
 app = typer.Typer()
 root = Path(__file__).parents[2]

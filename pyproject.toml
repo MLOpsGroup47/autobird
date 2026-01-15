@@ -48,6 +48,8 @@ dev = [
     "ruff==0.1.3",
     "mkdocstrings-python==1.12.2",
     "mypy>=1.19.1",
+    "types-markdown>=3.10.0.20251106",
+    "loguru>=0.7.3",
 ]
 
 [project.scripts]
