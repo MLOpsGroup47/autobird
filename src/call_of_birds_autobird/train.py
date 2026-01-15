@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data as data
-import torchaudio
+import torchaudio # type: ignore
 import typer
 from call_of_func.data.get_data import load_data
 from call_of_func.train.train_helper import rm_rare_classes

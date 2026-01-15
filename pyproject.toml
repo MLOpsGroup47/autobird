@@ -35,6 +35,11 @@ dependencies = [
     "omegaconf>=2.3.0",
     "torch-tb-profiler>=0.4.3",
     "snakeviz>=2.2.2",
+    "google-api-python-client>=2.188.0",
+    "dvc>=2.58.2",
+    "dvc-gdrive>=3.0.1",
+    "pathspec<1.0",
+    "dvc-gs>=3.0.2",
 ]
 
 [dependency-groups]
@@ -80,3 +85,6 @@ convention = "google"
 
 [tool.coverage.run]
 omit = ["tests/*"]
+
+[tool.mypy]
+disable_error_code = ["import-untyped"]

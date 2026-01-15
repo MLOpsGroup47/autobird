@@ -18,10 +18,10 @@ def preprocess_data(ctx: Context) -> None:
     ctx.run(f"uv run src/{PROJECT_NAME}/data.py data/raw data/processed", echo=True, pty=not WINDOWS)
 
 
-@task
-def train(ctx: Context) -> None:
-    """Train model."""
-    ctx.run(f"uv run src/{PROJECT_NAME}/train.py", echo=True, pty=not WINDOWS)
+# @task
+# def train(ctx: Context) -> None:
+#     """Train model."""
+#     ctx.run(f"uv run src/{PROJECT_NAME}/train.py", echo=True, pty=not WINDOWS)
 
 
 @task
@@ -42,6 +42,13 @@ def docker_build(ctx: Context, progress: str = "plain") -> None:
     ctx.run(
         f"docker build -t api:latest . -f dockerfiles/api.dockerfile --progress={progress}", echo=True, pty=not WINDOWS
     )
+
+
+# docker helpers
+@task
+def docker_build_multi(ctx: Context, entrypoint: str) -> None:
+    """Build multi-platform docker image."""
+    ctx.run(f"docker build --platform linux/amd64,linux/arm64 -f {entrypoint}.dockerfile . -t {entrypoint}:latest")
 
 
 # Documentation commands
@@ -73,13 +80,6 @@ def uvp(ctx: Context) -> None:
     ctx.run("uv add .")
 
 
-# docker helpers
-@task
-def docker_build(ctx: Context, entrypoint: str) -> None:
-    """Build multi-platform docker image."""
-    ctx.run(f"docker build --platform linux/amd64,linux/arm64 -f {entrypoint}.dockerfile . -t {entrypoint}:latest")
-
-
 # data and training tasks
 @task
 def preprocess(ctx, raw_dir="data/voice_of_birds", processed_dir="data/processed"):
@@ -100,6 +100,7 @@ def train(ctx, data_dir="data/processed", epochs=5, batch_size=32, lr=1e-3):
         echo=True,
         pty=_pty(),
     )
+
 
 @task
 def tests(ctx):
