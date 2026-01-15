@@ -18,7 +18,6 @@ class PreConfig:
     min_rms: float  # min rms for valid audio
     min_mel_std: float  # min mel std for valid audio
 
-
 @dataclass(frozen=True)
 class DataConfig:
     train_split: float
@@ -26,3 +25,4 @@ class DataConfig:
     clip_sec: float
     stride_sec: float
     pad_last: bool
+ 
