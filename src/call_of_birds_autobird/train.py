@@ -10,9 +10,9 @@ import torch.utils.data as data
 import torchaudio
 import typer
 from call_of_func.train.train_helper import rm_rare_classes
-import wandb
-import time
-from dotenv import load_dotenv
+# import wandb
+# import time
+# from dotenv import load_dotenv
 
 from call_of_func.data.get_data import load_data
 from call_of_func.train.train_helper import rm_rare_classes
