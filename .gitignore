@@ -183,7 +183,8 @@ cython_debug/
 #.idea/
 
 # Never track data
-data/
+data/processed
+data/voice_of_birds
 *.pt
 *.pth
 *.ckpt
