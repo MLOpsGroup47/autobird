@@ -5,7 +5,7 @@ from typing import List, Tuple
 
 import librosa
 import numpy as np
-import soundfile as sf
+import soundfile as sf  # type: ignore
 import torch
 
 from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
@@ -13,9 +13,7 @@ from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
 audio_exts = {".mp3", ".wav", ".flac", ".ogg", ".m4a"}
 
 
-def _index_dataset(
-        raw_dir: Path
-    ) -> Tuple[List[Tuple[Path, int]], List[str]]:
+def _index_dataset(raw_dir: Path) -> Tuple[List[Tuple[Path, int]], List[str]]:
     """Return list of (filepath, label_id) and class names."""
     # find class subfolders
     class_dirs = sorted([p for p in raw_dir.iterdir() if p.is_dir()])

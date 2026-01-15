@@ -24,7 +24,10 @@ jobs:
         uv sync --dev --locked
 
     - name: Ruff check
-      run: uv run ruff check .
+      run: uv run ruff check . --fix
 
     - name: Ruff format
       run: uv run ruff format .
+    
+    - name: mypy check
+      run: uv run mypy .

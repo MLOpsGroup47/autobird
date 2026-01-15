@@ -44,7 +44,6 @@ def docker_build(ctx: Context, progress: str = "plain") -> None:
     )
 
 
-
 # docker helpers
 @task
 def docker_build_multi(ctx: Context, entrypoint: str) -> None:
@@ -101,6 +100,7 @@ def train(ctx, data_dir="data/processed", epochs=5, batch_size=32, lr=1e-3):
         echo=True,
         pty=_pty(),
     )
+
 
 @task
 def tests(ctx):
