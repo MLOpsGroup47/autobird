@@ -12,6 +12,7 @@ from torch.profiler import profile, record_function, ProfilerActivity
 import torchaudio
 import typer
 from call_of_func.train.train_helper import rm_rare_classes
+import wandb
 
 from call_of_func.data.get_data import load_data
 from call_of_birds_autobird.model import Model
