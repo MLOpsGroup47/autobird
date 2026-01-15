@@ -67,7 +67,7 @@ def train(cfg, data_path: str = "data/processed", profile_run: bool = False):
         prof.__enter__()
     global_step = 0
 
-    # load hyperparameters
+    # load hyperparameters 
     epochs = int(cfg.hyperparameters.epochs)
     lr = float(cfg.hyperparameters.lr)
     batch_size = int(cfg.hyperparameters.batch_size)
