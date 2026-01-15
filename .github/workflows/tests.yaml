@@ -29,6 +29,6 @@ jobs:
       run: |
         uv sync --dev --locked
 
-   # - name: Test with pytest
-   #   run: |
-   #     uv run pytest -v
+    - name: Test with pytest
+      run: |
+        uv run pytest -v
