@@ -68,19 +68,10 @@ def preprocess(
     """Process raw audio data and save processed tensors.
 
     Args:
+        config: Hydra config name
+        o: Hydra overrides
         raw_dir: Raw data directory
         processed_dir: Processed data save directory
-        target_sr: Target sampling rate
-        clip_sec: Clip length in seconds
-        stride_sec: Stride length in secounds
-        n_fft: FFT window size
-        hop_length: Hop length
-        n_mels: Number of mel bands
-        fq_min: Min frequency
-        fq_max: Max frequency
-        train_split: Train/validation split
-        seed: Random seed
-        pad_last: Whether to pad the last chunk
         renamed_files: Whether to rename files and directories to replace spaces with underscores
 
     Returns:
