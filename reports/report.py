@@ -1,3 +1,4 @@
+# type: ignore
 # run following commands to install requirements
 # pip install typer markdown pydantic loguru
 # or

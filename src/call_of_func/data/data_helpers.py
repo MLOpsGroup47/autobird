@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import typer
+
 from call_of_func.dataclasses.pathing import PathConfig
 
 root = Path(__file__).resolve().parents[2]  # project root
