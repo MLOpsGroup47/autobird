@@ -217,7 +217,7 @@ def preprocess(
         with open(paths.processed_dir / f"{split_name}_group.json", "w", encoding="utf8") as fh:
             json.dump(group, fh, ensure_ascii=False)  # save group ids
 
-        torch.save(torch.tensor(chunk_starts, dtype=torch.float32), processed_dir / f"{split_name}_chunk_starts.pt")
+        torch.save(torch.tensor(chunk_starts, dtype=torch.float32), paths.processed_dir / f"{split_name}_chunk_starts.pt")
         print(f"Saved split '{split_name}': {len(y_tensor)} samples.")  # log save
 
     for split_name, split_items in splits.items():
