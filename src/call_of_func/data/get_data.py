@@ -8,7 +8,7 @@ import soundfile as sf
 from pathlib import Path
 from typing import List, Tuple
 from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
-
+audio_exts = {".mp3", ".wav", ".flac", ".ogg", ".m4a"}
 
 def _index_dataset(
         raw_dir: Path,
@@ -27,7 +27,7 @@ def _index_dataset(
     items: List[Tuple[Path, int]] = []
     for cdir in class_dirs:
         for f in cdir.rglob("*"):
-            if f.is_file() and f.suffix.lower() in cfg.audio_exts:
+            if f.is_file() and f.suffix.lower() in audio_exts:
                 items.append((f, class_to_id[cdir.name]))
 
     # check if any audio files found

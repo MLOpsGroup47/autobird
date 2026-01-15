@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import List, Tupleq
+from typing import List, Tuple
 
 import librosa
 import numpy as np
@@ -22,7 +22,7 @@ app = typer.Typer()
 root = Path(__file__).parents[2]
 PATHS = PathConfig(
     root = root,
-    raw_dir=Path("data/voice_of_bird"),
+    raw_dir=Path("data/voice_of_birds"),
     processed_dir=Path("data/processed"),
     reports_dir=Path("reports/figures"),
     ckpt_dir=Path("models/checkpoins")
@@ -102,7 +102,6 @@ def preprocess(
         n_mels=n_mels,
         fq_min=fq_min,
         fq_max=fq_max,
-        train_split=train_split,
         seed=seed,
     )
 
@@ -131,20 +130,19 @@ def preprocess(
     # validate and create
     if not paths.raw_dir.exists() or not paths.raw_dir.is_dir():
         raise typer.BadParameter(f"Raw data directory does not exist: {raw_dir}")
-    processed_dir.mkdir(parents=True, exist_ok=True)
+    paths.processed_dir.mkdir(parents=True, exist_ok=True)
 
     if renamed_files:
         rn_dir(paths.raw_dir)
         rn_mp3(paths.raw_dir)
 
     # index dataset
-    items, classes = _index_dataset(paths.raw_dir)
+    items, classes = _index_dataset(paths.raw_dir, data_cfg)
 
     train_items, val_items = _split_by_groups(
         items=items,
-        train_split=data_cfg.train_split,
-        seed=data_cfg.seed,
-    )
+        cfg=data_cfg)
+    
     splits = {"train": train_items, "val": val_items}
 
     # Save class label names separately
@@ -174,10 +172,8 @@ def preprocess(
 
                 chunks = _chunk_audio(
                     x,
-                    sr=pre_cfg.sr,
-                    clip_sec=pre_cfg.clip_sec,
-                    stride_sec=pre_cfg.clip_sec / 2,
-                    pad_last=data_cfg.pad_last,
+                    pre_cfg=pre_cfg,
+                    data_cfg=data_cfg,
                 )
 
                 for chunk, start_sample in chunks:
