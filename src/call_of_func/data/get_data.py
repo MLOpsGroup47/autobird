@@ -11,8 +11,7 @@ from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
 audio_exts = {".mp3", ".wav", ".flac", ".ogg", ".m4a"}
 
 def _index_dataset(
-        raw_dir: Path,
-        cfg: DataConfig,
+        raw_dir: Path
     ) -> Tuple[List[Tuple[Path, int]], List[str]]:
     """Return list of (filepath, label_id) and class names."""
     # find class subfolders

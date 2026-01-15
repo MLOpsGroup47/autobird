@@ -1,12 +1,19 @@
-dataconfig:
-  sr: int
-  clip_sec: float
-  n_fft: int
-  hop_legnth: int
-  n_mels: int
-  fq_min: int
-  fq_max: int
-  train_split: float
-  seed: int 
-  min_rms: float 0.005
-  min_rms_std: float
+# @package _global_
+
+preprocessing:
+  sr: 16000
+  clip_sec: 5.0
+  n_fft: 1024
+  hop_length: 512
+  n_mels: 64
+  fq_min: 20
+  fq_max: 8000
+  min_rms: 0.005
+  min_mel_std: 0.10
+
+data:
+  train_split: 0.8
+  seed: 4
+  clip_sec: 5.0
+  stride_sec: 2.5
+  pad_last: true
