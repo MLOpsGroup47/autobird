@@ -11,4 +11,8 @@ class hyperparameter():
     d_model: int = 64
     n_head: int = 2
     n_layers: int = 1
+    pin_memory: bool = False
+    shuffle_train: bool = True
+    shuffle_val: bool = False
+    num_workers: int = 2
 

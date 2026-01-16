@@ -1,4 +1,3 @@
-
 hyperparameters:
   epochs: 3
   lr: 0.0003
@@ -7,9 +6,7 @@ hyperparameters:
   d_model: 64
   n_heads: 2
   n_layers: 1
-  pin_memory: False
-  shuffle_train: True
-  shuffle_val: False
+  pin_memory: false
+  shuffle_train: true
+  shuffle_val: false
   num_workers: 2
-
-
