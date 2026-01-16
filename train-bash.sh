@@ -9,5 +9,5 @@ gcloud ai custom-jobs create \
   --args=--epochs=10 \
   --args=--batch-size=128 \
   --args=--learning-rate=0.001 \
-  --args=--data-path=gs://autobird-data-bucket/dataset/
+  --args=--data-path=gs://birdcage-bucket/data/processed
     
