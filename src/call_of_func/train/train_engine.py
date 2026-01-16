@@ -5,12 +5,12 @@ from typing import Optional, Tuple
 
 import torch
 import torch.nn as nn
+from call_of_birds_autobird.model import Model
+from call_of_func.train.get_dataloader import build_dataloader
+from call_of_func.train.optim import build_optimizer, build_scheduler
 from torch.cuda.amp import GradScaler, autocast
 from torch.profiler import ProfilerActivity, profile, record_function
 
-from call_of_birds_autobird.model import Model
-from call_of_func.train.optim import build_optimizer, build_scheduler
-from call_of_func.train.get_dataloader import build_dataloader
 
 def accuracy(logits, y) -> float:
     return (logits.argmax(dim=1) == y).float().mean().item()
