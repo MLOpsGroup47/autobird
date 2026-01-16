@@ -5,7 +5,6 @@ from typing import Optional, Tuple
 
 import torch
 import torch.nn as nn
-import torchaudio  # type: ignore
 from torch.cuda.amp import GradScaler, autocast
 from torch.profiler import ProfilerActivity, profile, record_function
 
@@ -20,11 +19,17 @@ def get_device() -> torch.device:
     return torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
 def create_fq_mask(fq_mask: int, time_mask: int):
+    try: # if torchaudio fail import for none gpu
+        import torchaudio  # type: ignore
+    except Exception:
+        return None, None
     fq_mask = torchaudio.transforms.FrequencyMasking(freq_mask_param=fq_mask)  # freq mask
     time_mask = torchaudio.transforms.TimeMasking(time_mask_param=time_mask)  # time mask
     return fq_mask, time_mask
 
 def specaugment(x: torch.tensor, fq_mask, time_mask) -> torch.tensor:
+    if fq_mask is None or time_mask is None: # if torchaudio fail import
+        return x  # no-op
     x = x.squeeze(1)  # [B, Mels, Time]
     x = fq_mask(x)
     x = time_mask(x)
