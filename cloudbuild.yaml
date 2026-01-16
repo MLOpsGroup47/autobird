@@ -16,21 +16,37 @@ steps:
     'push',
     'europe-west1-docker.pkg.dev/autobird-484409/autobird-container/train-image'
   ]
-# - name: 'gcr.io/cloud-builders/gcloud'
-#   id: 'Deploy to Cloud Run'
-#   args: [
-#     'run',
-#     'deploy',
-#     '<service-name>',
-#     '--image',
-#     'europe-west1-docker.pkg.dev/$PROJECT_ID/<registry-name>/<image-name>',
-#     '--region',
-#     'europe-west1',
-#     '--platform',
-#     'managed',
-#     # optional argument if you want to inject secrets as environment variables
-#     #'--update-secrets=<env-name-in-container>=<secret-name-in-secrets-manager>:latest'
-#   ]
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Build api image'
+  args: [
+    'build',
+    '.',
+    '-t',
+    'europe-west1-docker.pkg.dev/autobird-484409/autobird-container/gcp_test_app:latest',
+    '-f',
+    'api/simple_fastapi_app.dockerfile'
+  ]
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Push api image'
+  args: [
+    'push',
+    'europe-west1-docker.pkg.dev/autobird-484409/autobird-container/gcp_test_app:latest'
+  ]
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'Deploy to Cloud Run'
+  args: [
+    'run',
+    'deploy',
+    'gcp-test-app',
+    '--image',
+    'europe-west1-docker.pkg.dev/autobird-484409/autobird-container/gcp_test_app:latest',
+    '--region',
+    'europe-west1',
+    '--platform',
+    'managed',
+    # optional argument if you want to inject secrets as environment variables
+    #'--update-secrets=<env-name-in-container>=<secret-name-in-secrets-manager>:latest'
+  ]
 options:
   logging: CLOUD_LOGGING_ONLY
 
