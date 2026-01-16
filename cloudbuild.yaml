@@ -44,7 +44,7 @@ steps:
     'europe-west1',
     '--platform',
     'managed',
-    # optional argument if you want to inject secrets as environment variables
+    # optional argument if you want to inject secrets as environment variables (maybe later for WANDB API KEY)
     #'--update-secrets=<env-name-in-container>=<secret-name-in-secrets-manager>:latest'
   ]
 options:
