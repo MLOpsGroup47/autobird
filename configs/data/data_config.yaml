@@ -10,6 +10,7 @@ preprocessing:
   fq_max: 8000
   min_rms: 0.005
   min_mel_std: 0.10
+  min_samples: 20
 
 data:
   train_split: 0.8
