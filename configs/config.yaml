@@ -1,5 +1,11 @@
 defaults: 
   - data: data_config
   - pathing: path_config
-  - train: hyperparam
+  - train/hyperparams: hyperparam
+  - train/optimizer: adam
+  - train/scheduler: step
   - _self_
+
+hydra:
+  job:
+    chdir: false
