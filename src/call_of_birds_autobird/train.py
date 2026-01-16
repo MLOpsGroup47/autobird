@@ -11,6 +11,7 @@ import torchaudio  # type: ignore
 import typer
 from call_of_func.data.get_data import load_data
 from call_of_func.train.train_helper import rm_rare_classes
+
 # from torch.cuda.amp import GradScaler, autocast
 from torch.profiler import ProfilerActivity, profile, record_function
 
