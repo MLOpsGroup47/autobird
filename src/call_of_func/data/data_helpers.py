@@ -1,8 +1,8 @@
+import json
 from pathlib import Path
 
-import typer
 import torch
-import json
+import typer
 
 from call_of_func.dataclasses.pathing import PathConfig
 

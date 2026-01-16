@@ -1,5 +1,7 @@
-import torch
 from typing import Optional
+
+import torch
+
 
 def rm_rare_classes(
     x_train: torch.Tensor,

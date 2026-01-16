@@ -6,12 +6,12 @@ from typing import Optional, Tuple
 import torch
 import torch.nn as nn
 import torchaudio  # type: ignore
+from call_of_birds_autobird.model import Model
+from call_of_func.train.get_dataloader import build_dataloader
+from call_of_func.train.optim import build_optimizer, build_scheduler
 from torch.cuda.amp import GradScaler, autocast
 from torch.profiler import ProfilerActivity, profile, record_function
 
-from call_of_birds_autobird.model import Model
-from call_of_func.train.optim import build_optimizer, build_scheduler
-from call_of_func.train.get_dataloader import build_dataloader
 
 def accuracy(logits, y) -> float:
     return (logits.argmax(dim=1) == y).float().mean().item()
@@ -24,7 +24,7 @@ def create_fq_mask(fq_mask: int, time_mask: int):
     time_mask = torchaudio.transforms.TimeMasking(time_mask_param=time_mask)  # time mask
     return fq_mask, time_mask
 
-def specaugment(x: torch.tensor, fq_mask, time_mask) -> torch.tensor:
+def specaugment(x: torch.Tensor, fq_mask, time_mask) -> torch.Tensor:
     x = x.squeeze(1)  # [B, Mels, Time]
     x = fq_mask(x)
     x = time_mask(x)
