@@ -1,6 +1,7 @@
-import torch
 import pytest
+import torch
 from call_of_birds_autobird.model import Model
+
 
 def test_model():
     """Test the model."""

@@ -29,6 +29,10 @@ PATHS = PathConfig(
     processed_dir=Path("data/processed"),
     reports_dir=Path("reports/figures"),
     ckpt_dir=Path("models/checkpoins"),
+    x_train=Path("data/processed/train_x.pt"),
+    y_train=Path("data/processed/train_y.pt"),
+    x_val=Path("data/processed/val_x.pt"),
+    y_val=Path("data/processed/val_y.pt"),
 )
 
 
@@ -87,6 +91,10 @@ def preprocess(
         processed_dir=Path(cfg.paths.processed_dir),
         reports_dir=Path(cfg.paths.reports_dir),
         ckpt_dir=Path(cfg.paths.ckpt_dir),
+        x_train=Path(cfg.paths.x_train),
+        y_train=Path(cfg.paths.y_train),
+        x_val=Path(cfg.paths.x_val),
+        y_val=Path(cfg.paths.y_val),
     )
     if raw_dir is not None or processed_dir is not None:
         paths = PathConfig(
@@ -95,6 +103,10 @@ def preprocess(
             processed_dir=processed_dir or paths.processed_dir,
             reports_dir=paths.reports_dir,
             ckpt_dir=paths.ckpt_dir,
+            x_train=paths.x_train,
+            y_train=paths.y_train,
+            x_val=paths.x_val,
+            y_val=paths.y_val,
         ).resolve()
 
     pre_cfg = PreConfig(
