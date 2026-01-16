@@ -4,17 +4,18 @@ from typing import List
 
 import numpy as np
 import typer
+from omegaconf import DictConfig
+
 from call_of_func.data.data_helpers import rn_dir, rn_mp3
 from call_of_func.data.get_data import (
     _index_dataset,
-    _split_by_groups,
     _save_split,
+    _split_by_groups,
 )
-
 from call_of_func.dataclasses.pathing import PathConfig
 from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
 from call_of_func.utils.get_configs import _load_cfg
-from omegaconf import DictConfig
+
 
 def preprocess_cfg(
     cfg: DictConfig,

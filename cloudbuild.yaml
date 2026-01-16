@@ -16,6 +16,21 @@ steps:
     'push',
     'europe-west1-docker.pkg.dev/autobird-484409/autobird-container/train-image'
   ]
+# - name: 'gcr.io/cloud-builders/gcloud'
+#   id: 'Deploy to Cloud Run'
+#   args: [
+#     'run',
+#     'deploy',
+#     '<service-name>',
+#     '--image',
+#     'europe-west1-docker.pkg.dev/$PROJECT_ID/<registry-name>/<image-name>',
+#     '--region',
+#     'europe-west1',
+#     '--platform',
+#     'managed',
+#     # optional argument if you want to inject secrets as environment variables
+#     #'--update-secrets=<env-name-in-container>=<secret-name-in-secrets-manager>:latest'
+#   ]
 options:
   logging: CLOUD_LOGGING_ONLY
 
