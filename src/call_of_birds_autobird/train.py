@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data as data
-import torchaudio # type: ignore
+import torchaudio  # type: ignore
 import typer
 from call_of_func.train.train_helper import rm_rare_classes
 import time
@@ -15,8 +15,9 @@ import time
 # from dotenv import load_dotenv
 
 from call_of_func.data.get_data import load_data
-from call_of_func.train.train_helper import rm_rare_classes
-from torch.cuda.amp import GradScaler, autocast
+from call_of_func.train.train_helper import accuracy, rm_rare_classes
+
+# from torch.cuda.amp import GradScaler, autocast
 from torch.profiler import ProfilerActivity, profile, record_function
 
 from call_of_birds_autobird.model import Model
@@ -28,10 +29,6 @@ configs = root / "configs" / "train"
 os.chdir(root)
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 load_dotenv()
-
-
-def accuracy(logits, y) -> float:
-    return (logits.argmax(dim=1) == y).float().mean().item()
 
 
 @app.command()
@@ -102,7 +99,7 @@ def train(cfg, data_path: str = "data/processed", profile_run: bool = False):
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=lr)
     use_cuda = device.type == "cuda"
-    scaler = GradScaler()  # scaler to optimize backpro
+    scaler = torch.cuda.amp.GradScaler(enabled=use_cuda)  # scaler to optimize backpro
     # mby add scheduler later
 
     # Save checkpoint directory

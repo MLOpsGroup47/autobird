@@ -58,7 +58,8 @@ dev = [
 ]
 
 [project.scripts]
-data = "call_of_birds_autobird.data:app"
+data_typer = "call_of_birds_autobird.data:app"
+data = "call_of_birds_autobird.data:preprocess_hydra"
 train = "call_of_birds_autobird.train:train"
 test_train ="call_of_birds_autobird.test:app"
 
