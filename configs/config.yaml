@@ -1,4 +1,5 @@
 defaults: 
   - data: data_config
   - pathing: path_config
+  - train: hyperparam
   - _self_
