@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 import torch
-from call_of_birds_autobird.data import _compute_global_norm_stats, _log_mel
+from call_of_func.data.data_calc import _compute_global_norm_stats, _log_mel
 from call_of_func.data.get_data import _index_dataset, _split_by_groups
 from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
 
