@@ -60,7 +60,7 @@ def _compute_global_norm_stats(X: torch.Tensor) -> Tuple[torch.Tensor, torch.Ten
 ### Main preprocessing pipeline
 @app.command()
 def preprocess(
-    config: str = typer.Option("default", help="Hydra config name"),
+    config: str = typer.Option("config", help="Hydra config name"),
     o: List[str] = typer.Option(None, "--o", help="Hydra overrides"),
     raw_dir: Path = typer.Option(None, help="Override raw_dir over config"),
     processed_dir: Path = typer.Option(None, help="Override processed_dir"),
@@ -79,7 +79,7 @@ def preprocess(
         None
     """
     # load config
-    cfg = _load_cfg(config_name="config", overrides=o or [])
+    cfg = _load_cfg(config_name=config, overrides=o or [])
 
     paths = PathConfig(
         root=Path(cfg.paths.root),
