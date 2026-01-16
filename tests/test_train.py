@@ -1,8 +1,7 @@
 import pytest
 import torch
 from call_of_birds_autobird.model import Model
-from call_of_birds_autobird.train import accuracy
-from call_of_func.train.train_helper import rm_rare_classes
+from call_of_func.train.train_helper import accuracy, rm_rare_classes
 
 
 def test_accuracy():
