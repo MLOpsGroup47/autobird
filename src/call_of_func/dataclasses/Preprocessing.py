@@ -15,7 +15,8 @@ class PreConfig:
     fq_min: int = 20 # min frequency
     fq_max: int = 8000# max frequency
     min_rms: float = 0.005 # min rms for valid audio
-    min_mel_std: float =0.10  # min mel std for valid audio
+    min_mel_std: float = 0.10  # min mel std for valid audio
+    min_samples: int = 20
 
 @dataclass(frozen=True)
 class DataConfig:
