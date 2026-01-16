@@ -79,7 +79,7 @@ def preprocess(
         None
     """
     # load config
-    cfg = _load_cfg(config_name="config", overrides=o or [])
+    cfg = _load_cfg(config_name=config, overrides=o or [])
 
     paths = PathConfig(
         root=Path(cfg.paths.root),
