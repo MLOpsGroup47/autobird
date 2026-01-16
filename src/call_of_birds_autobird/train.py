@@ -10,8 +10,8 @@ import torch.utils.data as data
 import torchaudio # type: ignore
 import typer
 from call_of_func.train.train_helper import rm_rare_classes
+import time
 # import wandb
-# import time
 # from dotenv import load_dotenv
 
 from call_of_func.data.get_data import load_data
@@ -105,6 +105,14 @@ def train(cfg, data_path: str = "data/processed", profile_run: bool = False):
     scaler = GradScaler()  # scaler to optimize backpro
     # mby add scheduler later
 
+    # Save checkpoint directory
+    ckpt_dir = Path("models")
+    ckpt_dir.mkdir(parents=True, exist_ok=True)
+
+    # Tracking variables for best val loss and accuracy
+    best_val_loss = float("inf")
+    best_val_acc = 0.0
+
     dataset_train = data.TensorDataset(x_train, y_train)
     dataset_val = data.TensorDataset(x_val, y_val)
     is_cuda = device.type == "cuda"
@@ -183,6 +191,30 @@ def train(cfg, data_path: str = "data/processed", profile_run: bool = False):
         val_epoch_loss = val_loss / total
         val_accuracy = val_acc / total
         print(f"Epoch {epoch+1}/{epochs}, Validation Loss: {val_epoch_loss:.4f}, Accuracy: {val_accuracy:.4f}")
+       
+        # Always save "last" (resume/inspect)
+        last_path = ckpt_dir / "last.pt"
+        torch.save(
+            {
+                "model_state": model.state_dict(),
+                "optimizer_state": optimizer.state_dict(),
+                "epoch": epoch,
+                "val_loss": val_epoch_loss,
+                "val_acc": val_accuracy,
+                "n_classes": len(classes),
+                "d_model": 64,
+                "n_heads": 2,
+                "n_layers": 1,
+                "timestamp": time.time(),
+            },
+            last_path,
+        )
+
+        # Save best-by-loss
+        if val_epoch_loss < best_val_loss:
+            best_val_loss = val_epoch_loss
+            torch.save({"model_state": model.state_dict(), "n_classes": len(classes), "d_model": 64, "n_heads": 2, "n_layers": 1},
+                    ckpt_dir / "best_loss.pt")
 
 
 if __name__ == "__main__":
