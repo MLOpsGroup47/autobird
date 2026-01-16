@@ -1,12 +1,11 @@
-import typer
-import hydra
-
 from pathlib import Path
 from typing import List
-from omegaconf import DictConfig
 
+import hydra
+import typer
 from call_of_func.data.processing import preprocess_cfg
 from call_of_func.utils.get_configs import _load_cfg
+from omegaconf import DictConfig
 
 app = typer.Typer()
 config_dir = (Path(__file__).resolve().parents[2] / "configs").as_posix()

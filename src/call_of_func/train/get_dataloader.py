@@ -1,12 +1,13 @@
+from pathlib import Path
+
 import torch
 import typer
-from pathlib import Path
-from torch.utils.data import DataLoader, TensorDataset
 from call_of_func.dataclasses.pathing import PathConfig
 from call_of_func.dataclasses.training import hyperparameter
 from call_of_func.utils.get_configs import _load_cfg
+from torch.utils.data import DataLoader, TensorDataset
 
-cfg = PathConfig()
+#cfg = PathConfig()
 
 
 def build_dataloader(cfg: str = typer.Option("config"), test: bool = False):
@@ -16,6 +17,10 @@ def build_dataloader(cfg: str = typer.Option("config"), test: bool = False):
 
     paths = PathConfig(
         root=Path(cfg.paths.root),
+        raw_dir=Path(cfg.paths.raw_dir),
+        processed_dir=Path(cfg.paths.processed_dir),
+        reports_dir=Path(cfg.paths.reports_dir),
+        ckpt_dir=Path(cfg.paths.ckpt_dir),
         x_train=Path(cfg.paths.x_train),
         y_train=Path(cfg.paths.y_train),
         x_val= Path(cfg.paths.x_val),

@@ -5,15 +5,12 @@ from typing import List, Tuple
 
 import librosa
 import numpy as np
-import soundfile as sf  
+import soundfile as sf
 import torch
 
-from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
+from call_of_func.data.data_calc import _compute_global_norm_stats, _log_mel
 from call_of_func.dataclasses.pathing import PathConfig
-from call_of_func.data.data_calc import (
-    _log_mel, 
-    _compute_global_norm_stats
-)
+from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
 
 audio_exts = {".mp3", ".wav", ".flac", ".ogg", ".m4a"}
 
@@ -171,6 +168,9 @@ def _save_split(
     Args:
         split_name: Train/val split
         split_items: (filepath, label_id) tuples for the split
+        paths: PathConfig with processed_dir
+        pre_cfg: Preprocessing config
+        data_cfg: Data config
 
     Returns:
         None
