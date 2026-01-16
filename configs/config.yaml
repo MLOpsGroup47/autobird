@@ -1,0 +1,4 @@
+defaults: 
+  - data: data_config
+  - pathing: path_config
+  - _self_

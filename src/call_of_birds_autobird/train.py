@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data as data
-import torchaudio
+import torchaudio # type: ignore
 import typer
 from call_of_func.train.train_helper import rm_rare_classes
 # import wandb
@@ -73,7 +73,7 @@ def train(cfg, data_path: str = "data/processed", profile_run: bool = False):
         prof.__enter__()
     global_step = 0
 
-    # load hyperparameters
+    # load hyperparameters 
     epochs = int(cfg.hyperparameters.epochs)
     lr = float(cfg.hyperparameters.lr)
     batch_size = int(cfg.hyperparameters.batch_size)

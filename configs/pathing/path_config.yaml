@@ -1,0 +1,8 @@
+# @package _global_
+
+paths:
+  root: .
+  raw_dir: data/voice_of_birds
+  processed_dir: data/processed
+  reports_dir: reports/figures
+  ckpt_dir: models/checkpoints
