@@ -1,0 +1,80 @@
+outs:
+- path: processed
+  files:
+  - relpath: labels.json
+    md5: 47d7f13329a4ef2fbe2aff49134d6d92
+    size: 18
+    cloud:
+      remote_storage:
+        etag: 08a8e7b9e2dc8f92031001
+        version_id: '1768554996069288'
+  - relpath: train_chunk_starts.pt
+    md5: 67dd95c7879574df37f58c5ec370501e
+    size: 133395
+    cloud:
+      remote_storage:
+        etag: 088987fbe0dc8f92031001
+        version_id: '1768554992944009'
+  - relpath: train_group.json
+    md5: 2205ea8892ac6d14134a97ac77d88e82
+    size: 1554772
+    cloud:
+      remote_storage:
+        etag: 08d08795e3dc8f92031001
+        version_id: '1768554997564368'
+  - relpath: train_mean.pt
+    md5: be63704b278140d39a2ea0ce13a9c3fe
+    size: 1451
+    cloud:
+      remote_storage:
+        etag: 08bf9fb9e2dc8f92031001
+        version_id: '1768554996060095'
+  - relpath: train_std.pt
+    md5: a2ea40df00a636ebec4454d95404d4d8
+    size: 1446
+    cloud:
+      remote_storage:
+        etag: 089ca5aee2dc8f92031001
+        version_id: '1768554995880604'
+  - relpath: train_x.pt
+    md5: 2973bb5badd1cc7c58df9ef8b0bda196
+    size: 1328266396
+    cloud:
+      remote_storage:
+        etag: 08feecead9df8f92031001
+        version_id: '1768555783304830'
+  - relpath: train_y.pt
+    md5: 1e0a8c99d80fb55a1246d5d44ebe4163
+    size: 265564
+    cloud:
+      remote_storage:
+        etag: 08c2e89be1dc8f92031001
+        version_id: '1768554993480770'
+  - relpath: val_chunk_starts.pt
+    md5: e29202dd17aed61016ba205deffc65cf
+    size: 33609
+    cloud:
+      remote_storage:
+        etag: 08b8bac6e2dc8f92031001
+        version_id: '1768554996276536'
+  - relpath: val_group.json
+    md5: f227ddbbff13c1ffee87cb9111c29c56
+    size: 381024
+    cloud:
+      remote_storage:
+        etag: 08a3e6b2e4dc8f92031001
+        version_id: '1768555000148771'
+  - relpath: val_x.pt
+    md5: 4ec06be06f6a1758033cef58cb13b64d
+    size: 325355346
+    cloud:
+      remote_storage:
+        etag: 08bddeabf7dd8f92031001
+        version_id: '1768555308314429'
+  - relpath: val_y.pt
+    md5: 4aaf99cfd2cda7897041aa7a718e140f
+    size: 65874
+    cloud:
+      remote_storage:
+        etag: 08bbe69de3dc8f92031001
+        version_id: '1768554997707579'

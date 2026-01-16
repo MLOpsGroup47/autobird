@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import FrozenSet
 
+
 @dataclass
 class hyperparameter():
     epochs: int = 15
