@@ -5,15 +5,12 @@ from typing import List, Tuple
 
 import librosa
 import numpy as np
-import soundfile as sf  
+import soundfile as sf
 import torch
 
-from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
+from call_of_func.data.data_calc import _compute_global_norm_stats, _log_mel
 from call_of_func.dataclasses.pathing import PathConfig
-from call_of_func.data.data_calc import (
-    _log_mel, 
-    _compute_global_norm_stats
-)
+from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
 
 audio_exts = {".mp3", ".wav", ".flac", ".ogg", ".m4a"}
 
@@ -122,42 +119,6 @@ def _split_by_groups(
     return train_items, val_items
 
 
-def load_data(processed_dir: Path = Path("data/processed")):
-    """Load processed data tensors from disk.
-
-    Args:
-        processed_dir: Path to processed data directory.
-
-    Returns:
-        x_train, y_train, x_val, y_val, classes, train_chunk_starts, val_chunk_starts
-    """
-    ROOT = Path(__file__).resolve().parents[2]  # /app
-    processed_dir = Path(processed_dir)
-    if not processed_dir.is_absolute():
-        processed_dir = (ROOT / processed_dir).resolve()
-
-    # classes
-    with open(processed_dir / "labels.json", "r", encoding="utf8") as fh:
-        classes = json.load(fh)
-
-    # tensors
-    x_train = torch.load(processed_dir / "train_x.pt")
-    y_train = torch.load(processed_dir / "train_y.pt")
-    x_val = torch.load(processed_dir / "val_x.pt")
-    y_val = torch.load(processed_dir / "val_y.pt")
-
-    # json list
-    with open(processed_dir / "train_group.json", "r", encoding="utf8") as fh:
-        train_group = json.load(fh)
-    with open(processed_dir / "val_group.json", "r", encoding="utf8") as fh:
-        val_group = json.load(fh)
-
-    # chunk starts are tensors (binary)
-    train_chunk_starts = torch.load(processed_dir / "train_chunk_starts.pt")
-    val_chunk_starts = torch.load(processed_dir / "val_chunk_starts.pt")
-
-    return x_train, y_train, x_val, y_val, classes, train_group, val_group, train_chunk_starts, val_chunk_starts
-
 
 def _save_split(
         split_name: str, 
@@ -171,6 +132,9 @@ def _save_split(
     Args:
         split_name: Train/val split
         split_items: (filepath, label_id) tuples for the split
+        paths: PathConfig with processed_dir
+        pre_cfg: Preprocessing config
+        data_cfg: Data config
 
     Returns:
         None
