@@ -135,8 +135,8 @@ def train_from_cfg(cfg) -> None:
             entity=os.getenv("WANDB_ENTITY", None),
             config=OmegaConf.to_container(cfg, resolve=True),
             name=f"dm{hp.d_model}_L{hp.n_layers}_H{hp.n_heads}_bs{hp.batch_size}_lr{hp.lr}",
-        )
-
+        ) 
+        
     # dataloaders (prune rare based on hp.sample_min)
     train_loader, val_loader, n_classes, new_names = build_dataloader(
         cfg=cfg,
