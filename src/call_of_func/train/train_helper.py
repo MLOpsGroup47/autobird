@@ -3,6 +3,10 @@ from typing import Optional
 import torch
 
 
+def get_device() -> torch.device:
+    return torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+
+
 def rm_rare_classes(
     x_train: torch.Tensor,
     y_train: torch.Tensor,

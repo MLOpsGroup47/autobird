@@ -1,8 +1,10 @@
+import torch
 import json
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-import torch
+from omegaconf import DictConfig
+from torch.utils.data import DataLoader, TensorDataset
 from call_of_func.dataclasses.pathing import PathConfig
 from call_of_func.train.train_helper import rm_rare_classes
 from omegaconf import DictConfig
@@ -34,7 +36,7 @@ def build_dataloader(
     )
 
     # hyperparams from hydra
-    hp = cfg.train.hyperparams.hyperparameters
+    hp = cfg.hyperparams.hp
     min_samples = int(hp.sample_min)
 
     x_train = torch.load(paths.x_train)

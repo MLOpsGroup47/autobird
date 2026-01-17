@@ -1,9 +1,9 @@
 defaults: 
-  - data: data_config
   - pathing: path_config
-  - train/hyperparams: hyperparam
-  - train/optimizer: adam
-  - train/scheduler: step
+  - data: data_config
+  - hyperparams: hyperparam
+  - optimizer: adam
+  - scheduler: step
   - _self_
 
 hydra:
