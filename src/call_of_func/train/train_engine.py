@@ -5,36 +5,15 @@ from typing import Optional, Tuple
 
 import torch
 import torch.nn as nn
-from call_of_birds_autobird.model import Model
-from call_of_func.train.get_dataloader import build_dataloader
-from call_of_func.train.optim import build_optimizer, build_scheduler
 from torch.cuda.amp import GradScaler, autocast
 from torch.profiler import ProfilerActivity, profile, record_function
+from call_of_birds_autobird.model import Model
+from call_of_func.train.get_dataloader import build_dataloader
+from call_of_func.train.get_optim import build_optimizer, build_scheduler
+from call_of_func.train.train_helper import get_device
+from call_of_func.data.data_calc import accuracy, create_fq_mask, specaugment
 
-
-def accuracy(logits, y) -> float:
-    return (logits.argmax(dim=1) == y).float().mean().item()
-
-def get_device() -> torch.device:
-    return torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-
-def create_fq_mask(fq_mask: int, time_mask: int):
-    try: # if torchaudio fail import for none gpu
-        import torchaudio  # type: ignore
-    except Exception:
-        return None, None
-    fq_mask = torchaudio.transforms.FrequencyMasking(freq_mask_param=fq_mask)  # freq mask
-    time_mask = torchaudio.transforms.TimeMasking(time_mask_param=time_mask)  # time mask
-    return fq_mask, time_mask
-
-def specaugment(x: torch.tensor, fq_mask, time_mask) -> torch.tensor:
-    if fq_mask is None or time_mask is None: # if torchaudio fail import
-        return x  # no-op
-    x = x.squeeze(1)  # [B, Mels, Time]
-    x = fq_mask(x)
-    x = time_mask(x)
-    return x.unsqueeze(1)  # [B, 1, Mels, Time
-
+### epoch run
 def train_one_epoch(
     model: nn.Module,
     loader,
@@ -47,6 +26,10 @@ def train_one_epoch(
     amp: bool,
     grad_clip: float,
 ) -> Tuple[float, float]:
+    """This function train one full epoch. 
+    
+    Arg
+    """
     
     model.train()
     run_loss = 0
