@@ -1,8 +1,8 @@
 import pytest
 import torch
 from call_of_birds_autobird.model import Model
-from call_of_func.train.train_helper import rm_rare_classes
 from call_of_func.train.train_engine import accuracy
+from call_of_func.train.train_helper import rm_rare_classes
 
 
 def test_accuracy():
@@ -56,7 +56,12 @@ def test_rm_rare_classes():
     min_samples = 20
 
     x_train_new, y_train_new, x_val_new, y_val_new, classes_new = rm_rare_classes(
-        x_train, y_train, x_val, y_val, classes, min_samples=min_samples
+        x_train = x_train, 
+        y_train = y_train,
+        x_val = x_val,
+        y_val = y_val,
+        class_names = classes,
+        min_samples=min_samples
     )
     
     # Checks:

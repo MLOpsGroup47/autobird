@@ -5,8 +5,7 @@ import torch
 
 
 def _locate(path: str) -> Any:
-    """'torch.optim.Adam' -> <class torch.optim.adam.Adam>
-    """
+    """'torch.optim.Adam' -> <class torch.optim.adam.Adam>."""
     module_name, attr = path.rsplit(".", 1)
     module = importlib.import_module(module_name)
     return getattr(module, attr)

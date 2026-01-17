@@ -1,7 +1,24 @@
+<<<<<<< HEAD
 import typer
 import torch
 import json
 from pathlib import Path
+=======
+import json
+from pathlib import Path
+
+import torch
+import typer
+
+from call_of_func.dataclasses.pathing import PathConfig
+
+root = Path(__file__).resolve().parents[2]  # project root
+
+# cfg = PathConfig(
+#    root=root
+# )
+
+>>>>>>> 5076cca37ac4af026c33f8b17df22b796bd2ad8f
 
 def rn_dir(root: Path = typer.Argument("data/voice_of_birds", exists=True)) -> None:
     """Rename directories to replace spaces with underscores.
