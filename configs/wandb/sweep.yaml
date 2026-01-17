@@ -9,7 +9,7 @@ command:
   - ${interpreter}
   - -m
   - call_of_birds_autobird.train
-  - ${args_no_boolean_flags}
+  - ${args_no_hyphens}
 parameters:
   # Hydra override paths (match your cfg structure)
   train.hyperparams.hyperparameters.lr:
