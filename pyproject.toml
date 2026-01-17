@@ -40,6 +40,7 @@ dependencies = [
     "pathspec<1.0",
     "dvc-gs>=3.0.2",
     "wandb>=0.24.0",
+    "python-dotenv>=1.2.1",
 ]
 
 [dependency-groups]
