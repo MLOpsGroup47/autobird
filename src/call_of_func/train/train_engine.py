@@ -127,14 +127,16 @@ def train_from_cfg(cfg) -> None:
     hp = cfg.train.hyperparams.hyperparameters
     
     # wandb initialization
-    use_wandb = bool(getattr(hp, "use_wandb", True))  # kræver ikke config change hvis du default'er True
+    use_wandb = bool(getattr(hp, "use_wandb", True)) 
     run = None
     if use_wandb:
         run = wandb.init(
             project=os.getenv("WANDB_PROJECT", None),
             entity=os.getenv("WANDB_ENTITY", None),
             config=OmegaConf.to_container(cfg, resolve=True),
+            name=f"dm{hp.d_model}_L{hp.n_layers}_H{hp.n_heads}_bs{hp.batch_size}_lr{hp.lr}",
         )
+
     # dataloaders (prune rare based on hp.sample_min)
     train_loader, val_loader, n_classes, new_names = build_dataloader(
         cfg=cfg,
@@ -147,6 +149,7 @@ def train_from_cfg(cfg) -> None:
         n_heads=int(hp.n_heads),
         n_layers=int(hp.n_layers),
     ).to(device)
+
 
     criterion = nn.CrossEntropyLoss()
     optimizer = build_optimizer(model, cfg.train.optimizer)
@@ -183,8 +186,22 @@ def train_from_cfg(cfg) -> None:
         )
         va_loss, va_acc = validate_one_epoch(model, val_loader, criterion, device)
 
+
         if scheduler is not None:
             scheduler.step()
+
+
+        if run is not None:
+            wandb.log(
+                {
+                    "epoch": epoch + 1,
+                    "train/loss": tr_loss,
+                    "train/acc": tr_acc,
+                    "val/loss": va_loss,
+                    "val/acc": va_acc,
+                    "lr": optimizer.param_groups[0]["lr"],
+                }
+            )
 
         print(
             f"Epoch {epoch+1}/{int(hp.epochs)} | "
@@ -194,3 +211,6 @@ def train_from_cfg(cfg) -> None:
 
     if prof is not None:
         prof.__exit__(None, None, None)
+
+    if run is not None:
+        wandb.finish()
