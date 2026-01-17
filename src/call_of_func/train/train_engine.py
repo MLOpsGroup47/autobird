@@ -3,6 +3,9 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Optional, Tuple
 
+import os 
+import wandb
+from omegaconf import OmegaConf
 import torch
 import torch.nn as nn
 from call_of_birds_autobird.model import Model
@@ -122,7 +125,16 @@ def train_from_cfg(cfg) -> None:
     print(f"cwd: {Path.cwd()}")
 
     hp = cfg.train.hyperparams.hyperparameters
-
+    
+    # wandb initialization
+    use_wandb = bool(getattr(hp, "use_wandb", True))  # kræver ikke config change hvis du default'er True
+    run = None
+    if use_wandb:
+        run = wandb.init(
+            project=os.getenv("WANDB_PROJECT", None),
+            entity=os.getenv("WANDB_ENTITY", None),
+            config=OmegaConf.to_container(cfg, resolve=True),
+        )
     # dataloaders (prune rare based on hp.sample_min)
     train_loader, val_loader, n_classes, new_names = build_dataloader(
         cfg=cfg,

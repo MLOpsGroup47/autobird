@@ -13,4 +13,5 @@ hyperparameters:
   num_workers: 2
   amp: true
   grad_clip: 1.0
+  use_wandb: true
 
