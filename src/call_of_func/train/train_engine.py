@@ -104,7 +104,7 @@ def train_from_cfg(cfg) -> None:
     print(f"Training on device: {device}")
     print(f"cwd: {Path.cwd()}")
 
-    hp = cfg.train.hyperparams.hyperparameters
+    hp = cfg.hyperparams.hp
 
     # dataloaders (prune rare based on hp.sample_min)
     train_loader, val_loader, n_classes, new_names = build_dataloader(
@@ -120,8 +120,8 @@ def train_from_cfg(cfg) -> None:
     ).to(device)
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = build_optimizer(model, cfg.train.optimizer)
-    scheduler = build_scheduler(optimizer, cfg.train.scheduler)
+    optimizer = build_optimizer(model, cfg)
+    scheduler = build_scheduler(optimizer, cfg)
 
     fq_mask, time_mask = create_fq_mask(fq_mask=8, time_mask=20)  # make configurable later if you want
     scaler = GradScaler() if (bool(hp.amp) and device.type == "cuda") else None

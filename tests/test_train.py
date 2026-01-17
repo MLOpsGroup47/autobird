@@ -54,7 +54,7 @@ def test_rm_rare_classes():
     x_val = torch.randn(N_val, *feature_shape)
     
     min_samples = 20
-    
+
     x_train_new, y_train_new, x_val_new, y_val_new, classes_new = rm_rare_classes(
         x_train, y_train, x_val, y_val, classes, min_samples=min_samples
     )
