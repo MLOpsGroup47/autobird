@@ -3,21 +3,24 @@ method: random
 metric:
   name: val/loss
   goal: minimize
-# Hydra compatibility, makes sure that different params er tested
+
 command:
   - ${env}
   - ${interpreter}
   - -m
   - call_of_birds_autobird.train
   - ${args_no_hyphens}
+
 parameters:
-  # Hydra override paths (match your cfg structure)
-  train.hyperparams.hyperparameters.lr:
+  train.hp.lr:
     distribution: log_uniform_values
     min: 1e-5
     max: 3e-3
-  train.hyperparams.hyperparameters.batch_size:
+
+  train.hp.batch_size:
     values: [16, 32, 64]
-  train.hyperparams.hyperparameters.epochs:
+
+  train.hp.epochs:
     values: [1, 2, 3]
+
 run_cap: 3

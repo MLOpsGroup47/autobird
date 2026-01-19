@@ -36,7 +36,7 @@ def build_dataloader(
     )
 
     # hyperparams from hydra
-    hp = cfg.hyperparams.hp
+    hp = cfg.train.hp
     min_samples = int(hp.sample_min)
 
     x_train = torch.load(paths.x_train)

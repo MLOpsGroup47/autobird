@@ -107,7 +107,7 @@ def train_from_cfg(cfg) -> None:
     print(f"Training on device: {device}")
     print(f"cwd: {Path.cwd()}")
 
-    hp = cfg.train.hyperparams.hyperparameters
+    hp = cfg.train.hp
     
     # wandb initialization
     use_wandb = bool(getattr(hp, "use_wandb", True)) 
