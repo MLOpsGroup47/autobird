@@ -11,15 +11,15 @@ def _locate(path: str) -> Any:
     return getattr(module, attr)
 
 def build_optimizer(model: torch.nn.Module, cfg) -> torch.optim.Optimizer:
-    opt_cls = _locate(cfg.optimizer.optim.type)
-    kwargs = dict(cfg.optimizer.optim)
+    opt_cls = _locate(cfg.train.optim.type)
+    kwargs = dict(cfg.train.optim)
     kwargs.pop("type")
     return opt_cls(model.parameters(), **kwargs)
 
 def build_scheduler(optimizer: torch.optim.Optimizer, cfg):
-    if "Scheduler" not in cfg or cfg.scheduler is None:
+    if "Scheduler" not in cfg or cfg.train.slr is None:
         return None
-    sched_cls = _locate(cfg.scheduler.slr.type)
-    kwargs = dict(cfg.scheduler.slr)
+    sched_cls = _locate(cfg.train.slr.type)
+    kwargs = dict(cfg.train.slr)
     kwargs.pop("type")
     return sched_cls(optimizer, **kwargs)
