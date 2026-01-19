@@ -1,5 +1,21 @@
 steps:
-## Build and push train image
+## Build and push data image
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Build data image'
+  args: [
+    'build',
+    '.',
+    '-t',
+    'europe-west1-docker.pkg.dev/autobird-484409/autobird-container/data-image',
+    '-f',
+    'data.dockerfile'
+  ]
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Push data image'
+  args: [
+    'push',
+    'europe-west1-docker.pkg.dev/autobird-484409/autobird-container/data-image'
+  ]
 - name: 'gcr.io/cloud-builders/docker'
   id: 'Build train image'
   args: [

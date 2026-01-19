@@ -17,4 +17,3 @@ COPY src/ ./src
 RUN uv sync --locked --no-cache --no-install-project
 
 ENTRYPOINT ["uv", "run", "src/call_of_birds_autobird/train.py"]
-
