@@ -3,6 +3,10 @@ from typing import Optional
 import torch
 
 
+def get_device() -> torch.device:
+    return torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+
+
 def rm_rare_classes(
     x_train: torch.Tensor,
     y_train: torch.Tensor,
@@ -45,7 +49,8 @@ def rm_rare_classes(
         new_class_names = [class_names[i] for i in keep_sorted]
 
     new_counts = torch.bincount(y_train2, minlength=len(keep_sorted))
-    print("New train min/max:", int(new_counts.min().item()), int(new_counts.max().item()))
+    print(new_counts.shape)
+    #print("New train min/max:", int(new_counts.min().item()), int(new_counts.max().item()))
     print(f"After pruning: train={len(y_train2)}, val={len(y_val2)}, classes={len(keep_sorted)}")
 
     return x_train2, y_train2, x_val2, y_val2, new_class_names
