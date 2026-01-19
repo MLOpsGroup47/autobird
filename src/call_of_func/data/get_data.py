@@ -3,7 +3,7 @@ import random
 from pathlib import Path
 from typing import List, Tuple
 
-import librosa
+import torchaudio
 import numpy as np
 import soundfile as sf
 import torch
@@ -47,9 +47,12 @@ def _load_audio(path: Path) -> Tuple[np.ndarray, int]:
             x = x.mean(axis=1)
         return x.astype(np.float32), int(sr)
     except Exception:
-        # fallback: librosa
-        y, sr = librosa.load(str(path), sr=None, mono=True)
-        return y.astype(np.float32), int(sr)
+        # fallback: torchaudio
+        wav, sr = torchaudio.load(str(path))  # wav: [channels, time]
+        if wav.shape[0] > 1:
+            wav = wav.mean(dim=0, keepdim=True)
+        x = wav.squeeze(0).cpu().numpy().astype(np.float32)
+        return x, int(sr)
 
 
 def _chunk_audio(
@@ -147,7 +150,10 @@ def _save_split(
             x, sr = _load_audio(path)
 
             if sr != pre_cfg.sr:
-                x = librosa.resample(x, orig_sr=pre_cfg.sr, target_sr=pre_cfg.sr)
+                x_t = torch.from_numpy(x).float().unsqueeze(0)  # [1, time]
+                x_t = torchaudio.functional.resample(x_t, orig_freq=sr, new_freq=pre_cfg.sr)
+                x = x_t.squeeze(0).cpu().numpy().astype(np.float32)
+                sr = pre_cfg.sr
 
             rid = _recording_id(path)
 

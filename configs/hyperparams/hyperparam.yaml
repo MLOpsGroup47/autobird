@@ -1,4 +1,3 @@
-
 hp:
   epochs: 3
   lr: 0.0003
@@ -13,4 +12,5 @@ hp:
   num_workers: 2
   amp: true
   grad_clip: 1.0
+  use_wandb: true
 
