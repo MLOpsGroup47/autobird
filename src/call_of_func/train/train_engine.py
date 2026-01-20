@@ -15,6 +15,7 @@ from call_of_func.train.get_dataloader import build_dataloader
 from call_of_func.train.get_optim import build_optimizer, build_scheduler
 from call_of_func.train.train_helper import get_device
 from call_of_func.data.data_calc import accuracy, create_fq_mask, specaugment
+from call_of_func.utils.get_trackers import build_profiler
 
 ### epoch run
 def train_one_epoch(
@@ -28,6 +29,7 @@ def train_one_epoch(
     time_mask,
     amp: bool,
     grad_clip: float,
+    prof,
 ) -> Tuple[float, float]:
     """This function train one full epoch. 
     
@@ -56,7 +58,7 @@ def train_one_epoch(
             assert scaler is not None
             with autocast():
                 logits = model(x)
-                loss = criterion(x,y)
+                loss = criterion(logits,y)
             scaler.scale(loss).backward()
             scaler.unscale_(optimizer)
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
@@ -73,6 +75,8 @@ def train_one_epoch(
         run_loss += loss.item() * bs
         run_acc += accuracy(logits, y) * bs
         total += bs
+        if prof is not None:
+            prof.step()
 
     return run_loss / total, run_acc / total
 
@@ -102,98 +106,92 @@ def validate_one_epoch(
 
     return run_loss / total, run_acc / total
 
-def train_from_cfg(cfg) -> None:
+def training(cfg) -> None:
     device = get_device()
     print(f"Training on device: {device}")
     print(f"cwd: {Path.cwd()}")
 
+    #configs 
     hp = cfg.train.hp
-    
-    # wandb initialization
-    use_wandb = bool(getattr(hp, "use_wandb", True)) 
+
+    # prof initialization 
+    prof = build_profiler(cfg, device) if cfg is not None else None
     run = None
-    if use_wandb:
-        run = wandb.init(
-            project=os.getenv("WANDB_PROJECT", None),
-            entity=os.getenv("WANDB_ENTITY", None),
-            config=OmegaConf.to_container(cfg, resolve=True),
-            name=f"dm{hp.d_model}_L{hp.n_layers}_H{hp.n_heads}_bs{hp.batch_size}_lr{hp.lr}",
-        ) 
-        
-    # dataloaders (prune rare based on hp.sample_min)
-    train_loader, val_loader, n_classes, new_names = build_dataloader(
-        cfg=cfg,
-        prune_rare=True,
-    )
+    try:
+        if prof is not None:
+            prof.__enter__()
 
-    model = Model(
-        n_classes=n_classes,
-        d_model=int(hp.d_model),
-        n_heads=int(hp.n_heads),
-        n_layers=int(hp.n_layers),
-    ).to(device)
-
-
-    criterion = nn.CrossEntropyLoss()
-    optimizer = build_optimizer(model, cfg)
-    scheduler = build_scheduler(optimizer, cfg)
-
-    fq_mask, time_mask = create_fq_mask(fq_mask=8, time_mask=20)  # make configurable later if you want
-    scaler = GradScaler() if (bool(hp.amp) and device.type == "cuda") else None
-
-    # profiler 
-    prof = None
-    if getattr(hp, "profile_run", False):
-        acts = [ProfilerActivity.CPU] + ([ProfilerActivity.CUDA] if device.type == "cuda" else [])
-        prof = profile(
-            activities=acts,
-            record_shapes=True,
-            profile_memory=True,
-            with_stack=False,
-            on_trace_ready=torch.profiler.tensorboard_trace_handler("reports/torch_prof"),
+        # wandb initialization
+        use_wandb = bool(getattr(hp, "use_wandb", True)) 
+        if use_wandb:
+            run = wandb.init(
+                project=os.getenv("WANDB_PROJECT", None),
+                entity=os.getenv("WANDB_ENTITY", None),
+                config=OmegaConf.to_container(cfg, resolve=True),
+                name=f"dm{hp.d_model}_L{hp.n_layers}_H{hp.n_heads}_bs{hp.batch_size}_lr{hp.lr}",
+            ) 
+            
+        # dataloaders (prune rare based on hp.sample_min)
+        train_loader, val_loader, n_classes, new_names = build_dataloader(
+            cfg=cfg,
+            prune_rare=True,
         )
-        prof.__enter__()
 
-    for epoch in range(int(hp.epochs)):
-        tr_loss, tr_acc = train_one_epoch(
-            model=model,
-            loader=train_loader,
-            criterion=criterion,
-            optimizer=optimizer,
-            device=device,
-            scaler=scaler,
-            fq_mask=fq_mask,
-            time_mask=time_mask,
-            amp=bool(hp.amp),
-            grad_clip=float(hp.grad_clip),
-        )
-        va_loss, va_acc = validate_one_epoch(model, val_loader, criterion, device)
+        model = Model(
+            n_classes=n_classes,
+            d_model=int(hp.d_model),
+            n_heads=int(hp.n_heads),
+            n_layers=int(hp.n_layers),
+        ).to(device)
 
 
-        if scheduler is not None:
-            scheduler.step()
+        criterion = nn.CrossEntropyLoss()
+        optimizer = build_optimizer(model, cfg)
+        scheduler = build_scheduler(optimizer, cfg)
 
+        fq_mask, time_mask = create_fq_mask(fq_mask=8, time_mask=20)  # make configurable later if you want
+        scaler = GradScaler() if (bool(hp.amp) and device.type == "cuda") else None
 
-        if run is not None:
-            wandb.log(
-                {
-                    "epoch": epoch + 1,
-                    "train/loss": tr_loss,
-                    "train/acc": tr_acc,
-                    "val/loss": va_loss,
-                    "val/acc": va_acc,
-                    "lr": optimizer.param_groups[0]["lr"],
-                }
+        for epoch in range(int(hp.epochs)):
+            tr_loss, tr_acc = train_one_epoch(
+                model=model,
+                loader=train_loader,
+                criterion=criterion,
+                optimizer=optimizer,
+                device=device,
+                scaler=scaler,
+                fq_mask=fq_mask,
+                time_mask=time_mask,
+                amp=bool(hp.amp),
+                grad_clip=float(hp.grad_clip),
+                prof= prof,
             )
+            va_loss, va_acc = validate_one_epoch(model, val_loader, criterion, device)
 
-        print(
-            f"Epoch {epoch+1}/{int(hp.epochs)} | "
-            f"train loss {tr_loss:.4f} acc {tr_acc:.4f} | "
-            f"val loss {va_loss:.4f} acc {va_acc:.4f}"
-        )
 
-    if prof is not None:
-        prof.__exit__(None, None, None)
+            if scheduler is not None:
+                scheduler.step()
 
-    if run is not None:
-        wandb.finish()
+
+            if run is not None:
+                wandb.log(
+                    {
+                        "epoch": epoch + 1,
+                        "train/loss": tr_loss,
+                        "train/acc": tr_acc,
+                        "val/loss": va_loss,
+                        "val/acc": va_acc,
+                        "lr": optimizer.param_groups[0]["lr"],
+                    }
+                )
+
+            print(
+                f"Epoch {epoch+1}/{int(hp.epochs)} | "
+                f"train loss {tr_loss:.4f} acc {tr_acc:.4f} | "
+                f"val loss {va_loss:.4f} acc {va_acc:.4f}"
+            )
+    finally:
+        if prof is not None:
+            prof.__exit__(None, None, None)
+        if run is not None:
+            wandb.finish()
