@@ -5,12 +5,12 @@ import hydra
 import typer
 from call_of_func.data.processing import preprocess_cfg
 from call_of_func.utils.get_configs import _load_cfg
+from call_of_func.utils.get_source_path import CONFIG_DIR
 from omegaconf import DictConfig
 
 app = typer.Typer()
-config_dir = (Path(__file__).resolve().parents[2] / "configs").as_posix()
 
-@hydra.main(version_base=None, config_path=config_dir, config_name="config")
+@hydra.main(version_base=None, config_path=CONFIG_DIR, config_name="config")
 def preprocess_hydra(cfg: DictConfig) -> None:
     preprocess_cfg(cfg)
 
