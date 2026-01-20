@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Optional, Tuple
 
 import os 
+import json
 import wandb
 from omegaconf import OmegaConf
 import torch
@@ -16,6 +17,8 @@ from call_of_func.train.get_optim import build_optimizer, build_scheduler
 from call_of_func.train.train_helper import get_device
 from call_of_func.data.data_calc import accuracy, create_fq_mask, specaugment
 from call_of_func.utils.get_trackers import build_profiler
+from call_of_func.train.train_checkpoint import save_checkpoints
+
 
 ### epoch run
 def train_one_epoch(
@@ -132,7 +135,7 @@ def training(cfg) -> None:
             ) 
             
         # dataloaders (prune rare based on hp.sample_min)
-        train_loader, val_loader, n_classes, _ = build_dataloader(
+        train_loader, val_loader, n_classes, class_names = build_dataloader(
             cfg=cfg,
             prune_rare=True,
         )
@@ -167,6 +170,27 @@ def training(cfg) -> None:
                 prof= prof,
             )
             va_loss, va_acc = validate_one_epoch(model, val_loader, criterion, device)
+
+
+            save_checkpoints(
+                ckpt_dir=Path(cfg.paths.ckpt_dir),
+                epoch=epoch + 1,  
+                model_state=model.state_dict(),
+                optimizer_state=optimizer.state_dict(),
+                scheduler_state=scheduler.state_dict() if scheduler is not None else None,
+                n_classes=n_classes,
+                hp={
+                    "d_model": int(hp.d_model),
+                    "n_heads": int(hp.n_heads),
+                    "n_layers": int(hp.n_layers),
+                    "batch_size": int(hp.batch_size),
+                    "lr": float(hp.lr),
+                    "sample_min": int(hp.sample_min),
+                },
+                val_loss=float(va_loss),
+                val_acc=float(va_acc),
+                class_names=class_names,
+            )
 
 
             if scheduler is not None:
