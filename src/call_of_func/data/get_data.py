@@ -3,10 +3,10 @@ import random
 from pathlib import Path
 from typing import List, Tuple
 
-import torchaudio
 import numpy as np
 import soundfile as sf
 import torch
+import torchaudio
 
 from call_of_func.data.data_calc import _compute_global_norm_stats, _log_mel
 from call_of_func.dataclasses.pathing import PathConfig
