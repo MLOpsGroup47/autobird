@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import hydra
-from call_of_func.train.train_engine import train_from_cfg
+from call_of_func.train.train_engine import training
 from omegaconf import DictConfig
 from dotenv import load_dotenv
 
@@ -12,8 +12,9 @@ CONFIG_DIR = (ROOT / "configs").as_posix()
 load_dotenv(dotenv_path=ROOT / ".env", override=False)
 
 @hydra.main(version_base=None, config_path=CONFIG_DIR, config_name="config")
-def train(cfg: DictConfig) -> None:
-    train_from_cfg(cfg)
+def run_train(cfg: DictConfig) -> None:
+    training(cfg)
 
 if __name__ == "__main__":
-    train()
+    run_train()
+
