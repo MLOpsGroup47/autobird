@@ -1,9 +1,9 @@
 
 from typing import Tuple
 
-import torchaudio
 import numpy as np
 import torch
+import torchaudio
 
 from call_of_func.dataclasses.Preprocessing import PreConfig
 

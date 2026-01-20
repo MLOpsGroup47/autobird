@@ -132,7 +132,7 @@ def training(cfg) -> None:
             ) 
             
         # dataloaders (prune rare based on hp.sample_min)
-        train_loader, val_loader, n_classes, new_names = build_dataloader(
+        train_loader, val_loader, n_classes, _ = build_dataloader(
             cfg=cfg,
             prune_rare=True,
         )

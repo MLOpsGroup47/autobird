@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 from pathlib import Path
+
 import torch
 from torch.profiler import (
-    profile,
     ProfilerActivity,
+    profile,
     schedule,
     tensorboard_trace_handler,
 )
+
 
 def build_profiler(cfg, device: torch.device):
     prof_cfg = cfg.train.prof  # profiling params

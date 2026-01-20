@@ -1,25 +1,14 @@
 import importlib
 from typing import Any
-
+from hydra.utils import instantiate
 import torch
 
-
-def _locate(path: str) -> Any:
-    """'torch.optim.Adam' -> <class torch.optim.adam.Adam>."""
-    module_name, attr = path.rsplit(".", 1)
-    module = importlib.import_module(module_name)
-    return getattr(module, attr)
-
 def build_optimizer(model: torch.nn.Module, cfg) -> torch.optim.Optimizer:
-    opt_cls = _locate(cfg.train.optim.type)
-    kwargs = dict(cfg.train.optim)
-    kwargs.pop("type")
-    return opt_cls(model.parameters(), **kwargs)
+    return instantiate(cfg.train.optim, params=model.parameters())
+
 
 def build_scheduler(optimizer: torch.optim.Optimizer, cfg):
-    if "Scheduler" not in cfg or cfg.train.slr is None:
+    # Check for slr specifically based on your train_engine logic
+    if "slr" not in cfg.train or cfg.train.slr is None:
         return None
-    sched_cls = _locate(cfg.train.slr.type)
-    kwargs = dict(cfg.train.slr)
-    kwargs.pop("type")
-    return sched_cls(optimizer, **kwargs)
+    return instantiate(cfg.train.slr, optimizer=optimizer)
