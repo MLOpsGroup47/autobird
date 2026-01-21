@@ -1,7 +1,9 @@
-import torch
 from pathlib import Path
+
 import matplotlib.pyplot as plt
+import torch
 from matplotlib import colormaps
+
 data_root = Path.cwd().parent / "data" / "processed" / "train_x.pt"
 print(f"Data path:{data_root}")
 train_x = torch.load(data_root)

@@ -1,7 +1,9 @@
-import typer
-import torch
 import json
 from pathlib import Path
+
+import torch
+import typer
+
 
 def rn_dir(root: Path = typer.Argument("data/voice_of_birds", exists=True)) -> None:
     """Rename directories to replace spaces with underscores.
