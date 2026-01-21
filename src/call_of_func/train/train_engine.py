@@ -60,7 +60,7 @@ def train_one_epoch(
         if amp and device.type == "cuda":
             assert scaler is not None
             with autocast():
-                logits = model(x)
+                logits = model(x).to(device)
                 loss = criterion(logits,y)
             scaler.scale(loss).backward()
             scaler.unscale_(optimizer)
@@ -68,7 +68,7 @@ def train_one_epoch(
             scaler.step(optimizer)
             scaler.update()
         else:
-            logits = model(x)
+            logits = model(x).to(device)
             loss = criterion(logits, y)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
@@ -99,7 +99,7 @@ def validate_one_epoch(
         x = x.to(device)
         y = y.to(device)
 
-        logits = model(x)
+        logits = model(x).to(device)
         loss = criterion(logits, y)
 
         bs = x.size(0)

@@ -14,6 +14,7 @@ preprocessing:
 
 data:
   train_split: 0.8
+  test_split: 0.1
   seed: 4
   clip_sec: 5.0
   stride_sec: 2.5

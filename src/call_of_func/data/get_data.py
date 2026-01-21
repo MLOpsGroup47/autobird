@@ -107,19 +107,27 @@ def _split_by_groups(
     group_keys = list(groups.keys())
     rng.shuffle(group_keys)
 
-    n_train = int(len(group_keys) * cfg.train_split)  # number of train groups
-    train_id = set(group_keys[:n_train])  # id's of train groups
+    n = len(group_keys)
+    n_train = int(n * cfg.train_split)
+    n_test  = int(n * cfg.test_split)
+
+    train_id = set(group_keys[:n_train])
+    test_id  = set(group_keys[n_train:n_train + n_test])
+    val_id   = set(group_keys[n_train + n_test:])
 
     train_items: List[Tuple[Path, int]] = []
     val_items: List[Tuple[Path, int]] = []
+    test_items: List[Tuple[Path, int]] = []
 
     for rec_id, group_items in groups.items():
         if rec_id in train_id:
             train_items.extend(group_items)  # add all items in group train
-        else:
+        elif rec_id in test_id:
+            test_items.extend(group_items)
+        elif rec_id in val_id:
             val_items.extend(group_items)  # add all items in group val
 
-    return train_items, val_items
+    return train_items, val_items, test_items
 
 
 

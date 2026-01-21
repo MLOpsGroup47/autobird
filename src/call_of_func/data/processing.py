@@ -65,6 +65,7 @@ def preprocess_cfg(
     # Data split config
     data_cfg = DataConfig(
         train_split=cfg.data.train_split,
+        test_split=cfg.data.test_split,
         seed=cfg.data.seed,
         clip_sec=cfg.data.clip_sec,
         stride_sec=cfg.data.stride_sec,
@@ -74,6 +75,7 @@ def preprocess_cfg(
     print(f"Project root: {paths.root}")
     print(f"Raw data directory: {paths.raw_dir}")
     print(f"Processed data directory: {paths.processed_dir}")
+    print(f"Train split: {data_cfg.train_split} | Val split: {round(1-(data_cfg.train_split+data_cfg.test_split), 1)} | test split: {data_cfg.test_split}")
 
     if not paths.raw_dir.exists() or not paths.raw_dir.is_dir():
         raise typer.BadParameter(f"Raw data directory does not exist: {paths.raw_dir}")
@@ -84,8 +86,8 @@ def preprocess_cfg(
         rn_mp3(paths.raw_dir)
 
     items, classes = _index_dataset(paths.raw_dir)
-    train_items, val_items = _split_by_groups(items=items, cfg=data_cfg)
-    splits = {"train": train_items, "val": val_items}
+    train_items, val_items, test_items = _split_by_groups(items=items, cfg=data_cfg)
+    splits = {"train": train_items, "val": val_items, "test": test_items}
 
     with open(paths.processed_dir / "labels.json", "w", encoding="utf8") as fh:
         json.dump(classes, fh, ensure_ascii=False)

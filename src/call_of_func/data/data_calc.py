@@ -7,7 +7,6 @@ import torchaudio
 
 from call_of_func.dataclasses.Preprocessing import PreConfig
 
-
 def _log_mel(x: np.ndarray, cfg: PreConfig) -> np.ndarray:
     """Compute log-mel spectrogram: shape [n_mels, time]."""
     x_t = torch.from_numpy(x).float().unsqueeze(0)  # [1, time]
@@ -24,8 +23,6 @@ def _log_mel(x: np.ndarray, cfg: PreConfig) -> np.ndarray:
 
     S = torch.log(mel + 1e-6).squeeze(0).cpu().numpy().astype(np.float32)  # [n_mels, time]
     return S
-
-
 
 def _compute_global_norm_stats(X: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
     """Compute mean and std over dataset tensor X: shape [N, 1, Mels, Time]."""
