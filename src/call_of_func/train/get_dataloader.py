@@ -27,6 +27,7 @@ def build_dataloader(
         raw_dir=Path(cfg.paths.raw_dir),
         processed_dir=Path(cfg.paths.processed_dir),
         reports_dir=Path(cfg.paths.reports_dir),
+        eval_dir=Path(cfg.paths.eval_dir),
         ckpt_dir=Path(cfg.paths.ckpt_dir),
         x_train=Path(cfg.paths.x_train),
         y_train=Path(cfg.paths.y_train),
