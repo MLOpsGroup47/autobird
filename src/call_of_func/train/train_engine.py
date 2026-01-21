@@ -13,8 +13,6 @@ from torch.profiler import ProfilerActivity, profile, record_function
 from call_of_func.data.data_calc import create_fq_mask, specaugment
 from call_of_func.train.train_helper import accuracy
 
-def accuracy(logits, y) -> float:
-    return (logits.argmax(dim=1) == y).float().mean().item()
 
 def get_device() -> torch.device:
     return torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
