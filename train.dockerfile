@@ -1,4 +1,5 @@
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+#FROM nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04
 LABEL maintainer="Holger Floelyng"
 
 RUN apt update && \
