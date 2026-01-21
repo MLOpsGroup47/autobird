@@ -41,16 +41,17 @@ def build_dataloader(
 ) -> Tuple[DataLoader, DataLoader, int, Optional[List[str]]]:
     """Build dataloaders using the already composed Hydra cfg."""
     paths = PathConfig(
-        root=maybe_path(cfg.paths.root),
-        raw_dir=maybe_path(cfg.paths.raw_dir),
-        processed_dir=maybe_path(cfg.paths.processed_dir),
-        reports_dir=maybe_path(cfg.paths.reports_dir),
-        ckpt_dir=maybe_path(cfg.paths.ckpt_dir),
-        x_train=cfg.paths.x_train,
-        y_train=cfg.paths.y_train,
-        x_val=cfg.paths.x_val,
-        y_val=cfg.paths.y_val,
-)
+        root=Path(cfg.paths.root),
+        raw_dir=Path(cfg.paths.raw_dir),
+        processed_dir=Path(cfg.paths.processed_dir),
+        reports_dir=Path(cfg.paths.reports_dir),
+        eval_dir=Path(cfg.paths.eval_dir),
+        ckpt_dir=Path(cfg.paths.ckpt_dir),
+        x_train=Path(cfg.paths.x_train),
+        y_train=Path(cfg.paths.y_train),
+        x_val=Path(cfg.paths.x_val),
+        y_val=Path(cfg.paths.y_val),
+    )
 
     # hyperparams from hydra
     hp = cfg.train.hp
