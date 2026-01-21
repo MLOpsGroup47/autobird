@@ -110,8 +110,6 @@ def validate_one_epoch(
     return run_loss / total, run_acc / total
 
 def training(cfg) -> None:
-    MODEL_DIR = Path(os.environ.get("AIP_MODEL_DIR", "models"))
-    MODEL_DIR.mkdir(parents=True, exist_ok=True)
     device = get_device()
     print(f"Training on device: {device}")
     print(f"cwd: {Path.cwd()}")
@@ -195,6 +193,7 @@ def training(cfg) -> None:
                 class_names=class_names,
             )
 
+
             if scheduler is not None:
                 scheduler.step()
 
@@ -215,9 +214,8 @@ def training(cfg) -> None:
                 f"Epoch {epoch+1}/{int(hp.epochs)} | "
                 f"train loss {tr_loss:.4f} acc {tr_acc:.4f} | "
                 f"val loss {va_loss:.4f} acc {va_acc:.4f}"
-            )        
+            )
     finally:
-        torch.save(model.state_dict(), MODEL_DIR / "model.pth")
         if prof is not None:
             prof.__exit__(None, None, None)
         if run is not None:
