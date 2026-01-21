@@ -2,6 +2,7 @@ import torch
 import json
 from pathlib import Path
 from typing import List, Optional, Tuple
+import gcsfs
 
 from omegaconf import DictConfig
 from torch.utils.data import DataLoader, TensorDataset
@@ -10,12 +11,29 @@ from call_of_func.train.train_helper import rm_rare_classes
 from omegaconf import DictConfig
 from torch.utils.data import DataLoader, TensorDataset
 
-
 def _load_class_names(processed_dir: Path) -> Optional[List[str]]:
-    label_path = processed_dir / "labels.json"
-    if not label_path.exists():
-        return None
-    return json.loads(label_path.read_text(encoding="utf8"))
+    if str(processed_dir).startswith("gs://"):
+        fs = gcsfs.GCSFileSystem()
+        with fs.open(f"{processed_dir}/labels.json", "r") as f:
+            return json.load(f)
+    else:
+        label_path = processed_dir / "labels.json"
+        if not label_path.exists():
+            return None
+        return json.loads(label_path.read_text(encoding="utf8"))
+
+
+def _load_tensor(path: str | Path) -> torch.Tensor:
+    path_str = str(path)
+    if path_str.startswith("gs://"):
+        fs = gcsfs.GCSFileSystem()
+        with fs.open(path_str, "rb") as f:
+            return torch.load(f)
+    else:
+        return torch.load(Path(path_str)) 
+    
+def maybe_path(p):
+    return p if str(p).startswith("gs://") else Path(p)
 
 
 def build_dataloader(
@@ -24,25 +42,25 @@ def build_dataloader(
 ) -> Tuple[DataLoader, DataLoader, int, Optional[List[str]]]:
     """Build dataloaders using the already composed Hydra cfg."""
     paths = PathConfig(
-        root=Path(cfg.paths.root),
-        raw_dir=Path(cfg.paths.raw_dir),
-        processed_dir=Path(cfg.paths.processed_dir),
-        reports_dir=Path(cfg.paths.reports_dir),
-        ckpt_dir=Path(cfg.paths.ckpt_dir),
-        x_train=Path(cfg.paths.x_train),
-        y_train=Path(cfg.paths.y_train),
-        x_val=Path(cfg.paths.x_val),
-        y_val=Path(cfg.paths.y_val),
-    )
+        root=maybe_path(cfg.paths.root),
+        raw_dir=maybe_path(cfg.paths.raw_dir),
+        processed_dir=maybe_path(cfg.paths.processed_dir),
+        reports_dir=maybe_path(cfg.paths.reports_dir),
+        ckpt_dir=maybe_path(cfg.paths.ckpt_dir),
+        x_train=cfg.paths.x_train,
+        y_train=cfg.paths.y_train,
+        x_val=cfg.paths.x_val,
+        y_val=cfg.paths.y_val,
+)
 
     # hyperparams from hydra
     hp = cfg.train.hp
     min_samples = int(hp.sample_min)
 
-    x_train = torch.load(paths.x_train)
-    y_train = torch.load(paths.y_train).long()
-    x_val   = torch.load(paths.x_val)
-    y_val   = torch.load(paths.y_val).long()
+    x_train = _load_tensor(paths.x_train)
+    y_train = _load_tensor(paths.y_train).long()
+    x_val   = _load_tensor(paths.x_val)
+    y_val   = _load_tensor(paths.y_val).long()
     print(f"Loaded data: train={len(y_train)}, val={len(y_val)}")
 
     class_names = _load_class_names(paths.processed_dir)

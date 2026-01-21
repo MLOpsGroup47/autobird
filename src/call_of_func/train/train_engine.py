@@ -103,6 +103,8 @@ def validate_one_epoch(
     return run_loss / total, run_acc / total
 
 def train_from_cfg(cfg) -> None:
+    MODEL_DIR = Path(os.environ.get("AIP_MODEL_DIR", "models"))
+    MODEL_DIR.mkdir(parents=True, exist_ok=True)
     device = get_device()
     print(f"Training on device: {device}")
     print(f"cwd: {Path.cwd()}")
@@ -192,6 +194,8 @@ def train_from_cfg(cfg) -> None:
             f"val loss {va_loss:.4f} acc {va_acc:.4f}"
         )
 
+    torch.save(model.state_dict(), MODEL_DIR / "model.pth")
+    
     if prof is not None:
         prof.__exit__(None, None, None)
 

@@ -5,3 +5,6 @@ workerPoolSpecs:
     replicaCount: 1
     containerSpec:
         imageUri: europe-west1-docker.pkg.dev/autobird-484409/autobird-container/train-image:latest
+        env:
+            - name: WANDB_MODE
+              value: "disabled"
