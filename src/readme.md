@@ -114,7 +114,7 @@ Examples:
 uvr train train.hp.epochs=100
 ```
 #### Default hyperparameter settings
-```bash
+```yaml
 epochs: 3
 lr: 0.0003
 batch_size: 32
@@ -130,5 +130,6 @@ amp: true
 grad_clip: 1.0
 use_wandb: true
 ```
+
 
 
