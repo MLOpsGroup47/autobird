@@ -1,0 +1,28 @@
+{
+  "os":  "macOS-12.7.4-x86_64-i386-64bit",
+  "python":  "CPython 3.12.11",
+  "startedAt":  "2026-01-17T14:34:38.820467Z",
+  "program":  "/Users/asmustangdalsgaard/Desktop/DTU_Master/mlops_project/autobird/.venv/bin/train",
+  "codePath":  ".venv/bin/train",
+  "codePathLocal":  ".venv/bin/train",
+  "git":  {
+    "remote":  "https://github.com/MLOpsGroup47/autobird.git",
+    "commit":  "ad4f2444e81f82e333f3b7537b1d822706761ab8"
+  },
+  "email":  "weloveaus@gmail.com",
+  "root":  "/Users/asmustangdalsgaard/Desktop/DTU_Master/mlops_project/autobird",
+  "host":  "Asmuss-MacBook-Pro.local",
+  "executable":  "/Users/asmustangdalsgaard/Desktop/DTU_Master/mlops_project/autobird/.venv/bin/python3",
+  "cpu_count":  2,
+  "cpu_count_logical":  4,
+  "disk":  {
+    "/":  {
+      "total":  "250790436864",
+      "used":  "209593524224"
+    }
+  },
+  "memory":  {
+    "total":  "8589934592"
+  },
+  "writerId":  "iyb7pdgqkica4law4k7vlk38hkesx98u"
+}

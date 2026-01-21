@@ -20,17 +20,23 @@ requires-python = ">=3.11"
 dependencies = [
     "fastapi==0.115.6",
     "invoke>=2.2.0",
-    "librosa>=0.11.0",
     "matplotlib>=3.10.8",
     "numpy<2",
     "pandas>=2.3.3",
     "ruff>=0.1.3",
     "soundfile>=0.13.1",
-    "torch<=2.2.2",
+    # macOS (Apple Silicon)
+    "torch==2.2.2; sys_platform == 'darwin' and platform_machine == 'arm64'",
+    "torchaudio==2.2.2; sys_platform == 'darwin' and platform_machine == 'arm64'",
+    # maxOS (Intel)
+    "torch==2.2.2; sys_platform == 'darwin' and platform_machine == 'x86_64'",
+    "torchaudio==2.2.2; sys_platform == 'darwin' and platform_machine == 'x86_64'",
+    # Linux and Windows (CPU wheels via PyTorch index)
+    "torch==2.2.2+cpu; sys_platform == 'linux' or sys_platform == 'win32'",
+    "torchaudio==2.2.2+cpu; sys_platform == 'linux' or sys_platform == 'win32'",
     "click<8.1",
     "typer==0.15.1",
     "uvicorn==0.34.0",
-    "torchaudio>=2.2.2",
     "hydra-core>=1.3.2",
     "omegaconf>=2.3.0",
     "torch-tb-profiler>=0.4.3",
@@ -40,6 +46,8 @@ dependencies = [
     "dvc-gdrive>=3.0.1",
     "pathspec<1.0",
     "dvc-gs>=3.0.2",
+    "wandb>=0.24.0",
+    "python-dotenv>=1.2.1",
 ]
 
 [dependency-groups]
@@ -58,22 +66,31 @@ dev = [
 ]
 
 [project.scripts]
-data = "call_of_birds_autobird.data:app"
-train = "call_of_birds_autobird.train:train"
+data_typer = "call_of_birds_autobird.data:app"
+data = "call_of_birds_autobird.data:preprocess_hydra"
+train = "call_of_birds_autobird.train:run_train"
 test_train ="call_of_birds_autobird.test:app"
 
 [tool.uv.sources]
 torch = [
-    { index = "pytorch-cpu" },
+  { index = "pytorch-cpu", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
 ]
-torchvision = [
-    { index = "pytorch-cpu" },
+torchaudio = [
+  { index = "pytorch-cpu", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
 ]
 
 [[tool.uv.index]]
 name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
 explicit = true
+
+[tool.uv]
+required-environments = [
+  "sys_platform == 'darwin' and platform_machine == 'arm64' and python_version >= '3.11' and python_version < '3.13'",
+  "sys_platform == 'darwin' and platform_machine == 'x86_64' and python_version >= '3.11' and python_version < '3.13'",
+  "sys_platform == 'linux' and python_version >= '3.11' and python_version < '3.13'",
+  "sys_platform == 'win32' and python_version >= '3.11' and python_version < '3.13'",
+]
 
 [tool.ruff]
 line-length = 120

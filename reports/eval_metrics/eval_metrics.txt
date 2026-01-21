@@ -1,0 +1,6 @@
+checkpoint: models/checkpoints/best.pt
+val_loss: 3.664034
+val_acc: 0.112048
+macro_f1: 0.024442
+n_classes: 88
+class_names_present: True

@@ -1,0 +1,8 @@
+wandb_version: 1
+
+train.hyperparams.hyperparameters.batch_size:
+  value: 64
+train.hyperparams.hyperparameters.epochs:
+  value: 2
+train.hyperparams.hyperparameters.lr:
+  value: 0.002445019363171198

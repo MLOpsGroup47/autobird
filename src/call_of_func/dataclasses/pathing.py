@@ -8,7 +8,12 @@ class PathConfig:
     raw_dir: Path
     processed_dir: Path
     reports_dir: Path
+    eval_dir: Path
     ckpt_dir: Path
+    x_train: Path
+    y_train: Path
+    x_val: Path
+    y_val: Path
 
     def resolve(self) -> "PathConfig":
         # resolve project root first
@@ -22,11 +27,21 @@ class PathConfig:
         self.raw_dir = r(self.raw_dir)
         self.processed_dir = r(self.processed_dir)
         self.reports_dir = r(self.reports_dir)
+        self.eval_dir = r(self.eval_dir)
         self.ckpt_dir = r(self.ckpt_dir)
+        self.x_train = r(self.x_train)
+        self.y_train = r(self.y_train)
+        self.x_val = r(self.x_val)
+        self.y_val = r(self.y_val)
 
         # create dirs that should exist
         self.processed_dir.mkdir(parents=True, exist_ok=True)
         self.reports_dir.mkdir(parents=True, exist_ok=True)
+        self.eval_dir.mkdir(parents=True, exist_ok=True)
         self.ckpt_dir.mkdir(parents=True, exist_ok=True)
+        self.x_train.mkdir(parents=True, exist_ok=True)
+        self.y_train.mkdir(parents=True, exist_ok=True)
+        self.x_val.mkdir(parents=True, exist_ok=True)
+        self.y_val.mkdir(parents=True, exist_ok=True)
 
         return self

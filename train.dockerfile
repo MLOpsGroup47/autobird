@@ -7,14 +7,15 @@ RUN apt update && \
 
 WORKDIR /app
 
-COPY uv.lock .
-COPY pyproject.toml .
-COPY README.md .
+COPY uv.lock uv.lock
+COPY pyproject.toml pyproject.toml
+COPY README.md README.md
+COPY configs/ configs/
+COPY src/ src/
 COPY tasks.py .
-COPY src/ ./src
-COPY data/ ./data
+
+
 
 RUN uv sync --locked --no-cache --no-install-project
-
-ENTRYPOINT ["uv", "run", "src/call_of_birds_autobird/train.py"]
-
+ENV PYTHONPATH=/app/src
+ENTRYPOINT ["uv", "run", "python", "-m",  "call_of_birds_autobird.train"]

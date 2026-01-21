@@ -47,6 +47,7 @@ The directory structure of the project looks like this:
 │   └── workflows/
 │       └── tests.yaml
 ├── configs/                  # Configuration files
+| 	├──
 |   ├── .gitkeep
 ├── data/                     # Data directory
 │   ├── processed
@@ -73,6 +74,11 @@ The directory structure of the project looks like this:
 │   │   ├── models.py
 │   │   ├── train.py
 │   │   └── visualize.py
+│	└──	call_of_func/
+│		├── data/
+│		├── dataclasses/
+│		├── train/
+│		└──utils/
 └── tests/                    # Tests
 │   ├── __init__.py
 │   ├── test_api.py

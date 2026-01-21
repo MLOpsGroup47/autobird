@@ -1,4 +1,12 @@
 defaults: 
-  - data: data_config
   - pathing: path_config
+  - data: data_config
+  - hyperparams: hyperparam
+  - optimizer: adam
+  - prof: profiler_config
+  - scheduler: step
   - _self_
+
+hydra:
+  job:
+    chdir: false

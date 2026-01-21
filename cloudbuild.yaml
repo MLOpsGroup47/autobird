@@ -1,5 +1,21 @@
 steps:
-## Build and push train image
+## Build and push data image
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Build data image'
+  args: [
+    'build',
+    '.',
+    '-t',
+    'europe-west1-docker.pkg.dev/autobird-484409/autobird-container/data-image',
+    '-f',
+    'data.dockerfile'
+  ]
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Push data image'
+  args: [
+    'push',
+    'europe-west1-docker.pkg.dev/autobird-484409/autobird-container/data-image'
+  ]
 - name: 'gcr.io/cloud-builders/docker'
   id: 'Build train image'
   args: [
@@ -14,27 +30,39 @@ steps:
   id: 'Push train image'
   args: [
     'push',
-    'europe-west1-docker.pkg.dev/autobird-484409/autobird-container/autobird-image'
+    'europe-west1-docker.pkg.dev/autobird-484409/autobird-container/train-image'
   ]
-  
-## Build and push data image
 - name: 'gcr.io/cloud-builders/docker'
-  id: 'Build data image'
+  id: 'Build api image'
   args: [
     'build',
     '.',
     '-t',
-    'europe-west1-docker.pkg.dev/autobird-484409/autobird-container/data-image',
+    'europe-west1-docker.pkg.dev/autobird-484409/autobird-container/gcp_test_app:latest',
     '-f',
-    'data.dockerfile'
+    'api/simple_fastapi_app.dockerfile'
   ]
-
 - name: 'gcr.io/cloud-builders/docker'
-  id: 'Push data image'
+  id: 'Push api image'
   args: [
     'push',
-    'europe-west1-docker.pkg.dev/autobird-484409/autobird-container/data-image'
+    'europe-west1-docker.pkg.dev/autobird-484409/autobird-container/gcp_test_app:latest'
   ]
-
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'Deploy to Cloud Run'
+  args: [
+    'run',
+    'deploy',
+    'gcp-test-app',
+    '--image',
+    'europe-west1-docker.pkg.dev/autobird-484409/autobird-container/gcp_test_app:latest',
+    '--region',
+    'europe-west1',
+    '--platform',
+    'managed',
+    # optional argument if you want to inject secrets as environment variables (maybe later for WANDB API KEY)
+    #'--update-secrets=<env-name-in-container>=<secret-name-in-secrets-manager>:latest'
+  ]
 options:
   logging: CLOUD_LOGGING_ONLY
+

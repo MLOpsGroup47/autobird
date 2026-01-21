@@ -20,6 +20,9 @@ manual_test/
 *.mp3
 *.zip
 
+# Hydra outputs
+outputs/
+multirun/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -187,4 +190,6 @@ data/processed
 data/voice_of_birds
 *.pt
 *.pth
-*.ckpt
+*.ckptoutputs/
+
+

@@ -1,0 +1,26 @@
+name: autobird-sweep
+method: random
+metric:
+  name: val/loss
+  goal: minimize
+
+command:
+  - ${env}
+  - ${interpreter}
+  - -m
+  - call_of_birds_autobird.train
+  - ${args_no_hyphens}
+
+parameters:
+  train.hp.lr:
+    distribution: log_uniform_values
+    min: 1e-5
+    max: 3e-3
+
+  train.hp.batch_size:
+    values: [16, 32, 64]
+
+  train.hp.epochs:
+    values: [1, 2, 3]
+
+run_cap: 3

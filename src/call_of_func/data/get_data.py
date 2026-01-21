@@ -3,11 +3,14 @@ import random
 from pathlib import Path
 from typing import List, Tuple
 
-import librosa
 import numpy as np
-import soundfile as sf  # type: ignore
+import soundfile as sf
 import torch
+import torchaudio
 
+from call_of_func.data.data_calc import _log_mel
+from call_of_func.data.data_helpers import _compute_global_norm_stats
+from call_of_func.dataclasses.pathing import PathConfig
 from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
 
 audio_exts = {".mp3", ".wav", ".flac", ".ogg", ".m4a"}
@@ -45,9 +48,12 @@ def _load_audio(path: Path) -> Tuple[np.ndarray, int]:
             x = x.mean(axis=1)
         return x.astype(np.float32), int(sr)
     except Exception:
-        # fallback: librosa
-        y, sr = librosa.load(str(path), sr=None, mono=True)
-        return y.astype(np.float32), int(sr)
+        # fallback: torchaudio
+        wav, sr = torchaudio.load(str(path))  # wav: [channels, time]
+        if wav.shape[0] > 1:
+            wav = wav.mean(dim=0, keepdim=True)
+        x = wav.squeeze(0).cpu().numpy().astype(np.float32)
+        return x, int(sr)
 
 
 def _chunk_audio(
@@ -88,7 +94,7 @@ def _recording_id(path: Path) -> str:
 def _split_by_groups(
     items: List[Tuple[Path, int]],
     cfg: DataConfig,
-) -> Tuple[List[Tuple[Path, int]], List[Tuple[Path, int]]]:
+) -> tuple[List[Tuple[Path, int]], List[Tuple[Path, int]], List[Tuple[Path, int]]]:
     """Split items into train/val sets by recording ID groups."""
     rng = random.Random(cfg.seed)
 
@@ -102,53 +108,119 @@ def _split_by_groups(
     group_keys = list(groups.keys())
     rng.shuffle(group_keys)
 
-    n_train = int(len(group_keys) * cfg.train_split)  # number of train groups
-    train_id = set(group_keys[:n_train])  # id's of train groups
+    n = len(group_keys)
+    n_train = int(n * cfg.train_split)
+    n_test  = int(n * cfg.test_split)
+
+    train_id = set(group_keys[:n_train])
+    test_id  = set(group_keys[n_train:n_train + n_test])
+    val_id   = set(group_keys[n_train + n_test:])
 
     train_items: List[Tuple[Path, int]] = []
     val_items: List[Tuple[Path, int]] = []
+    test_items: List[Tuple[Path, int]] = []
+
 
     for rec_id, group_items in groups.items():
         if rec_id in train_id:
             train_items.extend(group_items)  # add all items in group train
-        else:
+        elif rec_id in test_id:
+            test_items.extend(group_items)
+        elif rec_id in val_id:
             val_items.extend(group_items)  # add all items in group val
 
-    return train_items, val_items
+    return train_items, val_items, test_items
 
 
-def load_data(processed_dir: Path = Path("data/processed")):
-    """Load processed data tensors from disk.
+
+def _save_split(
+        split_name: str, 
+        split_items: List[Tuple[Path, int]],
+        paths: PathConfig,
+        pre_cfg: PreConfig,
+        data_cfg: DataConfig
+        ) -> None:
+    """Process and save a data split.
 
     Args:
-        processed_dir: Path to processed data directory.
+        split_name: Train/val split
+        split_items: (filepath, label_id) tuples for the split
+        paths: PathConfig with processed_dir
+        pre_cfg: Preprocessing config
+        data_cfg: Data config
 
     Returns:
-        x_train, y_train, x_val, y_val, classes, train_chunk_starts, val_chunk_starts
+        None
     """
-    ROOT = Path(__file__).resolve().parents[2]  # /app
-    processed_dir = Path(processed_dir)
-    if not processed_dir.is_absolute():
-        processed_dir = (ROOT / processed_dir).resolve()
+    X, y, group = [], [], []
+    chunk_starts = []
 
-    # classes
-    with open(processed_dir / "labels.json", "r", encoding="utf8") as fh:
-        classes = json.load(fh)
+    for path, label_id in split_items:
+        try:
+            x, sr = _load_audio(path)
 
-    # tensors
-    x_train = torch.load(processed_dir / "train_x.pt")
-    y_train = torch.load(processed_dir / "train_y.pt")
-    x_val = torch.load(processed_dir / "val_x.pt")
-    y_val = torch.load(processed_dir / "val_y.pt")
+            if sr != pre_cfg.sr:
+                x_t = torch.from_numpy(x).float().unsqueeze(0)  # [1, time]
+                x_t = torchaudio.functional.resample(x_t, orig_freq=sr, new_freq=pre_cfg.sr)
+                x = x_t.squeeze(0).cpu().numpy().astype(np.float32)
+                sr = pre_cfg.sr
 
-    # json list
-    with open(processed_dir / "train_group.json", "r", encoding="utf8") as fh:
-        train_group = json.load(fh)
-    with open(processed_dir / "val_group.json", "r", encoding="utf8") as fh:
-        val_group = json.load(fh)
+            rid = _recording_id(path)
 
-    # chunk starts are tensors (binary)
-    train_chunk_starts = torch.load(processed_dir / "train_chunk_starts.pt")
-    val_chunk_starts = torch.load(processed_dir / "val_chunk_starts.pt")
+            chunks = _chunk_audio(
+                x,
+                pre_cfg=pre_cfg,
+                data_cfg=data_cfg,
+            )
 
-    return x_train, y_train, x_val, y_val, classes, train_group, val_group, train_chunk_starts, val_chunk_starts
+            for chunk, start_sample in chunks:
+                # RMS filter
+                if float(np.sqrt(np.mean(chunk**2))) < pre_cfg.min_rms:
+                    continue
+
+                S = _log_mel(chunk, cfg=pre_cfg)  # [n_mels, time]
+
+                # Mel variance filter
+                if float(S.std()) < pre_cfg.min_mel_std:
+                    continue
+
+                X.append(torch.from_numpy(S).unsqueeze(0))  # [1, n_mels, time]
+                y.append(label_id)
+                group.append(rid)
+                chunk_starts.append(start_sample / pre_cfg.sr)
+
+        except Exception as e:
+            print(f"Skipping bad audio: {path} -> {e}")
+            continue
+
+    if not X:
+        print(f"No valid audio for split '{split_name}', skipping save.")
+        return
+
+    x_tensor = torch.stack(X, dim=0)  # [N, 1, n_mels, time]
+    y_tensor = torch.tensor(y, dtype=torch.long)
+
+    # Normalize using train stats
+    if split_name == "train":
+        mean, std = _compute_global_norm_stats(x_tensor)
+        torch.save(mean, paths.processed_dir / "train_mean.pt")
+        torch.save(std, paths.processed_dir / "train_std.pt")
+    else:
+        mean = torch.load(paths.processed_dir / "train_mean.pt")
+        std = torch.load(paths.processed_dir / "train_std.pt")
+
+    x_tensor = (x_tensor - mean) / std
+
+    # Save tensors
+    torch.save(x_tensor, paths.processed_dir / f"{split_name}_x.pt")
+    torch.save(y_tensor, paths.processed_dir / f"{split_name}_y.pt")
+
+    with open(paths.processed_dir / f"{split_name}_group.json", "w", encoding="utf8") as fh:
+        json.dump(group, fh, ensure_ascii=False)
+
+    torch.save(
+        torch.tensor(chunk_starts, dtype=torch.float32),
+        paths.processed_dir / f"{split_name}_chunk_starts.pt",
+    )
+
+    print(f"Saved split '{split_name}': {len(y_tensor)} samples.")
