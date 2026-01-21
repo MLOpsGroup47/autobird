@@ -107,9 +107,9 @@ def run_eval(cfg: DictConfig) -> None:
     print(f"Val loss: {val_loss:.4f} | Val acc: {val_acc:.4f} | Macro F1: {macro_f1:.4f}")
 
     # Save report
-    reports_dir = Path(cfg.paths.reports_dir)
-    reports_dir.mkdir(parents=True, exist_ok=True)
-    out = reports_dir / "eval_metrics.txt"
+    eval_dir = Path(cfg.paths.eval_dir)
+    eval_dir.mkdir(parents=True, exist_ok=True)
+    out = eval_dir / "eval_metrics.txt"
     out.write_text(
         f"checkpoint: {ckpt_path}\n"
         f"val_loss: {val_loss:.6f}\n"
