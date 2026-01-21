@@ -2,7 +2,7 @@ from pathlib import Path
 
 import hydra
 from call_of_func.train.train_engine import training
-from call_of_func.utils.get_source_path import ROOT, CONFIG_DIR
+from call_of_func.utils.get_source_path import CONFIG_DIR, ROOT
 from dotenv import load_dotenv
 from omegaconf import DictConfig
 

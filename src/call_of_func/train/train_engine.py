@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-from typing import Optional, Tuple, Any, cast
+from typing import Any, Optional, Tuple, cast
 
 import torch
 import torch.nn as nn
@@ -13,11 +13,11 @@ from torch.cuda.amp import GradScaler, autocast
 from torch.profiler import ProfilerActivity, profile, record_function
 
 import wandb
-from call_of_func.data.data_calc import accuracy, create_fq_mask, specaugment
+from call_of_func.data.data_calc import create_fq_mask, specaugment
 from call_of_func.train.get_dataloader import build_dataloader
 from call_of_func.train.get_optim import build_optimizer, build_scheduler
 from call_of_func.train.train_checkpoint import save_checkpoints
-from call_of_func.train.train_helper import get_device
+from call_of_func.train.train_helper import accuracy, get_device
 from call_of_func.utils.get_trackers import build_profiler
 
 
