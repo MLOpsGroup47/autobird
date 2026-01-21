@@ -1,7 +1,9 @@
 import importlib
 from typing import Any
-from hydra.utils import instantiate
+
 import torch
+from hydra.utils import instantiate
+
 
 def build_optimizer(model: torch.nn.Module, cfg) -> torch.optim.Optimizer:
     return instantiate(cfg.train.optim, params=model.parameters())
