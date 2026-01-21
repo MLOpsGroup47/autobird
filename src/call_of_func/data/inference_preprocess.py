@@ -1,16 +1,17 @@
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Optional, Tuple, Union, List
 import json
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple, Union
+
 import numpy as np
 import torch
-from typing import Optional, Tuple, Union, List, Dict
 from call_of_birds_autobird.model import Model
-from call_of_func.data.get_data import _load_audio, _chunk_audio
+
 from call_of_func.data.data_calc import _log_mel
-from call_of_func.dataclasses.Preprocessing import PreConfig, DataConfig
+from call_of_func.data.get_data import _chunk_audio, _load_audio
 from call_of_func.dataclasses.pathing import PathConfig
+from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
 
 
 def inference_load(
@@ -20,11 +21,7 @@ def inference_load(
     norm_stats: Optional[Tuple[float, float]] = None,  # (mean, std) from training
     device: Optional[torch.device] = None,
 ) -> torch.Tensor:
-    """
-    Load a single audio file and return a model-ready tensor:
-        [B, 1, n_mels, frames]
-    where B = number of chunks.
-    """
+    """Load a single audio file and return a model-ready tensor: [B, 1, n_mels, frames] where B = number of chunks."""
     file = Path(file)
     if not file.exists():
         raise FileNotFoundError(f"Audio file not found: {file}")
@@ -33,7 +30,7 @@ def inference_load(
     data_cfg = data_cfg or DataConfig()
 
     # 1) load audio
-    x, sr = _load_audio(str(file))  # x typically: (samples,) or (channels, samples)
+    x, sr = _load_audio(file)  # x typically: (samples,) or (channels, samples)
 
     # 2) chunk audio (should return a list/iterable of chunks)
     chunks = _chunk_audio(x, pre_cfg=pre_cfg, data_cfg=data_cfg)
@@ -83,8 +80,8 @@ def predict_file(
     ckpt_name: str = "last.pt",
     agg: str = "vote",  # "vote" or "mean_prob"
 ) -> Dict[str, object]:
-    """
-    Predict on ALL chunks in x: [B,1,n_mels,frames]
+    """Predict on ALL chunks in x: [B,1,n_mels,frames].
+
     Returns a dict with:
       - label (file-level)
       - chunk_preds
@@ -155,7 +152,7 @@ def paths_from_hydra_cfg(cfg) -> PathConfig:
 
 
 if __name__ == "__main__":
-    file = "data/voice_of_birds/Andean_Guan_sound/Andean_Guan2.mp3"
+    file = "data/voice_of_birds/Andean Guan_sound/Andean Guan2.mp3"
 
     # local defaults (no hydra)
     x = inference_load(file)
