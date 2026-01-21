@@ -54,3 +54,8 @@ def rm_rare_classes(
     print(f"After pruning: train={len(y_train2)}, val={len(y_val2)}, classes={len(keep_sorted)}")
 
     return x_train2, y_train2, x_val2, y_val2, new_class_names
+
+
+
+def accuracy(logits, y) -> float:
+    return (logits.argmax(dim=1) == y).float().mean().item()

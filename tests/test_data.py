@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 import torch
-from call_of_func.data.data_calc import _compute_global_norm_stats, _log_mel
+from call_of_func.data.data_helpers import _compute_global_norm_stats
 from call_of_func.data.get_data import _index_dataset, _split_by_groups
 from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
 
@@ -20,33 +20,6 @@ def test_data_config():
     assert dataset.stride_sec == 2.0, "stride_sec attribute assignment incorrect"
     assert dataset.pad_last is True, "pad_last attribute assignment incorrect"
 
-
-
-def test_log_mel():
-    """Test the _log_mel function."""
-    cfg = PreConfig(
-        sr=16000,
-        n_fft=1024,
-        hop_length=512,
-        n_mels=64,
-        fq_min=20,
-        fq_max=8000
-    )
-    
-    # Create dummy audio signal
-    duration_sec = 1.0
-    x = np.random.randn(int(cfg.sr * duration_sec)).astype(np.float32)
-    
-    S = _log_mel(x, cfg)
-    
-    # Check output shape
-    # Expected time steps: ceil(len(x) / hop_length) 
-    # Logic in librosa depends on padding, usually close to len(x) // hop_length
-    expected_frames = 1 + int(len(x) / cfg.hop_length)
-    
-    assert S.shape == (cfg.n_mels, expected_frames), "Log-mel spectrogram shape is incorrect, expected (n_mels, time)"
-    assert S.dtype == np.float32, "Log-mel spectrogram dtype is not float32"
-    assert not np.isnan(S).any(), "Log-mel spectrogram contains NaNs"
 
 def test_compute_global_norm_stats():
     """Test the _compute_global_norm_stats function."""

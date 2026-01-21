@@ -8,7 +8,8 @@ import soundfile as sf
 import torch
 import torchaudio
 
-from call_of_func.data.data_calc import _compute_global_norm_stats, _log_mel
+from call_of_func.data.data_calc import _log_mel
+from call_of_func.data.data_helpers import _compute_global_norm_stats
 from call_of_func.dataclasses.pathing import PathConfig
 from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
 
@@ -93,7 +94,7 @@ def _recording_id(path: Path) -> str:
 def _split_by_groups(
     items: List[Tuple[Path, int]],
     cfg: DataConfig,
-) -> Tuple[List[Tuple[Path, int]], List[Tuple[Path, int]]]:
+) -> tuple[List[Tuple[Path, int]], List[Tuple[Path, int]], List[Tuple[Path, int]]]:
     """Split items into train/val sets by recording ID groups."""
     rng = random.Random(cfg.seed)
 
@@ -118,6 +119,7 @@ def _split_by_groups(
     train_items: List[Tuple[Path, int]] = []
     val_items: List[Tuple[Path, int]] = []
     test_items: List[Tuple[Path, int]] = []
+
 
     for rec_id, group_items in groups.items():
         if rec_id in train_id:

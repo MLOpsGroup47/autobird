@@ -2,9 +2,8 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import torch
+from call_of_func.utils.get_source_path import CONFIG_DIR, ROOT
 from matplotlib import colormaps
-from call_of_func.utils.get_source_path import ROOT, CONFIG_DIR
-
 
 data_root = ROOT / "data" / "processed" / "train_x.pt"
 print(f"Data path:{data_root}")

@@ -1,5 +1,5 @@
 steps:
-# Build and push data image
+## Build and push data image
 - name: 'gcr.io/cloud-builders/docker'
   id: 'Build data image'
   args: [
