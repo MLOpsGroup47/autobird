@@ -109,7 +109,7 @@ def validate_one_epoch(
 
     return run_loss / total, run_acc / total
 
-def train_from_cfg(cfg) -> None:
+def training(cfg) -> None:
     MODEL_DIR = Path(os.environ.get("AIP_MODEL_DIR", "models"))
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
     device = get_device()
