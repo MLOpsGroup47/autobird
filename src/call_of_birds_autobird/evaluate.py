@@ -6,11 +6,11 @@ from typing import Dict, Tuple
 import hydra
 import torch
 import torch.nn as nn
+from call_of_func.train.get_dataloader import build_dataloader
+from call_of_func.train.train_helper import get_device
 from omegaconf import DictConfig
 
 from call_of_birds_autobird.model import Model
-from call_of_func.train.get_dataloader import build_dataloader
-from call_of_func.train.train_helper import get_device
 
 
 @torch.no_grad()

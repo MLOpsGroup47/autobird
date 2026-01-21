@@ -1,6 +1,6 @@
+import json
 from pathlib import Path
 from typing import Any, Dict, Optional
-import json
 
 import torch
 
@@ -18,13 +18,11 @@ def save_checkpoints(
     val_acc: float,
     class_names: Optional[list[str]] = None,
 ) -> None:
-    """
-    Save training checkpoints.
+    """Save training checkpoints.
 
     - 'last.pt' is overwritten every epoch
     - 'best.pt' is updated when validation accuracy improves
     """
-
     # Check that checkpoint directory exists
     ckpt_dir = Path(ckpt_dir)
     ckpt_dir.mkdir(parents=True, exist_ok=True)
