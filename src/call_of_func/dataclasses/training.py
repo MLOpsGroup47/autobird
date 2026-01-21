@@ -3,7 +3,7 @@ from typing import FrozenSet
 
 
 @dataclass
-class hyperparameters:
+class HyperParams:
     epochs: int = 15
     lr: float = 3e-4
     batch_size: int = 32
@@ -17,6 +17,7 @@ class hyperparameters:
     num_workers: int = 2
     amp: bool = True
     grad_clip: float = 1.0
+    wandb: bool = True
 
 @dataclass
 class OptimizerConfig:
@@ -32,6 +33,6 @@ class SchedulerConfig:
 
 @dataclass
 class TrainConfig:
-    hyperparameters: hyperparameters = field(default_factory=hyperparameters)
-    Optimizer: OptimizerConfig = field(default_factory=OptimizerConfig)
-    Scheduler: SchedulerConfig = field(default_factory=SchedulerConfig)
+    hp: HyperParams = field(default_factory=HyperParams)
+    optim: OptimizerConfig = field(default_factory=OptimizerConfig)
+    slr: SchedulerConfig = field(default_factory=SchedulerConfig)

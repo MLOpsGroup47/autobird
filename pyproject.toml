@@ -20,7 +20,6 @@ requires-python = ">=3.11"
 dependencies = [
     "fastapi==0.115.6",
     "invoke>=2.2.0",
-    "librosa>=0.11.0",
     "matplotlib>=3.10.8",
     "numpy<2",
     "pandas>=2.3.3",
@@ -40,6 +39,8 @@ dependencies = [
     "dvc-gdrive>=3.0.1",
     "pathspec<1.0",
     "dvc-gs>=3.0.2",
+    "wandb>=0.24.0",
+    "python-dotenv>=1.2.1",
 ]
 
 [dependency-groups]
@@ -60,7 +61,7 @@ dev = [
 [project.scripts]
 data_typer = "call_of_birds_autobird.data:app"
 data = "call_of_birds_autobird.data:preprocess_hydra"
-train = "call_of_birds_autobird.train:train"
+train = "call_of_birds_autobird.train:run_train"
 test_train ="call_of_birds_autobird.test:app"
 
 [tool.uv.sources]

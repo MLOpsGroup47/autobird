@@ -1,28 +1,28 @@
 
 from typing import Tuple
 
-import librosa
 import numpy as np
 import torch
+import torchaudio
 
 from call_of_func.dataclasses.Preprocessing import PreConfig
 
 
 def _log_mel(x: np.ndarray, cfg: PreConfig) -> np.ndarray:
     """Compute log-mel spectrogram: shape [n_mels, time]."""
-    # mel power spectrogram
-    S = librosa.feature.melspectrogram(
-        y=x,
-        sr=cfg.sr,
+    x_t = torch.from_numpy(x).float().unsqueeze(0)  # [1, time]
+
+    mel = torchaudio.transforms.MelSpectrogram(
+        sample_rate=cfg.sr,
         n_fft=cfg.n_fft,
         hop_length=cfg.hop_length,
         n_mels=cfg.n_mels,
-        fmin=cfg.fq_min,
-        fmax=min(cfg.fq_max, cfg.sr // 2),
+        f_min=cfg.fq_min,
+        f_max=min(cfg.fq_max, cfg.sr // 2),
         power=2.0,
-    )
-    # log compression
-    S = np.log(S + 1e-6).astype(np.float32)
+    )(x_t)  # [1, n_mels, time]
+
+    S = torch.log(mel + 1e-6).squeeze(0).cpu().numpy().astype(np.float32)  # [n_mels, time]
     return S
 
 

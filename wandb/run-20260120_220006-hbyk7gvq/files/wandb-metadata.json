@@ -1,0 +1,40 @@
+{
+  "os": "macOS-26.1-arm64-arm-64bit",
+  "python": "CPython 3.12.12",
+  "startedAt": "2026-01-20T21:00:06.067227Z",
+  "args": [
+    "train.hp.sample_min=200"
+  ],
+  "program": "/Users/holgermaxfloelyng/Desktop/BioMed/MSc_Biomed/SEM_3/project/mlops_project/.venv/bin/train",
+  "codePath": ".venv/bin/train",
+  "codePathLocal": ".venv/bin/train",
+  "git": {
+    "remote": "https://github.com/MLOpsGroup47/autobird.git",
+    "commit": "84b6875be38c823df3c16916de107b4ec4168c8f"
+  },
+  "email": "s214776@dtu.dk",
+  "root": "/Users/holgermaxfloelyng/Desktop/BioMed/MSc_Biomed/SEM_3/project/mlops_project",
+  "host": "MBPtilhdeHolger",
+  "executable": "/Users/holgermaxfloelyng/Desktop/BioMed/MSc_Biomed/SEM_3/project/mlops_project/.venv/bin/python3",
+  "cpu_count": 10,
+  "cpu_count_logical": 10,
+  "disk": {
+    "/": {
+      "total": "494384795648",
+      "used": "476582469632"
+    }
+  },
+  "memory": {
+    "total": "17179869184"
+  },
+  "apple": {
+    "name": "Apple M2 Pro",
+    "ecpuCores": 4,
+    "pcpuCores": 6,
+    "gpuCores": 16,
+    "memoryGb": 16,
+    "swapTotalBytes": "12884901888",
+    "ramTotalBytes": "17179869184"
+  },
+  "writerId": "8c1wlobzukps7ug0nd1r86m3vu8b92df"
+}

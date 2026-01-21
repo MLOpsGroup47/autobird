@@ -6,6 +6,7 @@ paths:
   processed_dir: data/processed
   reports_dir: reports/figures
   ckpt_dir: models/checkpoints
+  profile_dir: reports/torch_prof
   x_train: data/processed/train_x.pt
   y_train: data/processed/train_y.pt
   x_val: data/processed/val_x.pt
