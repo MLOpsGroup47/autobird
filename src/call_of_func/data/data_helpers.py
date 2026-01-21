@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from typing import Tuple
 
 import torch
 import typer
@@ -70,3 +71,11 @@ def load_data(processed_dir: Path = Path("data/processed")):
     val_chunk_starts = torch.load(processed_dir / "val_chunk_starts.pt")
 
     return x_train, y_train, x_val, y_val, classes, train_group, val_group, train_chunk_starts, val_chunk_starts
+
+
+
+def _compute_global_norm_stats(X: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    """Compute mean and std over dataset tensor X: shape [N, 1, Mels, Time]."""
+    mean = X.mean(dim=(0, 1, 3), keepdim=True)  # [1, 1, Mels, 1]
+    std = X.std(dim=(0, 1, 3), keepdim=True).clamp_min(1e-8)  # [1, 1, Mels, 1]
+    return mean, std

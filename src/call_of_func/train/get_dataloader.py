@@ -1,14 +1,15 @@
 import json
 from pathlib import Path
 from typing import List, Optional, Tuple
-import gcsfs
 
+import gcsfs
 import torch
 from omegaconf import DictConfig
 from torch.utils.data import DataLoader, TensorDataset
 
 from call_of_func.dataclasses.pathing import PathConfig
 from call_of_func.train.train_helper import rm_rare_classes
+
 
 def _load_class_names(processed_dir: Path) -> Optional[List[str]]:
     if str(processed_dir).startswith("gs://"):

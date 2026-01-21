@@ -1,0 +1,19 @@
+name: Build and Push Docker Images
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Training Image
+        run: |
+          docker build -t train:latest . -f docker/train.dockerfile
+      - name: actions/checkout@v4
+        run: |
+          docker build - t data:latest . -f docker/data.dockerfile
+      - name: Build API Image
+        run: |
+          docker build -t api:latest . -f api/simple_fastapi_app.dockerfile
