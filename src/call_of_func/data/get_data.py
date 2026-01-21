@@ -8,7 +8,8 @@ import numpy as np
 import soundfile as sf
 import torch
 
-from call_of_func.data.data_calc import _compute_global_norm_stats, _log_mel
+from call_of_func.data.data_calc import _log_mel
+from call_of_func.data.data_helpers import _compute_global_norm_stats
 from call_of_func.dataclasses.pathing import PathConfig
 from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
 
