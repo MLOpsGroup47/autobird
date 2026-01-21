@@ -21,7 +21,6 @@ from call_of_func.train.train_helper import accuracy, get_device
 from call_of_func.utils.get_trackers import build_profiler
 
 
-
 ### epoch run
 def train_one_epoch(
     model: nn.Module,

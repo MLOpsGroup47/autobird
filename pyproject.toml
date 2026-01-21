@@ -26,11 +26,16 @@ dependencies = [
     "ruff>=0.1.3",
     "soundfile>=0.13.1",
     # Linux (Vertex AI, Docker)
-    "torch==2.2.2+cpu; sys_platform == 'linux'",
-    "torchaudio==2.2.2+cpu; sys_platform == 'linux'",
+    #"torch==2.2.2+cpu; sys_platform == 'linux'",
+    #"torchaudio==2.2.2+cpu; sys_platform == 'linux'",
     # macOS (local dev)
-    "torch==2.2.2; sys_platform == 'darwin'",
-    "torchaudio==2.2.2; sys_platform == 'darwin'",
+    #"torch==2.2.2; sys_platform == 'darwin'",
+    #"torchaudio==2.2.2; sys_platform == 'darwin'",
+    # Windows
+    #"torch==2.2.2+cpu; sys_platform == 'windows'",
+    #"torchaudio==2.2.2+cpu; sys_platform == 'windows'",
+    "torch==2.2.2+cpu",
+    "torchaudio==2.2.2+cpu",
     "click<8.1",
     "typer==0.15.1",
     "uvicorn==0.34.0",
