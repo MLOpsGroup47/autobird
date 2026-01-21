@@ -26,6 +26,8 @@ def _log_mel(x: np.ndarray, cfg: PreConfig) -> np.ndarray:
     return S
 
 
+def accuracy(logits, y) -> float:
+    return (logits.argmax(dim=1) == y).float().mean().item()
 
 def create_fq_mask(fq_mask: int, time_mask: int):
     try: # if torchaudio fail import for none gpu
