@@ -45,10 +45,10 @@ def create_fq_mask(fq_mask: int, time_mask: int):
     time_mask = torchaudio.transforms.TimeMasking(time_mask_param=time_mask)  # time mask
     return fq_mask, time_mask
 
-def specaugment(x: torch.tensor, fq_mask, time_mask) -> torch.tensor:
-    if fq_mask is None or time_mask is None: # if torchaudio fail import
+def specaugment(x: torch.Tensor, fq_mask, time_mask) -> torch.Tensor:
+    if fq_mask is None or time_mask is None:  # if torchaudio fail import
         return x  # no-op
     x = x.squeeze(1)  # [B, Mels, Time]
     x = fq_mask(x)
     x = time_mask(x)
-    return x.unsqueeze(1)  # [B, 1, Mels, Time
+    return x.unsqueeze(1)  # [B, 1, Mels, Time]

@@ -1,21 +1,25 @@
 from __future__ import annotations
 
+import json
+import os
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Any, cast
 
-import os 
-import wandb
-from omegaconf import OmegaConf
 import torch
 import torch.nn as nn
+from call_of_birds_autobird.model import Model
+from omegaconf import OmegaConf
 from torch.cuda.amp import GradScaler, autocast
 from torch.profiler import ProfilerActivity, profile, record_function
-from call_of_birds_autobird.model import Model
+
+import wandb
+from call_of_func.data.data_calc import accuracy, create_fq_mask, specaugment
 from call_of_func.train.get_dataloader import build_dataloader
 from call_of_func.train.get_optim import build_optimizer, build_scheduler
+from call_of_func.train.train_checkpoint import save_checkpoints
 from call_of_func.train.train_helper import get_device
-from call_of_func.data.data_calc import accuracy, create_fq_mask, specaugment
 from call_of_func.utils.get_trackers import build_profiler
+
 
 ### epoch run
 def train_one_epoch(
@@ -31,11 +35,10 @@ def train_one_epoch(
     grad_clip: float,
     prof,
 ) -> Tuple[float, float]:
-    """This function train one full epoch. 
+    """This function train one full epoch.
     
     Arg
     """
-    
     model.train()
     run_loss = 0
     run_acc = 0.0
@@ -124,15 +127,16 @@ def training(cfg) -> None:
         # wandb initialization
         use_wandb = bool(getattr(hp, "use_wandb", True)) 
         if use_wandb:
+            wandb_cfg = cast(dict[str, Any], OmegaConf.to_container(cfg, resolve=True))
             run = wandb.init(
                 project=os.getenv("WANDB_PROJECT", None),
                 entity=os.getenv("WANDB_ENTITY", None),
-                config=OmegaConf.to_container(cfg, resolve=True),
+                config=wandb_cfg,
                 name=f"dm{hp.d_model}_L{hp.n_layers}_H{hp.n_heads}_bs{hp.batch_size}_lr{hp.lr}",
-            ) 
+            )
             
         # dataloaders (prune rare based on hp.sample_min)
-        train_loader, val_loader, n_classes, _ = build_dataloader(
+        train_loader, val_loader, n_classes, class_names = build_dataloader(
             cfg=cfg,
             prune_rare=True,
         )
@@ -167,6 +171,27 @@ def training(cfg) -> None:
                 prof= prof,
             )
             va_loss, va_acc = validate_one_epoch(model, val_loader, criterion, device)
+
+
+            save_checkpoints(
+                ckpt_dir=Path(cfg.paths.ckpt_dir),
+                epoch=epoch + 1,  
+                model_state=model.state_dict(),
+                optimizer_state=optimizer.state_dict(),
+                scheduler_state=scheduler.state_dict() if scheduler is not None else None,
+                n_classes=n_classes,
+                hp={
+                    "d_model": int(hp.d_model),
+                    "n_heads": int(hp.n_heads),
+                    "n_layers": int(hp.n_layers),
+                    "batch_size": int(hp.batch_size),
+                    "lr": float(hp.lr),
+                    "sample_min": int(hp.sample_min),
+                },
+                val_loss=float(va_loss),
+                val_acc=float(va_acc),
+                class_names=class_names,
+            )
 
 
             if scheduler is not None:
