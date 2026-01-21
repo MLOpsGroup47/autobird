@@ -4,7 +4,8 @@ paths:
   root: .
   raw_dir: data/voice_of_birds
   processed_dir: data/processed
-  reports_dir: reports/figures
+  reports_dir: reports
+  eval_dir: reports/eval_metrics
   ckpt_dir: models/checkpoints
   profile_dir: reports/torch_prof
   x_train: data/processed/train_x.pt

@@ -21,6 +21,7 @@ class PreConfig:
 @dataclass(frozen=True)
 class DataConfig:
     train_split: float = 0.8
+    test_split: float = 0.1
     seed: int = 4
     clip_sec: float = 5.0
     stride_sec: float = 2.5
