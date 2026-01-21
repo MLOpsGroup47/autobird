@@ -1,4 +1,5 @@
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+
 ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
@@ -12,4 +13,3 @@ COPY src/ ./src
 RUN uv sync --frozen --no-dev --no-install-project
 
 ENTRYPOINT ["uv", "run", "python", "-u", "src/call_of_birds_autobird/data.py"]
-

@@ -12,7 +12,7 @@ COPY pyproject.toml .
 COPY README.md .
 COPY tasks.py .
 COPY src/ ./src
-COPY data/ ./data
+
 
 RUN uv sync --locked --no-cache --no-install-project
 
