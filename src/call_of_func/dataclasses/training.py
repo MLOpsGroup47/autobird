@@ -7,7 +7,6 @@ class HyperParams:
     epochs: int = 15
     lr: float = 3e-4
     batch_size: int = 32
-    sample_min: int = 50
     d_model: int = 64
     n_heads: int = 2
     n_layers: int = 1
@@ -17,8 +16,8 @@ class HyperParams:
     num_workers: int = 2
     amp: bool = True
     grad_clip: float = 1.0
-    wandb: bool = True
-
+    use_wandb: bool = True
+    use_ws: bool = False
 @dataclass
 class OptimizerConfig:
     type: str = "torch.optim.Adam"
