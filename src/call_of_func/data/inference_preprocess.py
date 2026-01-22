@@ -1,39 +1,35 @@
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Optional, Tuple, Union, List
 import json
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple, Union
+
 import numpy as np
+import soundfile as sf
 import torch
-from typing import Optional, Tuple, Union, List, Dict
+import torchaudio
 from call_of_birds_autobird.model import Model
-from call_of_func.data.get_data import _load_audio, _chunk_audio
+from fastapi import FastAPI, File, UploadFile
+
 from call_of_func.data.data_calc import _log_mel
-from call_of_func.dataclasses.Preprocessing import PreConfig, DataConfig
+from call_of_func.data.get_data import _chunk_audio
 from call_of_func.dataclasses.pathing import PathConfig
+from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
 
 
 def inference_load(
-    file: Union[str, Path],
+    x: np.ndarray,
+    sr: int,
     pre_cfg: Optional[PreConfig] = None,
     data_cfg: Optional[DataConfig] = None,
     norm_stats: Optional[Tuple[float, float]] = None,  # (mean, std) from training
     device: Optional[torch.device] = None,
 ) -> torch.Tensor:
-    """
-    Load a single audio file and return a model-ready tensor:
-        [B, 1, n_mels, frames]
-    where B = number of chunks.
-    """
-    file = Path(file)
-    if not file.exists():
-        raise FileNotFoundError(f"Audio file not found: {file}")
-
+    """Load a single audio file and return a model-ready tensor: [B, 1, n_mels, frames] where B = number of chunks."""
     pre_cfg = pre_cfg or PreConfig()
     data_cfg = data_cfg or DataConfig()
 
     # 1) load audio
-    x, sr = _load_audio(str(file))  # x typically: (samples,) or (channels, samples)
 
     # 2) chunk audio (should return a list/iterable of chunks)
     chunks = _chunk_audio(x, pre_cfg=pre_cfg, data_cfg=data_cfg)
@@ -78,34 +74,18 @@ def inference_load(
 @torch.no_grad()
 def predict_file(
     x: torch.Tensor,
+    model: Model,
     paths: PathConfig,
-    device: Optional[torch.device] = None,
-    ckpt_name: str = "best.pt",
+    device: torch.device,
     agg: str = "vote",  # "vote" or "mean_prob"
 ) -> Dict[str, object]:
-    """
-    Predict on ALL chunks in x: [B,1,n_mels,frames]
+    """Predict on ALL chunks in x: [B,1,n_mels,frames].
+
     Returns a dict with:
       - label (file-level)
       - chunk_preds
       - chunk_probs (optional)
     """
-    device = device or torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-    # Load model
-    model = Model()
-    ckpt_path = paths.ckpt_dir / ckpt_name
-    state = torch.load(ckpt_path, map_location=device)
-    n_classes = int(state["n_classes"])
-    hp = state.get("hp", {})  # might be dict or OmegaConf-like
-
-    model = Model(
-        n_classes=n_classes,
-        d_model=int(hp.get("d_model", 64)),
-        n_heads=int(hp.get("n_heads", 2)),
-        n_layers=int(hp.get("n_layers", 1)),
-    )
-    model.load_state_dict(state["model_state"])
     model.eval()
 
     # Forward on all chunks
@@ -155,11 +135,8 @@ def paths_from_hydra_cfg(cfg) -> PathConfig:
 
 
 if __name__ == "__main__":
-    file = "data/voice_of_birds/Highland_Tinamou_sound/Highland_Tinamou5.mp3"
-
-    # local defaults (no hydra)
-    x = inference_load(file)
-    print("Input shape:", x.shape)  # [B, 1, n_mels, frames]
+    file = "data/voice_of_birds/Andean_Guan_sound/Andean_Guan2.mp3"
+    ckpt_name = "last.pt"
 
     paths = PathConfig(
         root=Path("."),
@@ -174,5 +151,42 @@ if __name__ == "__main__":
         y_val=Path("data/processed/val_y.pt"),
     )
 
-    out = predict_file(x, paths=paths, agg="vote")
+    
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    ckpt_path = paths.ckpt_dir / ckpt_name
+    state = torch.load(ckpt_path, map_location=device)
+    n_classes = int(state["n_classes"])
+    hp = state.get("hp", {})  # might be dict or OmegaConf-like
+
+
+
+    # Load model
+    model = Model(
+        n_classes=n_classes,
+        d_model=int(hp.get("d_model", 64)),
+        n_heads=int(hp.get("n_heads", 2)),
+        n_layers=int(hp.get("n_layers", 1)),
+    )
+
+    model.load_state_dict(state["model_state"])
+    # local defaults (no hydra)
+
+    try:
+        x, sr = sf.read(file, always_2d=False)
+        if x.ndim == 2:
+            x = x.mean(axis=1)
+    except Exception:
+        # fallback: torchaudio
+        wav, sr = torchaudio.load(file)  # wav: [channels, time]
+        if wav.shape[0] > 1:
+            wav = wav.mean(dim=0, keepdim=True)
+        x = wav.squeeze(0).cpu().numpy().astype(np.float32)
+    
+    x = inference_load(x, sr)
+    print("Input shape:", x.shape)  # [B, 1, n_mels, frames]
+
+
+
+    out = predict_file(x, model=model, paths=paths, device=device, agg="vote")
     print("Predicted:", out["label"])
