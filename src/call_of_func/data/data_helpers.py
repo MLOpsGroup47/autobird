@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, Optional, List
 
 import torch
 import typer
@@ -79,3 +79,48 @@ def _compute_global_norm_stats(X: torch.Tensor) -> Tuple[torch.Tensor, torch.Ten
     mean = X.mean(dim=(0, 1, 3), keepdim=True)  # [1, 1, Mels, 1]
     std = X.std(dim=(0, 1, 3), keepdim=True).clamp_min(1e-8)  # [1, 1, Mels, 1]
     return mean, std
+
+def filter_data(
+    y_train: torch.Tensor,
+    min_samples: int,
+    class_names: Optional[list[str]] = None,
+) -> Tuple[torch.Tensor, list[int], Optional[list[str]]]:
+    y_train = y_train.long()
+    num_classes = int(y_train.max().item()) + 1
+    train_counts = torch.bincount(y_train, minlength=num_classes)
+
+    keep = (train_counts >= min_samples).nonzero(as_tuple=True)[0]
+    keep_sorted = keep.tolist()
+
+    print(f"Keeping {len(keep_sorted)}/{num_classes} classes with >= {min_samples} train samples")
+
+    old_to_new = torch.full((num_classes,), -1, dtype=torch.long)
+    old_to_new[keep] = torch.arange(len(keep), dtype=torch.long)
+
+    new_class_names = None
+    if class_names is not None:
+        new_class_names = [class_names[i] for i in keep_sorted]
+
+    return old_to_new, keep_sorted, new_class_names
+
+
+def _apply_mapping_with_meta(
+    x: torch.Tensor,
+    y: torch.Tensor,
+    group: list[str],
+    chunk_starts: list[float],
+    old_to_new: torch.Tensor,
+):
+    y = y.long()
+    mapped = old_to_new[y]
+    mask = mapped >= 0
+
+    x2 = x[mask]
+    y2 = mapped[mask]
+
+    # mask is torch bool; use it to filter python lists
+    mask_list = mask.cpu().numpy().tolist()
+    group2 = [g for g, m in zip(group, mask_list) if m]
+    starts2 = [s for s, m in zip(chunk_starts, mask_list) if m]
+
+    return x2, y2, group2, starts2

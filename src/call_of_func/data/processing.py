@@ -4,13 +4,20 @@ from typing import List
 
 import numpy as np
 import typer
+import torch
 from omegaconf import DictConfig
 
-from call_of_func.data.data_helpers import rn_dir, rn_mp3
+from call_of_func.data.data_helpers import (
+    rn_mp3,
+    rn_dir,
+    filter_data,
+    _apply_mapping_with_meta,
+)
 from call_of_func.data.get_data import (
     _index_dataset,
-    _save_split,
     _split_by_groups,
+    _build_split,
+    _compute_global_norm_stats
 )
 from call_of_func.dataclasses.pathing import PathConfig
 from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
@@ -62,6 +69,7 @@ def preprocess_cfg(
         fq_max=cfg.preprocessing.fq_max,
         min_rms=cfg.preprocessing.min_rms,
         min_mel_std=cfg.preprocessing.min_mel_std,
+        min_samples=cfg.preprocessing.min_samples,
     )
 
     # Data split config
@@ -77,7 +85,12 @@ def preprocess_cfg(
     print(f"Project root: {paths.root}")
     print(f"Raw data directory: {paths.raw_dir}")
     print(f"Processed data directory: {paths.processed_dir}")
-    print(f"Train split: {data_cfg.train_split} | Val split: {round(1-(data_cfg.train_split+data_cfg.test_split), 1)} | test split: {data_cfg.test_split}")
+    print(
+        f"Train split: {data_cfg.train_split} | "
+        f"Val split: {round(1 - (data_cfg.train_split + data_cfg.test_split), 2)} | "
+        f"Test split: {data_cfg.test_split}"
+    )
+    print(f"Pruning classes with < {pre_cfg.min_samples} train samples")
 
     if not paths.raw_dir.exists() or not paths.raw_dir.is_dir():
         raise typer.BadParameter(f"Raw data directory does not exist: {paths.raw_dir}")
@@ -89,16 +102,68 @@ def preprocess_cfg(
 
     items, classes = _index_dataset(paths.raw_dir)
     train_items, val_items, test_items = _split_by_groups(items=items, cfg=data_cfg)
-    splits = {"train": train_items, "val": val_items, "test": test_items}
 
+    # build raw tensor splits
+    train_x, train_y, train_group, train_chunk_starts = _build_split(
+        split_items=train_items, pre_cfg=pre_cfg, data_cfg=data_cfg
+    )
+    val_x, val_y, val_group, val_chunk_starts = _build_split(
+        split_items=val_items, pre_cfg=pre_cfg, data_cfg=data_cfg
+    )
+    test_x, test_y, test_group, test_chunk_starts = _build_split(
+        split_items=test_items, pre_cfg=pre_cfg, data_cfg=data_cfg
+    )
+
+    # map the excludes train groups to val and test set
+    old_to_new, keep_idx, new_class_names = filter_data(
+        y_train=train_y,
+        min_samples=pre_cfg.min_samples,
+        class_names=classes,
+    )
+    # apply prune to each split
+    train_x, train_y, train_group, train_chunk_starts = _apply_mapping_with_meta(
+        train_x, train_y, train_group, train_chunk_starts, old_to_new
+    )
+    val_x, val_y, val_group, val_chunk_starts = _apply_mapping_with_meta(
+        val_x, val_y, val_group, val_chunk_starts, old_to_new
+    )
+    test_x, test_y, test_group, test_chunk_starts = _apply_mapping_with_meta(
+        test_x, test_y, test_group, test_chunk_starts, old_to_new
+    )
+
+    print(f"After pruning/remap: train={len(train_y)} val={len(val_y)} test={len(test_y)} classes={len(new_class_names or [])}")
+
+    # save labels.json 
     with open(paths.processed_dir / "labels.json", "w", encoding="utf8") as fh:
-        json.dump(classes, fh, ensure_ascii=False)
+        json.dump(new_class_names, fh, ensure_ascii=False)
 
-    for split_name, split_items in splits.items():
-        _save_split(
-            split_name=split_name,
-            split_items=split_items,
-            paths=paths,
-            pre_cfg=pre_cfg,
-            data_cfg=data_cfg,
-        )
+    # compute normalization from train only, save stats, normalize all splits
+    mean, std = _compute_global_norm_stats(train_x)
+    torch.save(mean, paths.processed_dir / "train_mean.pt")
+    torch.save(std, paths.processed_dir / "train_std.pt")
+
+    train_x = (train_x - mean) / std
+    val_x = (val_x - mean) / std
+    test_x = (test_x - mean) / std
+
+    # save tensors
+    torch.save(train_x, paths.processed_dir / "train_x.pt")
+    torch.save(train_y, paths.processed_dir / "train_y.pt")
+    torch.save(val_x, paths.processed_dir / "val_x.pt")
+    torch.save(val_y, paths.processed_dir / "val_y.pt")
+    torch.save(test_x, paths.processed_dir / "test_x.pt")
+    torch.save(test_y, paths.processed_dir / "test_y.pt")
+
+    # 8) save meta files (optional, but you had them before)
+    with open(paths.processed_dir / "train_group.json", "w", encoding="utf8") as fh:
+        json.dump(train_group, fh, ensure_ascii=False)
+    with open(paths.processed_dir / "val_group.json", "w", encoding="utf8") as fh:
+        json.dump(val_group, fh, ensure_ascii=False)
+    with open(paths.processed_dir / "test_group.json", "w", encoding="utf8") as fh:
+        json.dump(test_group, fh, ensure_ascii=False)
+
+    torch.save(torch.tensor(train_chunk_starts, dtype=torch.float32), paths.processed_dir / "train_chunk_starts.pt")
+    torch.save(torch.tensor(val_chunk_starts, dtype=torch.float32), paths.processed_dir / "val_chunk_starts.pt")
+    torch.save(torch.tensor(test_chunk_starts, dtype=torch.float32), paths.processed_dir / "test_chunk_starts.pt")
+
+    print("Saved pruned+remapped+normalized splits + labels + meta.")
