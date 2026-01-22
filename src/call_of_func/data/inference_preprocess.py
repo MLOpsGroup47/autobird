@@ -80,7 +80,7 @@ def predict_file(
     x: torch.Tensor,
     paths: PathConfig,
     device: Optional[torch.device] = None,
-    ckpt_name: str = "last.pt",
+    ckpt_name: str = "best.pt",
     agg: str = "vote",  # "vote" or "mean_prob"
 ) -> Dict[str, object]:
     """
@@ -155,7 +155,7 @@ def paths_from_hydra_cfg(cfg) -> PathConfig:
 
 
 if __name__ == "__main__":
-    file = "data/voice_of_birds/Andean_Guan_sound/Andean_Guan2.mp3"
+    file = "data/voice_of_birds/Highland_Tinamou_sound/Highland_Tinamou5.mp3"
 
     # local defaults (no hydra)
     x = inference_load(file)
