@@ -154,7 +154,7 @@ def preprocess_cfg(
     torch.save(test_x, paths.processed_dir / "test_x.pt")
     torch.save(test_y, paths.processed_dir / "test_y.pt")
 
-    # 8) save meta files (optional, but you had them before)
+    # 8) save meta files
     with open(paths.processed_dir / "train_group.json", "w", encoding="utf8") as fh:
         json.dump(train_group, fh, ensure_ascii=False)
     with open(paths.processed_dir / "val_group.json", "w", encoding="utf8") as fh:
