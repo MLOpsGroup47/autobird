@@ -1,7 +1,19 @@
+from pathlib import Path
+
+import hydra
 import pytest
 import torch
+import torch.nn as nn
 from call_of_birds_autobird.model import Model
-from call_of_func.train.train_helper import accuracy, rm_rare_classes
+from call_of_func.data.data_calc import create_fq_mask
+from call_of_func.train.get_dataloader import build_dataloader
+from call_of_func.train.get_optim import build_optimizer
+from call_of_func.train.train_engine import train_one_epoch
+from call_of_func.train.train_helper import accuracy, get_device, rm_rare_classes
+from call_of_func.utils.get_source_path import CONFIG_DIR
+from call_of_func.utils.get_trackers import build_profiler
+from omegaconf import DictConfig
+from torch.cuda.amp import GradScaler
 
 
 def test_accuracy():
@@ -80,7 +92,7 @@ def test_rm_rare_classes():
 
 
 def test_single_train_step():
-    """Smoke test for a single training step."""
+    """Smoke test for a single training step."""   
     device = torch.device("cpu") # Test on CPU for CI compatibility
     n_classes = 5
     batch_size = 4
@@ -122,3 +134,49 @@ def test_single_train_step():
              grads_found = True
              break
     assert grads_found, "No gradients were computed!"
+
+# @hydra.main(version_base=None, config_path=CONFIG_DIR, config_name="config")
+# def test_train_one_epoch(cfg: DictConfig):
+
+#     device = get_device()
+
+#     #configs 
+#     hp = cfg.train.hp
+
+#     prof = build_profiler(cfg, device) if cfg is not None else None
+#     # dataloaders (prune rare based on hp.sample_min)
+#     train_loader, val_loader, n_classes, class_names = build_dataloader(
+#         cfg=cfg,
+#         prune_rare=True,
+#     )
+
+#     model = Model(
+#         n_classes=n_classes,
+#         d_model=int(hp.d_model),
+#         n_heads=int(hp.n_heads),
+#         n_layers=int(hp.n_layers),
+#     ).to(device)
+
+
+#     criterion = nn.CrossEntropyLoss()
+#     optimizer = build_optimizer(model, cfg)
+#     fq_mask, time_mask = create_fq_mask(fq_mask=8, time_mask=20)  # make configurable later if you want
+#     scaler = GradScaler() if (bool(hp.amp) and device.type == "cuda") else None
+    
+#     train_loss, val_loss = train_one_epoch(
+#         model=model,
+#         loader=train_loader,
+#         criterion=criterion,
+#         optimizer=optimizer,
+#         device=device,
+#         scaler=scaler,
+#         fq_mask=fq_mask,
+#         time_mask=time_mask,
+#         amp=bool(hp.amp),
+#         grad_clip=float(hp.grad_clip),
+#         prof= prof,
+#     )
+#     assert isinstance(train_loss, float), "Train loss should be a float"
+#     assert isinstance(val_loss, float), "Validation loss should be a float"
+#     assert train_loss > 0, "Train loss should be positive"
+#     assert val_loss > 0, "Validation loss should be positive"
