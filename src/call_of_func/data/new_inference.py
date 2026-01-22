@@ -193,7 +193,7 @@ if __name__ == "__main__":
     # -----------------------------
     # USER SETTINGS
     # -----------------------------
-    file = "/Users/holgermaxfloelyng/Desktop/BioMed/MSc_Biomed/SEM_3/project/mlops_project/data/voice_of_birds/West_Mexican_Chachalaca_sound/West_Mexican_Chachalaca28.mp3"
+    file = "data/voice_of_birds/Cauca_Guan_sound/Cauca_Guan16.mp3"
     ckpt_name = "best.pt"
 
     paths = PathConfig(
