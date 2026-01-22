@@ -121,9 +121,8 @@ will check the repositories and the code to verify your answers.
 ### Question 1
 > **Enter the group number you signed up on <learn.inside.dtu.dk>**
 >
-> Answer:
-
---- question 1 fill here ---
+> Answer: 
+Group 47
 
 ### Question 2
 > **Enter the study number for each member in the group**
@@ -134,7 +133,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 2 fill here ---
+s224473, s224022, s224031, s214776
 
 ### Question 3
 > **Did you end up using any open-source frameworks/packages not covered in the course during your project? If so**
@@ -148,7 +147,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 3 fill here ---
+We have predominantly implemented the recommended tools shown in the course exercises to solve the MLops part of the assignment (i.e to check off most of the boxes in the section above). As far as packages/libraries not introduced in the course, we have used the torchaudio library in out data processing pipeline. This was used, among other things, to transform raw audio signals into log-mel spectrograms and apply audio data augmentation during training.
 
 ## Coding environment
 
