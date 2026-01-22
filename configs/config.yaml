@@ -5,6 +5,7 @@ defaults:
   - optimizer: adam
   - prof: profiler_config
   - scheduler: step
+  - ddp: runtime
   - _self_
 
 hydra:

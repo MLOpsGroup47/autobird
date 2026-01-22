@@ -9,7 +9,7 @@ from call_of_func.data.data_calc import create_fq_mask
 from call_of_func.train.get_dataloader import build_dataloader
 from call_of_func.train.get_optim import build_optimizer
 from call_of_func.train.train_engine import train_one_epoch
-from call_of_func.train.train_helper import accuracy, get_device, rm_rare_classes
+from call_of_func.train.train_helper import accuracy, get_device
 from call_of_func.utils.get_source_path import CONFIG_DIR
 from call_of_func.utils.get_trackers import build_profiler
 from omegaconf import DictConfig
