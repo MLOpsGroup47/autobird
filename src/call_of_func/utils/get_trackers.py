@@ -19,7 +19,7 @@ def build_profiler(cfg, device: torch.device):
         return None
 
     # output dir from path config
-    out_dir = Path(cfg.paths.profile_dir)  # <- your config says this exists
+    out_dir = Path(cfg.paths.profile_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
     acts = [ProfilerActivity.CPU]
