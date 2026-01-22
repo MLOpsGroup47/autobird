@@ -88,7 +88,7 @@ will check the repositories and the code to verify your answers.
 * [x] Create a data storage in GCP Bucket for your data and link this with your data version control setup (M21)
 * [x] Create a trigger workflow for automatically building your docker images (M21)
 * [x] Get your model training in GCP using either the Engine or Vertex AI (M21)
-* [ ] Create a FastAPI application that can do inference using your model (M22)
+* [x] Create a FastAPI application that can do inference using your model (M22)
 * [ ] Deploy your model in GCP using either Functions or Run as the backend (M23)
 * [ ] Write API tests for your application and setup continues integration for these (M24)
 * [ ] Load test your application (M24)
@@ -167,7 +167,8 @@ We have predominantly implemented the recommended tools shown in the course exer
 >
 > Answer:
 
---- question 4 fill here ---
+We used uv together with pyproject.toml to manage dependencies in our project. All project dependencies are declared in pyproject.toml, while exact package versions are locked in uv.lock to ensure full reproducibility. Whenever a new dependency was to added, the command: "uv add <package-name>" was used, which updates the pyproject.py and uv.lock files. Assuming a new member is working on a branch with an up-to-date pyproject.toml and uv.lock file, the command: "uv sync", downloads all necessary dependcies ensures they are working with an exact copy of the environment, and ensures reproducibility. 
+
 
 ### Question 5
 
@@ -183,7 +184,29 @@ We have predominantly implemented the recommended tools shown in the course exer
 >
 > Answer:
 
---- question 5 fill here ---
+We used cookiecutter as a template for our repository, specifically we initiallized the project with the following command and template:
+
+uvx cookiecutter \
+ https://github.com/SkafteNicki/mlops_template 
+
+We have filed out the following: 
+- src: this includes 2 sub folders, "call_of_func" for modular/helper functions for both train, dataclasses, data and utils. the other subfolder "call_of_birds_autobird" for main functions eg. train.py, evaluate.py, api.py, model.py, visualize.py etc
+- configs: hydra config files with parameters etc. Subfolders for    data            hyperparams     optimizer       pathing         prof            scheduler       wandb
+- reports: subfolders include  eval_metrics    figures         report.py       torch_prof
+- notesbooks: data visualizations (raw and processed)
+- models: subfolder "checkpoints" stores and metrics and model for last.pt and best.pt
+- docker: dockerfiles
+
+We have added the following folders: 
+- wandb: experiment logging
+- outputs: displays how are config files are stuctured for dataprocessing and training for each run
+- data: data storage, two subfolders voice_of_birds (raw) and processed (processed data)
+- api: to configure and develop APIs
+
+We have removed the following folders: 
+- docs
+- .devcontainer
+
 
 ### Question 6
 
