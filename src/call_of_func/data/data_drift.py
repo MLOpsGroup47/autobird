@@ -1,99 +1,92 @@
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import torch
+from evidently.legacy.metric_preset import DataDriftPreset, DataQualityPreset, TargetDriftPreset
+from evidently.legacy.report import Report
+from hydra import compose, initialize
 
-from evidently.report import Report
-from evidently.metric_preset import (
-    DataDriftPreset,
-    DataQualityPreset,
-    TargetDriftPreset,
-)
-
-
-PROCESSED_DIR = Path("data/processed")  # <-- tilpas til jeres PathConfig.processed_dir
-REPORT_PATH = Path("reports/audio_drift_report.html")
-REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
+from call_of_func.dataclasses.pathing import PathConfig
 
 
 def extract_audio_features(x: torch.Tensor) -> pd.DataFrame:
-    """
-    x: [N, 1, n_mels, time] (som jeres get_data.py gemmer)
-    Return: DataFrame med N rækker og numeriske feature-kolonner.
+    """Extracts structured (tabular) features from log-mel tensors.
+
+    Args:
+        x: Tensor of shape [N, 1, n_mels, time] (like in the preprocessing pipeline).
+
+    Returns:
+        A pandas DataFrame with one row per sample and numeric feature columns.
     """
     if x.ndim != 4:
-        raise ValueError(f"Expected x with shape [N,1,n_mels,time], got {tuple(x.shape)}")
+        raise ValueError(f"Expected x with shape [N, 1, n_mels, time], got {tuple(x.shape)}")
 
     x = x.float()
-    # fjern kanal-dim
     S = x[:, 0, :, :]  # [N, n_mels, time]
 
-    # globale stats
+    # Global statistics over the entire log-mel spectrogram
     mel_mean = S.mean(dim=(1, 2)).cpu().numpy()
     mel_std = S.std(dim=(1, 2)).cpu().numpy()
 
-    # energi pr. frame (over mels) -> stilhed proxy
+    # Frame-wise energy (mean over mel bins) -> indicator for loudness / silence
     frame_energy = (S**2).mean(dim=1)  # [N, time]
     energy_mean = frame_energy.mean(dim=1).cpu().numpy()
     energy_std = frame_energy.std(dim=1).cpu().numpy()
 
-    # silence ratio: andel af frames under en relativ threshold
-    # (threshold = 10% af median-energi pr sample)
-    med = frame_energy.median(dim=1).values  # [N]
-    thr = 0.1 * med.unsqueeze(1)            # [N,1] broadcast
-    silence_ratio = (frame_energy < thr).float().mean(dim=1).cpu().numpy()
-
-    # band energy ratios (low/mid/high mel bins)
-    n_mels = S.shape[1]
-    low_end = max(1, int(0.33 * n_mels))
-    mid_end = max(low_end + 1, int(0.66 * n_mels))
-
-    band_energy = (S**2).mean(dim=2)  # [N, n_mels]
-    total = band_energy.sum(dim=1).clamp_min(1e-12)  # [N]
-
-    low_ratio = (band_energy[:, :low_end].sum(dim=1) / total).cpu().numpy()
-    mid_ratio = (band_energy[:, low_end:mid_end].sum(dim=1) / total).cpu().numpy()
-    high_ratio = (band_energy[:, mid_end:].sum(dim=1) / total).cpu().numpy()
-
-    df = pd.DataFrame(
+    return pd.DataFrame(
         {
             "mel_mean": mel_mean,
             "mel_std": mel_std,
             "energy_mean": energy_mean,
             "energy_std": energy_std,
-            "silence_ratio": silence_ratio,
-            "low_band_ratio": low_ratio,
-            "mid_band_ratio": mid_ratio,
-            "high_band_ratio": high_ratio,
         }
     )
-    return df
 
 
-def main():
-    # ---- 3) load tensors ----
-    train_x = torch.load(PROCESSED_DIR / "train_x.pt", map_location="cpu")
-    test_x = torch.load(PROCESSED_DIR / "test_x.pt", map_location="cpu")
+def main() -> None:
+    """Create an Evidently drift report by comparing reference (train) vs current (val) feature distributions.
+   
+    HTML report saved under reports/monitoring/
+   
+    """
+    # Path loading from hydraconfiguration
+    with initialize(config_path="../../../configs", version_base=None):
+        cfg = compose(config_name="pathing/path_config")
 
-    # optional: target drift kræver target kolonne i begge (hvis I vil)
-    train_y = torch.load(PROCESSED_DIR / "train_y.pt", map_location="cpu")
-    test_y = torch.load(PROCESSED_DIR / "test_y.pt", map_location="cpu")
+    paths = cfg.paths
 
+    monitoring_dir = Path(paths.reports_dir) / "monitoring"
+    monitoring_dir.mkdir(parents=True, exist_ok=True)
+    report_path = monitoring_dir / "audio_drift_report.html"
+    
+    train_x = torch.load(paths.x_train, map_location="cpu")
+    val_x   = torch.load(paths.x_val, map_location="cpu")
+    train_y = torch.load(paths.y_train, map_location="cpu")
+    val_y   = torch.load(paths.y_val, map_location="cpu")
+
+    # Extract tabular features for drift detection
     reference_data = extract_audio_features(train_x)
-    current_data = extract_audio_features(test_x)
+    current_data = extract_audio_features(val_x)
 
-    # Hvis du vil have TargetDriftPreset med:
+    # Add target column to enable target drift checks
     reference_data["target"] = train_y.cpu().numpy()
-    current_data["target"] = test_y.cpu().numpy()
+    current_data["target"] = val_y.cpu().numpy()
 
-    # ---- 4) evidently report ----
-    report = Report(metrics=[DataDriftPreset(), DataQualityPreset(), TargetDriftPreset()])
+    # Create and run Evidently report
+    report = Report(
+        metrics=[
+            DataDriftPreset(),
+            DataQualityPreset(),
+            TargetDriftPreset(),
+        ]
+    )
     report.run(reference_data=reference_data, current_data=current_data)
-    report.save_html(str(REPORT_PATH))
+    report.save_html(str(report_path))
 
-    print(f"Saved drift report to: {REPORT_PATH.resolve()}")
+    print(f"Saved drift report to: {report_path.resolve()}")
+    print("Reference data preview:")
     print(reference_data.head())
+    print("Current data preview:")
     print(current_data.head())
 
 
