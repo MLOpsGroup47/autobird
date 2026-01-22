@@ -1,24 +1,25 @@
-FROM python:3.11-slim
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
 EXPOSE $PORT
 
 WORKDIR /api/app
 
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    git \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt update && \
+    apt install --no-install-recommends -y build-essential gcc && \
+    apt clean && rm -rf /var/lib/apt/lists/*
 
 
-WORKDIR /app
+WORKDIR /
 
-COPY uv.lock .
-COPY pyproject.toml .
-COPY README.md .
-COPY tasks.py .
+COPY uv.lock uv.lock
+COPY pyproject.toml pyproject.toml
+COPY api/ ./api
 COPY src/ ./src
+COPY models/ ./models
+COPY configs/ configs/
+COPY README.md README.md
 
 
 RUN uv sync --locked --no-cache --no-install-project
 
-ENTRYPOINT ["uv", "run", "src/call_of_birds_autobird/train.py"]
+CMD exec uv run uvicorn api.app.inference:app --port $PORT --host 0.0.0.0 --workers 1

@@ -49,6 +49,7 @@ dependencies = [
     "wandb>=0.24.0",
     "python-dotenv>=1.2.1",
     "evidently>=0.7.20",
+    "python-multipart>=0.0.21",
 ]
 
 [dependency-groups]
