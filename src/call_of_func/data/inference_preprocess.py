@@ -26,32 +26,26 @@ def inference_load(
     data_cfg: Optional[DataConfig] = None,
     device: Optional[torch.device] = None,
 ) -> torch.Tensor:
-    """Load a single audio file and return a model-ready tensor: [B, 1, n_mels, frames] where B = number of chunks."""
+    """Load a single audio file and return a model-ready tensor."""
     pre_cfg = pre_cfg or PreConfig()
     data_cfg = data_cfg or DataConfig()
 
-    # 1) load audio
-
-    # 2) chunk audio (should return a list/iterable of chunks)
+    # 1) chunk audio
     chunks = _chunk_audio(x, pre_cfg=pre_cfg, data_cfg=data_cfg)
     if len(chunks) == 0:
-        raise ValueError(f"No chunks produced for {file}. Check clip_sec/stride/pad settings.")
+        # Fixed the 'file' name error here by using a generic message
+        raise ValueError("No chunks produced. Check audio length vs clip_sec settings.")
 
-    # 3) log-mel per chunk -> list of [n_mels, frames]
+    # 2) log-mel per chunk
     mels: List[np.ndarray] = []
     for chunk in chunks:
-        # some implementations return (chunk, start_time) or (chunk, meta...)
-        # handle both: if it's a tuple/list, take first element as audio
-        if isinstance(chunk, (tuple, list)):
-            chunk_audio = chunk[0]
-        else:
-            chunk_audio = chunk
-
-        mel = _log_mel(chunk_audio, cfg=pre_cfg)  # [n_mels, frames]
+        chunk_audio = chunk[0] if isinstance(chunk, (tuple, list)) else chunk
+        mel = _log_mel(chunk_audio, cfg=pre_cfg)
         mels.append(mel.astype(np.float32))
 
-    # 4) stack -> [B, n_mels, frames]
-    mel_batch = np.stack(mels, axis=0)
+    # 3) stack and add channel dim -> [B, 1, n_mels, frames]
+    mel_batch = np.stack(mels, axis=0)[:, None, :, :]
+    x_out = torch.from_numpy(mel_batch)
 
     # 5) add channel dim -> [B, 1, n_mels, frames]
     mel_batch = mel_batch[:, None, :, :]
@@ -60,7 +54,7 @@ def inference_load(
     x_out = torch.from_numpy(mel_batch)  # float32
 
     # 7) optional normalization (use SAME stats as training)
-    norm_stats = _load_norm_stats(processed_dir=path_cfg.processed_dir)
+    norm_stats = _load_norm_stats(processed_dir=Path(path_cfg.processed_dir))
 
     # 7) normalize with TRAIN stats (supports scalar OR per-mel vector)
     mean, std = norm_stats
@@ -83,12 +77,10 @@ def inference_load(
 
         x_out = (x_out - mean_t) / std_t
 
-    # 8) optional device
     if device is not None:
         x_out = x_out.to(device)
 
     return x_out
-
 
 @torch.no_grad()
 def predict_file(
@@ -96,45 +88,39 @@ def predict_file(
     model: Model,
     paths: PathConfig,
     device: torch.device,
-    agg: str = "vote",  # "vote" or "mean_prob"
+    agg: str = "vote",
 ) -> Dict[str, object]:
-    """Predict on ALL chunks in x: [B,1,n_mels,frames].
-
-    Returns a dict with:
-      - label (file-level)
-      - chunk_preds
-      - chunk_probs (optional)
-    """
     model.eval()
-
-    # Forward on all chunks
     x = x.to(device)
-    logits = model(x)  # [B, C]
-    probs = torch.softmax(logits, dim=-1)  # [B, C]
-    chunk_preds = probs.argmax(dim=-1)  # [B]
+    
+    logits = model(x)  
+    probs = torch.softmax(logits, dim=-1)  
+    chunk_preds = probs.argmax(dim=-1)  
 
-    # Load label map
-    label_path = paths.processed_dir / "labels.json"
-    with open(label_path) as f:
-        idx_to_label = json.load(f)  # keys often strings
+    # Type narrowing for Mypy safety
+    p_proc = Path(paths.processed_dir)
+    label_path = p_proc / "labels.json"
+    
+    with open(label_path, "r", encoding="utf8") as f:
+        idx_to_label = json.load(f)
 
-    # Aggregate
     if agg == "vote":
-        # majority vote on predicted class indices
         vals, counts = torch.unique(chunk_preds, return_counts=True)
-        winner = vals[counts.argmax()].item()
-        file_label = idx_to_label[winner]
+        winner = int(vals[counts.argmax()].item())
+        # JSON keys are strings, so cast winner to str
+        file_label = idx_to_label[str(winner)] 
     elif agg == "mean_prob":
-        mean_prob = probs.mean(dim=0)  # [C]
-        winner = mean_prob.argmax().item()
+        mean_prob = probs.mean(dim=0)
+        winner = int(mean_prob.argmax().item())
         file_label = idx_to_label[str(winner)]
     else:
-        raise ValueError(f"Unknown agg='{agg}'. Use 'vote' or 'mean_prob'.")
+        raise ValueError(f"Unknown agg='{agg}'.")
 
     return {
         "label": file_label,
-        "chunk_preds": chunk_preds.detach().cpu().tolist(),
-        "chunk_probs": probs.detach().cpu().tolist(),  # remove if too heavy
+        "winner_idx": winner,
+        "chunk_preds": chunk_preds.cpu().tolist(),
+        "chunk_probs": probs.cpu().tolist(),
     }
 
 
@@ -156,6 +142,7 @@ def paths_from_hydra_cfg(cfg) -> PathConfig:
 if __name__ == "__main__":
     file = "/Users/holgermaxfloelyng/Desktop/BioMed/MSc_Biomed/SEM_3/project/mlops_project/data/voice_of_birds/West_Mexican_Chachalaca_sound/West_Mexican_Chachalaca4.mp3"
     ckpt_name = "best.pt"
+    
     paths = PathConfig(
         root=Path("."),
         raw_dir=Path("data/voice_of_birds"),
@@ -169,15 +156,17 @@ if __name__ == "__main__":
         y_val=Path("data/processed/val_y.pt"),
     )
 
-    
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    ckpt_path = paths.ckpt_dir / ckpt_name
+    # --- FIX START ---
+    # Narrow the type to Path to allow the / operator
+    p_ckpt = Path(paths.ckpt_dir)
+    ckpt_path = p_ckpt / ckpt_name
+    # --- FIX END ---
+
     state = torch.load(ckpt_path, map_location=device)
     n_classes = int(state["n_classes"])
-    hp = state.get("hp", {})  # might be dict or OmegaConf-like
-
-
+    hp = state.get("hp", {}) 
 
     # Load model
     model = Model(
@@ -188,23 +177,21 @@ if __name__ == "__main__":
     )
 
     model.load_state_dict(state["model_state"])
-    # local defaults (no hydra)
 
     try:
-        x, sr = sf.read(file, always_2d=False)
-        if x.ndim == 2:
-            x = x.mean(axis=1)
+        x_raw, sr = sf.read(file, always_2d=False)
+        if x_raw.ndim == 2:
+            x_raw = x_raw.mean(axis=1)
     except Exception:
-        # fallback: torchaudio
-        wav, sr = torchaudio.load(file)  # wav: [channels, time]
+        wav, sr = torchaudio.load(file) 
         if wav.shape[0] > 1:
             wav = wav.mean(dim=0, keepdim=True)
-        x = wav.squeeze(0).cpu().numpy().astype(np.float32)
+        x_raw = wav.squeeze(0).cpu().numpy().astype(np.float32)
     
-    x = inference_load(x, sr)
-    print("Input shape:", x.shape)  # [B, 1, n_mels, frames]
+    # Process audio into mel-spectrogram chunks
+    x_tensor = inference_load(x_raw, sr, path_cfg=paths, device=device)
+    print("Input shape:", x_tensor.shape)  # [B, 1, n_mels, frames]
 
-
-
-    out = predict_file(x, model=model, paths=paths, device=device, agg="vote")
+    # Run prediction
+    out = predict_file(x_tensor, model=model, paths=paths, device=device, agg="vote")
     print("Predicted:", out["label"])
