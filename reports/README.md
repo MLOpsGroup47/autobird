@@ -104,7 +104,7 @@ will check the repositories and the code to verify your answers.
 * [ ] Setup cloud monitoring of your instrumented application (M28)
 * [ ] Create one or more alert systems in GCP to alert you if your app is not behaving correctly (M28)
 * [ ] If applicable, optimize the performance of your data loading using distributed data loading (M29)
-* [ ] If applicable, optimize the performance of your training pipeline by using distributed training (M30)
+* [x] If applicable, optimize the performance of your training pipeline by using distributed training (M30)
 * [ ] Play around with quantization, compilation and pruning for you trained models to increase inference speed (M31)
 
 ### Extra
@@ -362,7 +362,10 @@ We implemented both branches and pull requests throughout our project work. We h
 >
 > Answer:
 
---- question 14 fill here ---
+We have setup W&B for experiment logging of our training and additionally setup a hyperparameter sweep.yaml file in our configs folder. 
+
+
+
 
 ### Question 15
 
@@ -529,7 +532,10 @@ We implemented both branches and pull requests throughout our project work. We h
 >
 > Answer:
 
---- question 26 fill here ---
+Yes, we did manage to implement monitoring to check drift in data. We did this locally in a script src/call_of_func/data/data_drift.py, and this script essentially compares current data (our processed validation split) with reference data (the processed train split) across relevant sound metrics (mel_mean, mel_std, energy_mean, energy_std) and generates an Evidently html report that summarizes if there is data drifting or not. We also managed to implement this feature API on cloud run, ***FJERN DETTE HVIS IKKE VI NÅR FÆRDIG, OG TILFØJ DEL OM DEPLOYED MONITORING OGSÅ***
+
+
+
 
 ## Overall discussion of project
 
@@ -614,4 +620,6 @@ We implemented both branches and pull requests throughout our project work. We h
 > Answer:
 
 --- question 31 fill here ---
+
+
 
