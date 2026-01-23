@@ -1,3 +1,5 @@
+
+
 name: autobird-sweep
 method: random
 metric:
@@ -23,4 +25,4 @@ parameters:
   train.hp.epochs:
     values: [1, 2, 3]
 
-run_cap: 3
+run_cap: 10
