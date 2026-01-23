@@ -758,6 +758,12 @@ In the inference API we also managed to implement monitoring of input-output. He
 > Answer:
 
 --- question 29 fill here ---
+- Starting point is our local setup where we develop code on our seperate machines. Here we built the source code (including, model, training, evaluation, data-preprocessing pipeline etc.), config files (hydra/dataclass), dockerfiles (train/data/api), DVC, tests, logging (wandb) and profiling (TorchProfiling), cloudbuild.yaml, all in the uv framework.  
+- A bucket is filled manually in GCP, which stores our data. 
+- When we commit and push local changes and PRs, we have setup CI-pipeline via Github actions that tests code functionality and ensures proper code quaility. Additionally our cloudbuild.yaml is triggered via PRs which automatically builds docker images for data, train and api. We also make sure to push to DVC to track data versioning. 
+- The API image (which includes all of our src) is automatically deployed in Cloud Run, which acts as a serverless service which can perform inference using our trained model. 
+- Alternatively, we build a docker image, which we the push to GCP, where we train the model (VM or Vertex AI), and the best model is deployed for inference.
+
 
 ### Question 30
 
