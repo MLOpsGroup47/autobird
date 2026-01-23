@@ -1,0 +1,29 @@
+{
+  "os":  "Windows-11-10.0.26100-SP0",
+  "python":  "CPython 3.12.1",
+  "startedAt":  "2026-01-23T09:07:41.593518Z",
+  "args":  [
+    "train.hp.epochs=1"
+  ],
+  "program":  "-m __main__",
+  "git":  {
+    "remote":  "https://github.com/MLOpsGroup47/autobird.git",
+    "commit":  "ddb0597e7babd1af91df3a68bd852215d6d86f11"
+  },
+  "email":  "s224031@dtu.dk",
+  "root":  "C:\\Users\\gusta\\UniGit\\autobird",
+  "host":  "GustavLaptop",
+  "executable":  "C:\\Users\\gusta\\UniGit\\autobird\\.venv\\Scripts\\python.exe",
+  "cpu_count":  10,
+  "cpu_count_logical":  12,
+  "disk":  {
+    "/":  {
+      "total":  "509722226688",
+      "used":  "478018826240"
+    }
+  },
+  "memory":  {
+    "total":  "8274370560"
+  },
+  "writerId":  "d4viitk5fc47ug9124onwu9795nsjff3"
+}
