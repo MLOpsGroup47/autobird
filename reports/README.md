@@ -246,7 +246,7 @@ Both of these concepts are important for coding projects (in particular group pr
 > *application but also ... .*
 >
 > Answer:
-We have 8 unit tests
+8 individual unit tests targeting API, data, model and training. We are primarily testing function level, meaning we are testing the functions to be used in larger procedures. For the API we test reading the root and using our classify endpoint which performs inference from a POST event. Data tests include confirming config class and its attributes along with a couple of tests of helper functions for the data processing. We test the model by forwading dummy data and thus confirming the model from the output received from the forward pass. Lastly we test the training by simulating 1 iteration of our training loop alongside testing a relevant helper function. 
 
 ### Question 8
 
@@ -466,9 +466,9 @@ To reproduce a previous experiment, one can simply locate the Hydra output folde
 
 We have setup W&B for experiment logging of our training and additionally setup a hyperparameter sweep.yaml file in our configs folder. We pass our Hydra/Omegaconf configuration to wandb when we initialize it which ensures that all hyperparams are store correclty for each run. The runs are logged to track model dimension, number of layers and attentionheads, bacth size, and learning rate (eg. dm64_L1_H2_bs16_lr0.003). We track the train/validations loss and accuracy metrics and learning rate, so that we can track/detect overfitting, convergence etc. 
 
-[This figure](indsæt rigtige billede) shows the logging of all of our previous runs on the left hand side. On the right we see the train/validation loss and accuracy graphs and a learning rate over each epochs, and this allows us to track the performance of each run, and take note of which hyperparamter configurations yield the best results.
+[This figure](figures/wandb_experiement_logs.png) shows the logging of all of our previous runs on the left hand side. On the right we see the train/validation loss and accuracy graphs and a learning rate over each epochs, and this allows us to track the performance of each run, and take note of which hyperparamter configurations yield the best results.
 
-[This figure](reports/figures/wandb_hyperparameter_sweep.png) shows a hyper parameter sweep which follows the configuration seen in configs/wandb/sweep.yaml. Here we run 10 experiments and vary the learning rate, epochs and batch sizes for each run, and this is done in order to find an optimal configuration of hyperparamters to minimize the validation and training loss of the model. The left sidepanel shows the 10 runs for the sweep, and the sweep graphs (top row of images) shows which runs yields the lowest validation loss, what parameters are most influential with respect to validation loss, and the rightmost graph shows a "pathway graph" which shows how the different configurations of batch_size + epochs + learning rate impact the validation loss. The remaining graphs are train/val loss and accuracy for the 10 runs.
+[This figure](figures/wandb_hyperparameter_sweep.png) shows a hyper parameter sweep which follows the configuration seen in configs/wandb/sweep.yaml. Here we run 10 experiments and vary the learning rate, epochs and batch sizes for each run, and this is done in order to find an optimal configuration of hyperparamters to minimize the validation and training loss of the model. The left sidepanel shows the 10 runs for the sweep, and the sweep graphs (top row of images) shows which runs yields the lowest validation loss, what parameters are most influential with respect to validation loss, and the rightmost graph shows a "pathway graph" which shows how the different configurations of batch_size + epochs + learning rate impact the validation loss. The remaining graphs are train/val loss and accuracy for the 10 runs.
 
 
 
@@ -541,7 +541,14 @@ Debugging methods varied from groups members. Mostly print() was enough to debug
 >
 > Answer:
 
---- question 19 fill here ---
+Our bucket is called bird-cage bucket and contains 3 folders, data/ models/ voice_of_birds/
+
+data/ includes a subfolder processed/ which contains all processed data
+models/ contains .pt and .pth files of models
+voice_of_birds/ contains folders for each species of bird, each containing 
+
+[bucket image including processed data](figures/bucket.png)
+[bucket image including bird mp3 files](figures/bucket_2.png)
 
 ### Question 20
 
@@ -550,7 +557,7 @@ Debugging methods varied from groups members. Mostly print() was enough to debug
 >
 > Answer:
 
---- question 20 fill here ---
+[artifact registry](figures/artifact_registry.png)
 
 ### Question 21
 
@@ -559,7 +566,7 @@ Debugging methods varied from groups members. Mostly print() was enough to debug
 >
 > Answer:
 
---- question 21 fill here ---
+[cloud build history](figures/cloud_build_history.png)
 
 ### Question 22
 
