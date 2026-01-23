@@ -533,11 +533,15 @@ Debugging methods varied from groups members. Mostly print() was enough to debug
 >
 > Answer:
 
-Compute Engine: Was used to create and run Virtual Machines "VMs".
-Vertex AI: Was used to automatically start, set up and end VMs for each experiment.
+Compute Engine: Was used to create and run Virtual Machines "VMs". 
+
+Vertex AI: Was used to automatically start, set up and end VMs for each experiment. 
+
 Cloud Storage: We created a bucket to store our raw data, processed data, and trained models.
-Artifact Registry: Repository to hold our container images.
-CLoud run: Was used to deploy our model and allow interaction through FastAPI interface.
+
+Artifact Registry: Repository to hold our container images. 
+
+CLoud run: Was used to deploy our model and allow interaction through FastAPI interface. 
 
 ### Question 18
 
@@ -559,7 +563,8 @@ We used the compute enginge through Vertex AI to run our experiments. Our experi
 | **vCPUs** | 8 Virtual CPUs               |
 | **Memory** | 30GB RAM                     |
 | **Accelerator** | NVIDIA Tesla T4 (16GB VRAM) |
-\
+
+
 The CPUs and 30GB RAM ensured sufficient compute for data loading, while the GPU was critical for accelerating the training of our model.
 We launched these VMs through Vertex AI Custom Jobs using a custom Docker container stored in the Artifact Registry. This approach allowed us to ensure Compute Engine instances could execute our code consistently
 
