@@ -494,8 +494,8 @@ We have setup W&B for experiment logging of our training and additionally setup 
 >
 > Answer:
 
-In this project we developed multiple images: training, data preprocessing, inference, data drifting, and gcp test api.
-For example can one use the training docker by writing this in the terminal:
+In this project we developed multiple images: training, data preprocessing, inference, data drifting, and gcp test api. We mainly used docker images to do testing with Vertex AI, and to deploy our inference API to the cloud. Furthermore we made an image for our data drift image API which was deployed both locally and on gcloud. 
+For example can one run the training docker, after building or pulling, by writing this in the terminal:
 ```bash
 docker run train:latest lr=0.0003 batch_size=32
 ```
@@ -517,7 +517,9 @@ See readme.md in src/
 >
 > Answer:
 
-Debugging methods varied from groups members. Mostly print() was enough to debug the script. Profiling (torch.profiler) is included in train_engine.py, our code is already fucking prime. We used the profiler to update train_engine, from always using spectogram augmentation to it being optional, through the profiler it was seen that it was very computations heavy and took long time to due. Plus our training accuracy increased.
+Debugging methods varied from groups members. Mostly print() was enough to debug the script. But also for many cloud tasks, debugging had to be carried out utilizing their built-in logging system. 
+
+Profiling (torch.profiler) is included in train_engine.py. We used the profiler to update train_engine, from always using spectogram augmentation to it being optional, through the profiler it was seen that it was very computations heavy and took long time to due. Plus our training accuracy increased. The remaining code was not profiled. For future work we would like to profile the API scripts in order to hopefully reduce response times.
 
 ## Working in the cloud
 
