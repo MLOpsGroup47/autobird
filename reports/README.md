@@ -89,23 +89,23 @@ will check the repositories and the code to verify your answers.
 * [x] Create a trigger workflow for automatically building your docker images (M21)
 * [x] Get your model training in GCP using either the Engine or Vertex AI (M21)
 * [x] Create a FastAPI application that can do inference using your model (M22)
-* [ ] Deploy your model in GCP using either Functions or Run as the backend (M23)
-* [ ] Write API tests for your application and setup continues integration for these (M24)
-* [ ] Load test your application (M24)
+* [x] Deploy your model in GCP using either Functions or Run as the backend (M23)
+* [x] Write API tests for your application and setup continues integration for these (M24)
+* [x] Load test your application (M24)
 * [ ] Create a more specialized ML-deployment API using either ONNX or BentoML, or both (M25)
 * [ ] Create a frontend for your API (M26)
 
 ### Week 3
 
 * [x] Check how robust your model is towards data drifting (M27)
-* [ ] Setup collection of input-output data from your deployed application (M27)
+* [x] Setup collection of input-output data from your deployed application (M27)
 * [ ] Deploy to the cloud a drift detection API (M27)
 * [ ] Instrument your API with a couple of system metrics (M28)
 * [ ] Setup cloud monitoring of your instrumented application (M28)
 * [ ] Create one or more alert systems in GCP to alert you if your app is not behaving correctly (M28)
-* [ ] If applicable, optimize the performance of your data loading using distributed data loading (M29)
+* [x] If applicable, optimize the performance of your data loading using distributed data loading (M29)
 * [x] If applicable, optimize the performance of your training pipeline by using distributed training (M30)
-* [ ] Play around with quantization, compilation and pruning for you trained models to increase inference speed (M31)
+* [x] Play around with quantization, compilation and pruning for you trained models to increase inference speed (M31)
 
 ### Extra
 
@@ -246,7 +246,6 @@ Both of these concepts are important for coding projects (in particular group pr
 > *application but also ... .*
 >
 > Answer:
-
 --- question 7 fill here ---
 
 ### Question 8
@@ -294,7 +293,9 @@ We implemented both branches and pull requests throughout our project work. We h
 >
 > Answer:
 
---- question 10 fill here ---
+Yes, we implemented DVC to manage our data, to version and track datasets stored outside the Git repository. DVC was configured with a remote gcloud storage bucket, which allowed us to keep large data files outside our of Git, while maintaining a link between code, configuration, and data version used in experiments. 
+
+It helped us improve the reproducibility of our project. Each of our git commmands is associated with a specific version of the data in the DVC, making it easy to determine which data was used for train, validation and testing. ADDD MORE
 
 ### Question 11
 
@@ -330,7 +331,104 @@ We implemented both branches and pull requests throughout our project work. We h
 >
 > Answer:
 
---- question 12 fill here ---
+We used hydra and typer, but hydra was mainly used, typer is optional. In the configs/ folder contain subfolder with configuration for training hyperparameters, distributed training, profiling, paths configurations, and preprocessing configuratiosns. 
+#### To run data preprocessing, use the following commands: 
+```bash
+uvr data processing.sr=16000
+uvr data data.train_split=0.8
+uvr data pathing.paths.raw_dir=data/voice_of_birds
+```
+Optional commands and their defaults can be seen below: 
+```yaml
+preprocessing:
+  sr: 16000
+  clip_sec: 5.0
+  n_fft: 1024
+  hop_length: 512
+  n_mels: 64
+  fq_min: 20
+  fq_max: 8000
+  min_rms: 0.005
+  min_mel_std: 0.10
+  min_samples: 50
+
+data:
+  train_split: 0.8
+  test_split: 0.1
+  seed: 4
+  clip_sec: 5.0
+  stride_sec: 2.5
+  pad_last: true
+```
+#### To run training, use the following commands:
+```bash
+uvr train train.hp.lr=0.0003
+uvr train train.optim._target_=torch.optim.Adam
+uvr train train.slr._target_=torch.optim.lr_scheduler.StepLR
+uvr train pathing.paths.ckpt_dir=models/checkpoints
+```
+
+```yaml
+# @package train.hp
+
+epochs: 3
+lr: 0.0003
+batch_size: 32
+d_model: 64
+n_heads: 2
+n_layers: 1
+pin_memory: false
+shuffle_train: true
+shuffle_val: false
+num_workers: 2
+amp: true
+grad_clip: 1.0
+use_wandb: true
+use_ws: false
+
+# @package train.optim
+
+_target_: torch.optim.Adam
+lr: 0.0003
+weight_decay: 0.0001
+
+# @package train.slr
+
+_target_: torch.optim.lr_scheduler.StepLR
+step_size: 5
+gamma: 0.5
+```
+
+
+profiler options
+```yaml
+# @package train.prof
+enabled: false
+wait: 1
+warmup: 1
+active: 3
+repeat: 1
+record_shapes: true
+profile_memory: true
+with_stack: false
+```
+
+Pathing options
+```yaml
+paths:
+  root: .
+  raw_dir: data/voice_of_birds
+  processed_dir: data/processed
+  reports_dir: reports
+  eval_dir: reports/eval_metrics
+  ckpt_dir: models/checkpoints
+  profile_dir: reports/torch_prof
+  out_dir: ${paths.processed_dir}/shards
+  x_train: ${paths.processed_dir}/train_x.pt
+  y_train: ${paths.processed_dir}/train_y.pt
+  x_val: ${paths.processed_dir}/val_x.pt
+  y_val: ${paths.processed_dir}/val_y.pt
+```
 
 ### Question 13
 
@@ -620,6 +718,7 @@ Yes, we did manage to implement monitoring to check drift in data. We did this l
 > Answer:
 
 --- question 31 fill here ---
+
 
 
 
