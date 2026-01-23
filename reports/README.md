@@ -122,6 +122,7 @@ will check the repositories and the code to verify your answers.
 > **Enter the group number you signed up on <learn.inside.dtu.dk>**
 >
 > Answer: 
+
 Group 47
 
 ### Question 2
@@ -246,6 +247,7 @@ Both of these concepts are important for coding projects (in particular group pr
 > *application but also ... .*
 >
 > Answer:
+
 8 individual unit tests targeting API, data, model and training. We are primarily testing function level, meaning we are testing the functions to be used in larger procedures. For the API we test reading the root and using our classify endpoint which performs inference from a POST event. Data tests include confirming config class and its attributes along with a couple of tests of helper functions for the data processing. We test the model by forwading dummy data and thus confirming the model from the output received from the forward pass. Lastly we test the training by simulating 1 iteration of our training loop alongside testing a relevant helper function. 
 
 ### Question 8
@@ -767,7 +769,6 @@ In the inference API we also managed to implement monitoring of input-output. He
 >
 > Answer:
 
---- question 29 fill here ---
 - Starting point is our local setup where we develop code on our seperate machines. Here we built the source code (including, model, training, evaluation, data-preprocessing pipeline etc.), config files (hydra/dataclass), dockerfiles (train/data/api), DVC, tests, logging (wandb) and profiling (TorchProfiling), cloudbuild.yaml, all in the uv framework.  
 - A bucket is filled manually in GCP, which stores our data. 
 - When we commit and push local changes and PRs, we have setup CI-pipeline via Github actions that tests code functionality and ensures proper code quaility. Additionally our cloudbuild.yaml is triggered via PRs which automatically builds docker images for data, train and api. We also make sure to push to DVC to track data versioning. 
@@ -786,6 +787,7 @@ In the inference API we also managed to implement monitoring of input-output. He
 > *The biggest challenges in the project was using ... tool to do ... . The reason for this was ...*
 >
 > Answer:
+
 One of the biggest challenges in our project was handling packages and dependencies across different machines. Ensuring that all environments could run the same libraries consistently turned out to be difficult, especially due to hardware differences. In particular, an older Mac with an Intel chip could not support newer versions of PyTorch, which required us to adapt our setup accordingly. We also encountered persistent issues with the Librosa library, which failed to run reliably across machines and took considerable time to troubleshoot. Eventually, this issue was resolved by switching from Librosa to TorchAudio, which provided better compatibility and allowed all team members to run the same pipeline. Overall, managing dependencies and achieving a stable, reproducible environment was one of the most time-consuming aspects of the project.
 
 
@@ -814,14 +816,13 @@ Using DDP introduced additional pain. Understanding how to use multiple cores an
 > *We have used ChatGPT to help debug our code. Additionally, we used GitHub Copilot to help write some of our code.*
 > Answer:
 
---- question 31 fill here ---
 Student s224473 was in charge of developing a parts of the source code, (including the evaluation script), ensuring that the codebase was fully compatible with TorchAudio after transitioning away from Librosa setting up wandb configuration to track all training runs and implemented a hyperparameter sweep, and setting up data drift monitoring (Evidently), both locally and as a deployed API in the cloud.
 
 Student s214776 was in charge of developing of setting up the initial cookie cutter project, model development, data preprocessing, training, distributed training, profiler implementation, amp/quantization, and configurations of yaml configs and dataclass configs.
 
 Student s224022 
 
-Student s224031 
+Student s224031 was in charge of setting up all GitHub related tasks. This included setting up the repository, Dependabot, GitHub actions, branch rules and connecting it to Google Cloud Build. Related to this the student also set up the continuous integration by making the workflows and linking them to GitHub actions. In addition, the student also made all the pytest scripts to be triggered by the "Run tests" workflow. Furthermore the student made everything related to the inference API, including developing the FastAPI script, dockerfile and deploying the API both locally and in cloud via continuous deployment. To this the student also developed all the tests for API for both functionality and load testing. 
 
 
 ### Declaration on the Use of Artificial Intelligence Tools
