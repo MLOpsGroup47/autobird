@@ -168,7 +168,7 @@ We have predominantly implemented the recommended tools shown in the course exer
 >
 > Answer:
 
-We used uv together with pyproject.toml to manage dependencies in our project. All project dependencies are declared in pyproject.toml, while exact package versions are locked in uv.lock to ensure full reproducibility. Whenever a new dependency was to added, the command: "uv add <package-name>" was used, which updates the pyproject.py and uv.lock files. Assuming a new member is working on a branch with an up-to-date pyproject.toml and uv.lock file, the command: "uv sync", downloads all necessary dependcies ensures they are working with an exact copy of the environment, and ensures reproducibility. 
+We used the uv framework together with pyproject.toml to manage all dependencies in our project. All project dependencies are declared in pyproject.toml, while the exact package versions are locked in uv.lock to ensure full reproducibility of the eviroment. Whenever a new dependency is introduced to the project, the command: "uv add <package-name>" was used, which updates the pyproject.py and uv.lock files. Assuming a new member is working on a branch with an up-to-date pyproject.toml and uv.lock file, the command: "uv sync", to downloads all necessary dependcies that ensures they are working with an exact copy of the original environment, and ensures reproducibility. 
 
 
 ### Question 5
@@ -295,9 +295,10 @@ We implemented both branches and pull requests throughout our project work. We h
 >
 > Answer:
 
-Yes, we implemented DVC to manage our data, to version and track datasets stored outside the Git repository. DVC was configured with a remote gcloud storage bucket, which allowed us to keep large data files outside our of Git, while maintaining a link between code, configuration, and data version used in experiments. 
+Yes, we implemented DVC to manage our data, to version and track datasets stored outside the Git repository. DVC was configured with a remote gcloud storage bucket, which allowed us to keep large data files outside our of Git, while maintaining a link between code, configuration, and data version used in new experiments. 
 
-It helped us improve the reproducibility of our project. Each of our git commmands is associated with a specific version of the data in the DVC, making it easy to determine which data was used for train, validation and testing. ADDD MORE
+It helped us to improve the reproducibility of our project. Each of our git commmands is associated with a specific version of the data in the DVC, making it easy to determine which data was used for train, validation and testing. 
+
 
 ### Question 11
 
