@@ -764,7 +764,7 @@ We ended up spending in total 10.3$ during the development of our project. The m
 >
 > Answer:
 
---- question 28 fill here ---
+No we did not implement anything extra in our project not covered by other questions.
 
 ### Question 29
 
