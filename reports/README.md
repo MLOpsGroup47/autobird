@@ -109,12 +109,12 @@ will check the repositories and the code to verify your answers.
 
 ### Extra
 
-* [ ] Write some documentation for your application (M32)
-* [ ] Publish the documentation to GitHub Pages (M32)
+* [x] Write some documentation for your application (M32)
+* [x] Publish the documentation to GitHub Pages (M32)
 * [ ] Revisit your initial project description. Did the project turn out as you wanted?
 * [ ] Create an architectural diagram over your MLOps pipeline
-* [ ] Make sure all group members have an understanding about all parts of the project
-* [ ] Uploaded all your code to GitHub
+* [x] Make sure all group members have an understanding about all parts of the project
+* [x] Uploaded all your code to GitHub
 
 ## Group information
 
@@ -500,7 +500,7 @@ We have setup W&B for experiment logging of our training and additionally setup 
 >
 > Answer:
 
---- question 16 fill here ---
+Debugging methods varied from groups members. Mostly print() was enough to debug the script. Profiling is included in train_engine.py, but we havent used it much. add more 
 
 ## Working in the cloud
 
@@ -725,6 +725,7 @@ Yes, we did manage to implement monitoring to check drift in data. We did this l
 > Answer:
 
 --- question 31 fill here ---
+
 
 
 
