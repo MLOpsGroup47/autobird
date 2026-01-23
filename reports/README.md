@@ -551,10 +551,12 @@ CLoud run: Was used to deploy our model and allow interaction through FastAPI in
 > Answer:
 
 We used the compute enginge through Vertex AI to run our experiments. Our experiments were carried out on machines with following hardware:
-vCPUs:  8 Virtual CPUs
-Memory: 30GB RAM
-Machine Family: N1
-GPU:  NVIDIA Tesla T4
+| Component       | Specification                |
+|:----------------|:-----------------------------|
+| **VM Family** | N1 Series (`n1-standard-8`) |
+| **vCPUs** | 8 Virtual CPUs               |
+| **Memory** | 30GB RAM                     |
+| **Accelerator** | NVIDIA Tesla T4 (16GB VRAM) |
 The CPUs and 30GB RAM ensured sufficient compute for data loading, while the GPU was critical for accelerating the training of our model.
 We launched these VMs through Vertex AI Custom Jobs using a custom Docker container stored in the Artifact Registry. This approach allowed us to ensure Compute Engine instances could execute our code consistently 
 
@@ -632,7 +634,7 @@ workerPoolSpecs:
         - name: WANDB_MODE
           value: "online"
         - name: WANDB_API_KEY
-          value: "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" 
+          value: "--INSERT_WANDB_API_KEY--" 
         - name: WANDB_PROJECT
           value: "autobird"
 ```
