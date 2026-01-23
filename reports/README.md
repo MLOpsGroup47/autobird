@@ -723,7 +723,11 @@ Yes, we did manage to implement monitoring to check drift in data. We did this l
 >
 > Answer:
 
-Getting our training docker to run on GPU in gcloud. 
+Getting our training docker to run on GPU in gcloud.
+Struggles of student s214776 - The preprocessing pipeline was difficult to implement correctly, and integrating Distributed Data Parallel (DDP) into `train_engine.py`. Ensuring no data leakage was a pain, as audio files had to be chunked while keeping all chunks from the same file within a single dataset split. This was necessary to prevent chunks from the same audio appearing in the training, validation, and test sets. Keeping track of which files were used during training also required careful handling.
+
+Using DDP introduced additional pain. Understanding how to use multiple cores and processes for parallel training was a pain, and resolving duplicated log outputs, e.g. repeated `print("training started")` statements, was frustrating.
+
 
 ### Question 31
 
@@ -757,3 +761,4 @@ In this project, artificial intelligence (AI) tools were used as a supporting ai
 The AI tools were used solely as a support for the authors’ own work. All design choices, implementations, experiments, analyses, and evaluations were carried out by the authors. Any AI-generated suggestions were critically assessed, tested, and, where necessary, modified before inclusion.
 
 AI tools were not used to generate experimental data, conduct analyses automatically, or produce results, interpretations, or conclusions. The authors take full responsibility for the academic content, correctness, originality, and integrity of the project.
+
