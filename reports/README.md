@@ -312,7 +312,11 @@ It helped us improve the reproducibility of our project. Each of our git commman
 >
 > Answer:
 
-For our continuous intefration we have split it into 2 primary workflow files: one for doing tests and one for running linting, formatting and typecheck. Arguably the most important is our "Run tests" workflow located [here](../.github/workflows/tests.yaml). It runs all our pytest tests, but crucially it does so on 4 different platforms. The group included
+For our continuous intefration we have split it into 2 primary workflow files: one for doing tests and one for running linting, formatting and typecheck. 
+
+Arguably the most important is our "Run tests" workflow located [here](../.github/workflows/tests.yaml). It runs all our pytest tests, but crucially it does so on 4 different platforms. Our group consists of users of windows, mac with M2/3 and mac with intel. Thus we set up our continuous integration to run pytests on all those 3 platforms in addition to ubuntu to ensure it would also run on a linux platform. Additionally we tested all platforms on python version 3.11 and 3.12 to ensure multiple working python versions for our project. An example of a triggered workflow can be seen here <https://github.com/MLOpsGroup47/autobird/actions/runs/21289542698>.  
+
+Secondly we made a combined workflow called "Run linting" located [here](../.github/workflows/tests.yaml). Despite the name the workflow covers both linting, formatting and type checking. We use ruff for linting and formatting to ensure our python code lives up to the PEP8 standard, and to overall keep the code consistant and readable. For type checking we use mypy to further enhance readablity. An example of a triggered workflow can be found here <https://github.com/MLOpsGroup47/autobird/actions/runs/21289542694>.
 
 We also tried to add a workflow for doing load testing of our API, but due to time constraints the workflow was not finished. 
 
@@ -608,7 +612,7 @@ voice_of_birds/ contains folders for each species of bird, each containing
 >
 > Answer:
 
---- question 23 fill here ---
+We managed to write a working API for doing inference using our model. We made our API script working both locally and in the cloud by adjusting path strings in order to use the native project paths when working locally, and a path to our Bucket when used in the cloud. Apart from the root we made 2 endpoint called "files" and "classify". The "files" endpoint uses a GET event to list the files located in our model folder, which depends on the platform. "classify" receives an audio file through a POST event and returns the predicted class as response. We used FastAPI the make the API.
 
 ### Question 24
 
