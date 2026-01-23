@@ -822,7 +822,6 @@ Using DDP introduced additional pain. Understanding how to use multiple cores an
 > *We have used ChatGPT to help debug our code. Additionally, we used GitHub Copilot to help write some of our code.*
 > Answer:
 
---- question 31 fill here ---
 Student s224473 was in charge of developing a parts of the source code, (including the evaluation script), ensuring that the codebase was fully compatible with TorchAudio after transitioning away from Librosa setting up wandb configuration to track all training runs and implemented a hyperparameter sweep, and setting up data drift monitoring (Evidently), both locally and as a deployed API in the cloud.
 
 Student s214776 was in charge of setting up the initial cookie cutter project, model development, data preprocessing, training, distributed training, profiler implementation, amp/quantization, and configs for for all of the respectively, in configs/.
