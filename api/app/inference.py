@@ -10,7 +10,8 @@ import soundfile as sf
 import torch
 import torchaudio
 from call_of_birds_autobird.model import Model
-from call_of_func.data.inference_preprocess import inference_load, predict_file
+from call_of_func.data.inference_preprocess import inference_load
+from call_of_func.data.new_inference import predict_file
 from call_of_func.dataclasses.pathing import PathConfig
 from fastapi import BackgroundTasks, FastAPI, File, UploadFile
 
@@ -41,17 +42,31 @@ async def lifespan(app: FastAPI):
     paths = PathConfig( 
         root=Path("."),
         raw_dir=Path("data/voice_of_birds"),
-        processed_dir=Path("../../data/processed"),
+        processed_dir=Path("data/processed"),
         reports_dir=Path("reports/figures"),
         eval_dir=Path("reports/eval"),
-        ckpt_dir= Path("../../models/checkpoints"),
+        ckpt_dir= Path("models/checkpoints"),
         x_train=Path("data/processed/train_x.pt"),
         y_train=Path("data/processed/train_y.pt"),
         x_val=Path("data/processed/val_x.pt"),
         y_val=Path("data/processed/val_y.pt"),
     )
+    
+    if not (Path.cwd() / "pyproject.toml").exists():
+        paths = PathConfig( 
+            root=Path("."),
+            raw_dir=Path("../../data/voice_of_birds"),
+            processed_dir=Path("../../data/processed"),
+            reports_dir=Path("../../reports/figures"),
+            eval_dir=Path("../../reports/eval"),
+            ckpt_dir= Path("../../models/checkpoints"),
+            x_train=Path("../../data/processed/train_x.pt"),
+            y_train=Path("../../data/processed/train_y.pt"),
+            x_val=Path("../../data/processed/val_x.pt"),
+            y_val=Path("../../data/processed/val_y.pt"),
+        )
 
-    paths = paths.resolve()
+    
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     ckpt_path = resolve_checkpoint_path(MODEL_NAME, paths)
@@ -77,7 +92,6 @@ async def lifespan(app: FastAPI):
 
     model.load_state_dict(state["model_state"])
 
-    model.to(device)
 
     with open("prediction_database.csv", "w") as file:
         file.write("time, audio_file, prediction\n")
@@ -134,10 +148,10 @@ async def caption(
 ):
     try:
         try:
-            x, sr = sf.read(audio.file, always_2d=False)
-            if x.ndim == 2:
-                x = x.mean(axis=1)
-            x = x.astype(np.float32)
+            x_in, sr = sf.read(audio.file, always_2d=False)
+            if x_in.ndim == 2:
+                x_in = x_in.mean(axis=1)
+            x_in = x_in.astype(np.float32)
             sr = int(sr)
         except Exception as e:
             print(f"SF Read Error: {e}")
@@ -146,12 +160,17 @@ async def caption(
             wav, sr = torchaudio.load(audio.file)  # wav: [channels, time]
             if wav.shape[0] > 1:
                 wav = wav.mean(dim=0, keepdim=True)
-            x = wav.squeeze(0).cpu().numpy().astype(np.float32)
+            x_in = wav.squeeze(0).cpu().numpy().astype(np.float32)
             sr = int(sr)
 
-        x = inference_load(x, sr)
+        x = inference_load(
+            x=x_in,
+            sr=sr,
+            device=device,
+            path_cfg=paths,
+        )
 
-        out = predict_file(x, model=model, paths=paths, device=device, agg="vote")
+        out = predict_file(x, model=model, agg="vote", processed_dir=paths.processed_dir)
         now = str(datetime.now(tz=timezone.utc))
         background_tasks.add_task(add_to_database, now, str(audio.filename), str(out['label']))
 
@@ -182,12 +201,12 @@ def predict_step(file: str, model: Model, paths: PathConfig, device: torch.devic
         x = wav.squeeze(0).cpu().numpy().astype(np.float32)
         sr = int(sr)
 
-    x = inference_load(x, sr)
+    x = inference_load(x, sr, path_cfg=paths, device=device)
     print("Input shape:", x.shape)  # [B, 1, n_mels, frames]
 
 
 
-    out = predict_file(x, model=model, paths=paths, device=device, agg="vote")
+    out = predict_file(x, model=model, agg="vote", processed_dir=paths.processed_dir)
     return out
 
 

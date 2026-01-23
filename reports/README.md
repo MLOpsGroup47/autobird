@@ -246,7 +246,7 @@ Both of these concepts are important for coding projects (in particular group pr
 > *application but also ... .*
 >
 > Answer:
---- question 7 fill here ---
+We have 8 unit tests
 
 ### Question 8
 
