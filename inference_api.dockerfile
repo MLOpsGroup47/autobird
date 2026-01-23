@@ -18,6 +18,7 @@ RUN uv sync --locked --no-install-project --no-cache
 
 COPY api/ ./api
 COPY src/ ./src
+COPY data/processed/ ./data/processed
 COPY models/ ./models
 COPY configs/ ./configs
 COPY README.md README.md
