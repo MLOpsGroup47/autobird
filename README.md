@@ -42,59 +42,41 @@ The model is based on a transformer based architecture for audio classification 
 
 The directory structure of the project looks like this:
 ```txt
-├── .github/                  # Github actions and dependabot
-│   ├── dependabot.yaml
+.
+├── .github/                 # CI/CD workflows
 │   └── workflows/
-│       └── tests.yaml
-├── configs/                  # Configuration files
-| 	├──
-|   ├── .gitkeep
-├── data/                     # Data directory
-│   ├── processed
-│   └── raw
-├── dockerfiles/              # Dockerfiles
-│   ├── api.Dockerfile
-│   └── train.Dockerfile
-├── docs/                     # Documentation
-│   ├── mkdocs.yml
-│   └── source/
-│       └── index.md
-├── models/                   # Trained models
-├── notebooks/                # Jupyter notebooks
-├── reports/                  # Reports
-|   ├── figures/
-|   ├── README.md
-│   └── report.py
-├── src/                      # Source code
-│   ├── call_of_birds_autobird/
-│   │   ├── __init__.py
-│   │   ├── api.py
-│   │   ├── data.py
-│   │   ├── evaluate.py
-│   │   ├── models.py
-│   │   ├── train.py
-│   │   └── visualize.py
-│	└──	call_of_func/
-│		├── data/
-│		├── dataclasses/
-│		├── train/
-│		└──utils/
-└── tests/                    # Tests
-│   ├── __init__.py
-│   ├── test_api.py
-│   ├── test_data.py
-│   └── test_model.py
-├── .gitignore
-├── .pre-commit-config.yaml
-├── LICENSE
-├── pyproject.toml            # Python project file
-├── README.md                 # Project README
-├── requirements.txt          # Project requirements
-├── requirements_dev.txt      # Development requirements
-└── tasks.py                  # Project tasks
+├── configs/                 # Hydra configs
+│   ├── config.yaml
+│   ├── data/
+│   ├── ddp/
+│   ├── hyperparams/
+│   ├── optimizer/
+│   ├── pathing/
+│   ├── prof/
+│   ├── scheduler/
+│   └── wandb/
+├── data/                    # Data (raw/processed)
+│   ├── raw/                 # raw audio (not tracked)
+│   └── processed/           # tensors + labels
+├── models/                  # Saved checkpoints
+│   └── checkpoints/
+├── reports/                 # Figures, metrics, profiling
+│   ├── figures/
+│   ├── eval_metrics/
+│   └── torch_prof/
+├── src/                     # Python package source
+│   ├── call_of_birds_autobird/   # main package (api, train, eval)
+│   └── call_of_func/             # shared utils (data, train, utils)
+├── tests/                   # Unit tests
+├── docker/                  # Dockerfiles
+├── docs/                    # Documentation
+├── pyproject.toml
+└── README.md
+
 ```
 
 
 Created using [mlops_template](https://github.com/SkafteNicki/mlops_template),
 a [cookiecutter template](https://github.com/cookiecutter/cookiecutter) for getting
 started with Machine Learning Operations (MLOps).
+

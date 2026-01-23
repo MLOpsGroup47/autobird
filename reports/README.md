@@ -99,7 +99,7 @@ will check the repositories and the code to verify your answers.
 
 * [x] Check how robust your model is towards data drifting (M27)
 * [x] Setup collection of input-output data from your deployed application (M27)
-* [ ] Deploy to the cloud a drift detection API (M27)
+* [x] Deploy to the cloud a drift detection API (M27)
 * [ ] Instrument your API with a couple of system metrics (M28)
 * [ ] Setup cloud monitoring of your instrumented application (M28)
 * [ ] Create one or more alert systems in GCP to alert you if your app is not behaving correctly (M28)
@@ -109,12 +109,12 @@ will check the repositories and the code to verify your answers.
 
 ### Extra
 
-* [ ] Write some documentation for your application (M32)
-* [ ] Publish the documentation to GitHub Pages (M32)
+* [x] Write some documentation for your application (M32)
+* [x] Publish the documentation to GitHub Pages (M32)
 * [ ] Revisit your initial project description. Did the project turn out as you wanted?
 * [ ] Create an architectural diagram over your MLOps pipeline
-* [ ] Make sure all group members have an understanding about all parts of the project
-* [ ] Uploaded all your code to GitHub
+* [x] Make sure all group members have an understanding about all parts of the project
+* [x] Uploaded all your code to GitHub
 
 ## Group information
 
@@ -193,7 +193,7 @@ We have filed out the following:
 - src: this includes 2 sub folders, "call_of_func" for modular/helper functions for both train, dataclasses, data and utils. the other subfolder "call_of_birds_autobird" for main functions eg. train.py, evaluate.py, api.py, model.py, visualize.py etc
 - configs: hydra config files with parameters etc. Subfolders for    data            hyperparams     optimizer       pathing         prof            scheduler       wandb
 - reports: subfolders include  eval_metrics    figures         report.py       torch_prof
-- notesbooks: data visualizations (raw and processed)
+- notesbooks: data visualizations (raw and processed), model tesing
 - models: subfolder "checkpoints" stores and metrics and model for last.pt and best.pt
 - docker: dockerfiles
 
@@ -246,7 +246,7 @@ Both of these concepts are important for coding projects (in particular group pr
 > *application but also ... .*
 >
 > Answer:
---- question 7 fill here ---
+8 individual unit tests targeting API, data, model and training. We are primarily testing function level, meaning we are testing the functions to be used in larger procedures. For the API we test reading the root and using our classify endpoint which performs inference from a POST event. Data tests include confirming config class and its attributes along with a couple of tests of helper functions for the data processing. We test the model by forwading dummy data and thus confirming the model from the output received from the forward pass. Lastly we test the training by simulating 1 iteration of our training loop alongside testing a relevant helper function. 
 
 ### Question 8
 
@@ -261,7 +261,7 @@ Both of these concepts are important for coding projects (in particular group pr
 >
 > Answer:
 
---- question 8 fill here ---
+The total code coverage of the code i 33%, which includes all of our source code. 100% code coverage does not necessarily ensure an errorless coding-pipeline. The coverage is only representative of the tests built by the developers and these may themselves be full of errors. But even if the errors don't have errors, and the cover 100% of the code, there is no guarantee that the code will behave flawlessly on unexpected input data. So code coverage can be a helpful indicator, but cannot be solely relied on. 
 
 ### Question 9
 
@@ -312,7 +312,13 @@ It helped us improve the reproducibility of our project. Each of our git commman
 >
 > Answer:
 
---- question 11 fill here ---
+For our continuous intefration we have split it into 2 primary workflow files: one for doing tests and one for running linting, formatting and typecheck. 
+
+Arguably the most important is our "Run tests" workflow located [here](../.github/workflows/tests.yaml). It runs all our pytest tests, but crucially it does so on 4 different platforms. Our group consists of users of windows, mac with M2/3 and mac with intel. Thus we set up our continuous integration to run pytests on all those 3 platforms in addition to ubuntu to ensure it would also run on a linux platform. Additionally we tested all platforms on python version 3.11 and 3.12 to ensure multiple working python versions for our project. An example of a triggered workflow can be seen here <https://github.com/MLOpsGroup47/autobird/actions/runs/21289542698>.  
+
+Secondly we made a combined workflow called "Run linting" located [here](../.github/workflows/tests.yaml). Despite the name the workflow covers both linting, formatting and type checking. We use ruff for linting and formatting to ensure our python code lives up to the PEP8 standard, and to overall keep the code consistant and readable. For type checking we use mypy to further enhance readablity. An example of a triggered workflow can be found here <https://github.com/MLOpsGroup47/autobird/actions/runs/21289542694>.
+
+We also tried to add a workflow for doing load testing of our API, but due to time constraints the workflow was not finished. 
 
 ## Running code and tracking experiments
 
@@ -443,7 +449,11 @@ paths:
 >
 > Answer:
 
---- question 13 fill here ---
+We ensured reproducibility by using hydra configuration files to manage all experiemtns parameters. Each experiment is run with fully specified configs, including preprocessing settings, model architecture, training hyperparameters, and runtime options. When a run is launched, Hydra automatically creates a dedicated log directory under outputs/<date>/<time>/, which contains the exact configuration files used for that experiment. This guarantees that no parameter choices are lost, even when experimenting with multiple hyperparameter variations.
+
+During training, all active parameters are printed to the terminal and stored in the Hydra output directory. In addition, when train.hp.use_wandb=True, we log training and validation metrics, learning rates, and model performance statistics to a Weights & Biases project, providing a persistent and centralized experiment history.
+
+To reproduce a previous experiment, one can simply locate the Hydra output folder, inspect the saved configuration files, and rerun the training using those exact parameters. This setup ensures that preprocessing steps, training behavior, and results can be reproduced by others or at a later time.
 
 ### Question 14
 
@@ -462,9 +472,9 @@ paths:
 
 We have setup W&B for experiment logging of our training and additionally setup a hyperparameter sweep.yaml file in our configs folder. We pass our Hydra/Omegaconf configuration to wandb when we initialize it which ensures that all hyperparams are store correclty for each run. The runs are logged to track model dimension, number of layers and attentionheads, bacth size, and learning rate (eg. dm64_L1_H2_bs16_lr0.003). We track the train/validations loss and accuracy metrics and learning rate, so that we can track/detect overfitting, convergence etc. 
 
-[This figure](indsæt rigtige billede) shows the logging of all of our previous runs on the left hand side. On the right we see the train/validation loss and accuracy graphs and a learning rate over each epochs, and this allows us to track the performance of each run, and take note of which hyperparamter configurations yield the best results.
+[This figure](figures/wandb_experiement_logs.png) shows the logging of all of our previous runs on the left hand side. On the right we see the train/validation loss and accuracy graphs and a learning rate over each epochs, and this allows us to track the performance of each run, and take note of which hyperparamter configurations yield the best results.
 
-[This figure](reports/figures/wandb_hyperparameter_sweep.png) shows a hyper parameter sweep which follows the configuration seen in configs/wandb/sweep.yaml. Here we run 10 experiments and vary the learning rate, epochs and batch sizes for each run, and this is done in order to find an optimal configuration of hyperparamters to minimize the validation and training loss of the model. The left sidepanel shows the 10 runs for the sweep, and the sweep graphs (top row of images) shows which runs yields the lowest validation loss, what parameters are most influential with respect to validation loss, and the rightmost graph shows a "pathway graph" which shows how the different configurations of batch_size + epochs + learning rate impact the validation loss. The remaining graphs are train/val loss and accuracy for the 10 runs.
+[This figure](figures/wandb_hyperparameter_sweep.png) shows a hyper parameter sweep which follows the configuration seen in configs/wandb/sweep.yaml. Here we run 10 experiments and vary the learning rate, epochs and batch sizes for each run, and this is done in order to find an optimal configuration of hyperparamters to minimize the validation and training loss of the model. The left sidepanel shows the 10 runs for the sweep, and the sweep graphs (top row of images) shows which runs yields the lowest validation loss, what parameters are most influential with respect to validation loss, and the rightmost graph shows a "pathway graph" which shows how the different configurations of batch_size + epochs + learning rate impact the validation loss. The remaining graphs are train/val loss and accuracy for the 10 runs.
 
 
 
@@ -481,7 +491,15 @@ We have setup W&B for experiment logging of our training and additionally setup 
 >
 > Answer:
 
---- question 15 fill here ---
+In this project we developed multiple images: training, data preprocessing, inference, data drifting, and gcp test api.
+For example can one use the training docker by writing this in the terminal:
+```bash
+docker run train:latest lr=0.0003 batch_size=32
+```
+See <https://console.cloud.google.com/artifacts/docker/autobird-484409/europe-west1/autobird-container/train-image?authuser=1&project=autobird-484409>
+This training docker can take the same arguments as ```bash uvr train ```
+See readme.md in src/
+
 
 ### Question 16
 
@@ -496,7 +514,7 @@ We have setup W&B for experiment logging of our training and additionally setup 
 >
 > Answer:
 
---- question 16 fill here ---
+Debugging methods varied from groups members. Mostly print() was enough to debug the script. Profiling (torch.profiler) is included in train_engine.py, our code is already fucking prime. We used the profiler to update train_engine, from always using spectogram augmentation to it being optional, through the profiler it was seen that it was very computations heavy and took long time to due. Plus our training accuracy increased.
 
 ## Working in the cloud
 
@@ -537,7 +555,14 @@ We have setup W&B for experiment logging of our training and additionally setup 
 >
 > Answer:
 
---- question 19 fill here ---
+Our bucket is called bird-cage bucket and contains 3 folders, data/ models/ voice_of_birds/
+
+data/ includes a subfolder processed/ which contains all processed data
+models/ contains .pt and .pth files of models
+voice_of_birds/ contains folders for each species of bird, each containing 
+
+[bucket image including processed data](figures/bucket.png)
+[bucket image including bird mp3 files](figures/bucket_2.png)
 
 ### Question 20
 
@@ -546,7 +571,7 @@ We have setup W&B for experiment logging of our training and additionally setup 
 >
 > Answer:
 
---- question 20 fill here ---
+[artifact registry](figures/artifact_registry.png)
 
 ### Question 21
 
@@ -555,7 +580,7 @@ We have setup W&B for experiment logging of our training and additionally setup 
 >
 > Answer:
 
---- question 21 fill here ---
+[cloud build history](figures/cloud_build_history.png)
 
 ### Question 22
 
@@ -587,7 +612,7 @@ We have setup W&B for experiment logging of our training and additionally setup 
 >
 > Answer:
 
---- question 23 fill here ---
+We managed to write a working API for doing inference using our model. We made our API script working both locally and in the cloud by adjusting path strings in order to use the native project paths when working locally, and a path to our Bucket when used in the cloud. Apart from the root we made 2 endpoint called "files" and "classify". The "files" endpoint uses a GET event to list the files located in our model folder, which depends on the platform. "classify" receives an audio file through a POST event and returns the predicted class as response. We used FastAPI the make the API.
 
 ### Question 24
 
@@ -633,7 +658,10 @@ We have setup W&B for experiment logging of our training and additionally setup 
 >
 > Answer:
 
-Yes, we did manage to implement monitoring to check drift in data. We did this locally in a script src/call_of_func/data/data_drift.py, and this script essentially compares current data (our processed validation split) with reference data (the processed train split) across relevant sound metrics (mel_mean, mel_std, energy_mean, energy_std) and generates an Evidently html report that summarizes if there is data drifting or not. We also managed to implement this feature API on cloud run, ***FJERN DETTE HVIS IKKE VI NÅR FÆRDIG, OG TILFØJ DEL OM DEPLOYED MONITORING OGSÅ***
+Yes, to an extent. We did manage to implement monitoring to check drift in data. We did this locally in a script src/call_of_func/data/data_drift.py, and this script essentially compares current data (our processed validation split) with reference data (the processed train split) across relevant sound metrics (mel_mean, mel_std, energy_mean, energy_std) and generates an Evidently html report that summarizes if there is data drifting or not. This is important because it allows us to detect when new incoming data starts to differ from the data the model was trained on, which can lead to degraded model performance if not addressed in time. (In an industry setting we would substitute current data with new incoming data instead of just the validation data). We also managed to implement this feature in an API on cloud run (autobird-drift), which does precisely the same, but uses data directly from the bucket instead. The endpoints <url>/drift/report displays the report and <url>/drift/run returns a JSON object that determines whether drift is detected in the dataset, number of samples in current/ref and status for the run. 
+
+In the inference API we also managed to implement monitoring of input-output. Here we collect the time and name of the uploaded file to the and we output a prediction of the class. This is important because it enables basic traceability and observability of the inference pipeline, making it easier to debug incorrect predictions and understand how the model is being used in practice. For future steps, we could have logged prediction confidence, model version, response time etc, which would allow us to monitor performance and trigger retraining when necessary.
+
 
 
 
@@ -701,8 +729,17 @@ Yes, we did manage to implement monitoring to check drift in data. We did this l
 > *The biggest challenges in the project was using ... tool to do ... . The reason for this was ...*
 >
 > Answer:
+One of the biggest challenges in our project was handling packages and dependencies across different machines. Ensuring that all environments could run the same libraries consistently turned out to be difficult, especially due to hardware differences. In particular, an older Mac with an Intel chip could not support newer versions of PyTorch, which required us to adapt our setup accordingly. We also encountered persistent issues with the Librosa library, which failed to run reliably across machines and took considerable time to troubleshoot. Eventually, this issue was resolved by switching from Librosa to TorchAudio, which provided better compatibility and allowed all team members to run the same pipeline. Overall, managing dependencies and achieving a stable, reproducible environment was one of the most time-consuming aspects of the project.
 
---- question 30 fill here ---
+
+
+Getting our training docker to run on GPU in gcloud.
+
+
+Struggles of student s214776 - The preprocessing pipeline was difficult to implement correctly, and integrating Distributed Data Parallel (DDP) into `train_engine.py`. Ensuring no data leakage was a pain, as audio files had to be chunked while keeping all chunks from the same file within a single dataset split. This was necessary to prevent chunks from the same audio appearing in the training, validation, and test sets. Keeping track of which files were used during training also required careful handling.
+
+Using DDP introduced additional pain. Understanding how to use multiple cores and processes for parallel training was a pain, and resolving duplicated log outputs, e.g. repeated `print("training started")` statements, was frustrating.
+
 
 ### Question 31
 
@@ -721,8 +758,21 @@ Yes, we did manage to implement monitoring to check drift in data. We did this l
 > Answer:
 
 --- question 31 fill here ---
+Student s224473 was in charge of developing a parts of the source code, (including the evaluation script), ensuring that the codebase was fully compatible with TorchAudio after transitioning away from Librosa setting up wandb configuration to track all training runs and implemented a hyperparameter sweep, and setting up data drift monitoring (Evidently), both locally and as a deployed API in the cloud.
+
+Student s214776 was in charge of developing of setting up the initial cookie cutter project, model development, data preprocessing, training, distributed training, profiler implementation, amp/quantization, and configurations of yaml configs and dataclass configs.
+
+Student s224022 
+
+Student s224031 
 
 
+### Declaration on the Use of Artificial Intelligence Tools
 
+In this project, artificial intelligence (AI) tools were used as a supporting aid in the development process, including chatGPT, Gemini, Vertex AI and Grok. The use of AI was limited to assistance with programming-related tasks, including code structuring, debugging, optimization, and clarification of technical concepts.
+
+The AI tools were used solely as a support for the authors’ own work. All design choices, implementations, experiments, analyses, and evaluations were carried out by the authors. Any AI-generated suggestions were critically assessed, tested, and, where necessary, modified before inclusion.
+
+AI tools were not used to generate experimental data, conduct analyses automatically, or produce results, interpretations, or conclusions. The authors take full responsibility for the academic content, correctness, originality, and integrity of the project.
 
 

@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from typing import List, Optional, Tuple
 
+import fsspec
 import gcsfs
 import torch
 from omegaconf import DictConfig
@@ -11,29 +12,27 @@ from torch.utils.data.distributed import DistributedSampler
 from call_of_func.dataclasses.pathing import PathConfig
 
 
-def _load_class_names(processed_dir: Path) -> Optional[List[str]]:
-    if str(processed_dir).startswith("gs://"):
-        fs = gcsfs.GCSFileSystem()
-        with fs.open(f"{processed_dir}/labels.json", "r") as f:
-            return json.load(f)
-    else:
-        label_path = processed_dir / "labels.json"
-        if not label_path.exists():
-            return None
-        return json.loads(label_path.read_text(encoding="utf8"))
+def _load_tensor(path) -> torch.Tensor:
+    # fsspec.open handles gs:// and local paths automatically
+    with fsspec.open(str(path), "rb") as f:
+        return torch.load(f, map_location="cpu")
 
-
-def _load_tensor(path: str | Path) -> torch.Tensor:
-    path_str = str(path)
-    if path_str.startswith("gs://"):
-        fs = gcsfs.GCSFileSystem()
-        with fs.open(path_str, "rb") as f:
-            return torch.load(f)
-    else:
-        return torch.load(Path(path_str)) 
+def _load_class_names(processed_dir) -> Optional[list[str]]:
+    # Join paths correctly whether string (GCS) or Path (Local)
+    path_str = f"{str(processed_dir)}/labels.json"
     
-def maybe_path(p):
-    return p if str(p).startswith("gs://") else Path(p)
+    try:
+        with fsspec.open(path_str, "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return None
+    
+def safe_path(p):
+    if p is None: return None
+    p_str = str(p)
+    if "://" in p_str:  # Catch gs://, s3://, etc.
+        return p_str
+    return Path(p_str)
 
 
 def build_dataloader(
@@ -41,16 +40,16 @@ def build_dataloader(
 ) -> tuple[DataLoader, DataLoader, int, Optional[List[str]], Optional[DistributedSampler]]:
     """Build dataloaders using the already composed Hydra cfg."""
     paths = PathConfig(
-        root=Path(cfg.paths.root),
-        raw_dir=Path(cfg.paths.raw_dir),
-        processed_dir=Path(cfg.paths.processed_dir),
-        reports_dir=Path(cfg.paths.reports_dir),
-        eval_dir=Path(cfg.paths.eval_dir),
-        ckpt_dir=Path(cfg.paths.ckpt_dir),
-        x_train=Path(cfg.paths.x_train),
-        y_train=Path(cfg.paths.y_train),
-        x_val=Path(cfg.paths.x_val),
-        y_val=Path(cfg.paths.y_val),
+        root=safe_path(cfg.paths.root),
+        raw_dir=safe_path(cfg.paths.raw_dir),
+        processed_dir=safe_path(cfg.paths.processed_dir),
+        reports_dir=safe_path(cfg.paths.reports_dir),
+        eval_dir=safe_path(cfg.paths.eval_dir),
+        ckpt_dir=safe_path(cfg.paths.ckpt_dir),
+        x_train=safe_path(cfg.paths.x_train),
+        y_train=safe_path(cfg.paths.y_train),
+        x_val=safe_path(cfg.paths.x_val),
+        y_val=safe_path(cfg.paths.y_val),
     )
 
     rank = int(cfg.runtime.rank)

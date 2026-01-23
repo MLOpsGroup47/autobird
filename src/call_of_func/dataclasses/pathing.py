@@ -1,25 +1,26 @@
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Union
 
 
 @dataclass
 class PathConfig:
-    root: Path
-    raw_dir: Path
-    processed_dir: Path
-    reports_dir: Path
-    eval_dir: Path
-    ckpt_dir: Path
-    x_train: Path
-    y_train: Path
-    x_val: Path
-    y_val: Path
+    root: Union[Path, str]
+    raw_dir: Union[Path, str]
+    processed_dir: Union[Path, str]
+    reports_dir: Union[Path, str]
+    eval_dir: Union[Path, str]
+    ckpt_dir: Union[Path, str]
+    x_train: Union[Path, str]
+    y_train: Union[Path, str]
+    x_val: Union[Path, str]
+    y_val: Union[Path, str]
 
     def resolve(self) -> "PathConfig":
         # resolve project root first
         root = Path(self.root).expanduser().resolve()
 
-        def r(p: Path) -> Path:
+        def r(p: Path | str) -> Path:
             p = Path(p).expanduser()
             return p if p.is_absolute() else (root / p).resolve()
 
@@ -35,13 +36,9 @@ class PathConfig:
         self.y_val = r(self.y_val)
 
         # create dirs that should exist
-        self.processed_dir.mkdir(parents=True, exist_ok=True)
-        self.reports_dir.mkdir(parents=True, exist_ok=True)
-        self.eval_dir.mkdir(parents=True, exist_ok=True)
-        self.ckpt_dir.mkdir(parents=True, exist_ok=True)
-        self.x_train.mkdir(parents=True, exist_ok=True)
-        self.y_train.mkdir(parents=True, exist_ok=True)
-        self.x_val.mkdir(parents=True, exist_ok=True)
-        self.y_val.mkdir(parents=True, exist_ok=True)
+        for attr in ["processed_dir", "reports_dir", "eval_dir", "ckpt_dir", 
+                     "x_train", "y_train", "x_val", "y_val"]:
+            val = getattr(self, attr)
+            Path(val).mkdir(parents=True, exist_ok=True)
 
         return self
