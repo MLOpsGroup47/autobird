@@ -460,8 +460,11 @@ paths:
 >
 > Answer:
 
-We have setup W&B for experiment logging of our training and additionally setup a hyperparameter sweep.yaml file in our configs folder. 
+We have setup W&B for experiment logging of our training and additionally setup a hyperparameter sweep.yaml file in our configs folder. We pass our Hydra/Omegaconf configuration to wandb when we initialize it which ensures that all hyperparams are store correclty for each run. The runs are logged to track model dimension, number of layers and attentionheads, bacth size, and learning rate (eg. dm64_L1_H2_bs16_lr0.003). We track the train/validations loss and accuracy metrics and learning rate, so that we can track/detect overfitting, convergence etc. 
 
+[This figure](indsæt rigtige billede) shows the logging of all of our previous runs on the left hand side. On the right we see the train/validation loss and accuracy graphs and a learning rate over each epochs, and this allows us to track the performance of each run, and take note of which hyperparamter configurations yield the best results.
+
+[This figure](reports/figures/wandb_hyperparameter_sweep.png) shows a hyper parameter sweep which follows the configuration seen in configs/wandb/sweep.yaml. Here we run 10 experiments and vary the learning rate, epochs and batch sizes for each run, and this is done in order to find an optimal configuration of hyperparamters to minimize the validation and training loss of the model. The left sidepanel shows the 10 runs for the sweep, and the sweep graphs (top row of images) shows which runs yields the lowest validation loss, what parameters are most influential with respect to validation loss, and the rightmost graph shows a "pathway graph" which shows how the different configurations of batch_size + epochs + learning rate impact the validation loss. The remaining graphs are train/val loss and accuracy for the 10 runs.
 
 
 
@@ -718,6 +721,7 @@ Yes, we did manage to implement monitoring to check drift in data. We did this l
 > Answer:
 
 --- question 31 fill here ---
+
 
 
 
