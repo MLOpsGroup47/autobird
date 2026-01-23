@@ -129,18 +129,19 @@ def inference_load(
 def predict_file(
     x: torch.Tensor,  # [B, 1, n_mels, frames]
     model: Model,
-    processed_dir: Path,
+    processed_dir: Path | str,
     agg: str = "vote",  # "vote" or "mean_prob"
 ) -> Dict[str, object]:
     """Predict on all chunks; aggregate to file-level label."""
     model.eval()
+    p_proc = Path(processed_dir)
 
     logits = model(x)                 # [B, C]
     probs = torch.softmax(logits, -1) # [B, C]
     chunk_preds = probs.argmax(-1)    # [B]
 
     # labels.json
-    label_path = processed_dir / "labels.json"
+    label_path = p_proc / "labels.json"
     if not label_path.exists():
         raise FileNotFoundError(f"Missing {label_path}")
     with open(label_path, "r", encoding="utf8") as f:
@@ -207,12 +208,16 @@ if __name__ == "__main__":
         y_val=Path("data/processed/val_y.pt"),
     )
 
+    p_proc = Path(paths.processed_dir)
+    p_ckpt = Path(paths.ckpt_dir)
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # -----------------------------
     # LOAD CHECKPOINT + MODEL
     # -----------------------------
-    ckpt_path = paths.ckpt_dir / ckpt_name
+    # Use p_ckpt here instead of paths.ckpt_dir
+    ckpt_path = p_ckpt / ckpt_name
     state = torch.load(ckpt_path, map_location="cpu")
 
     n_classes = int(state["n_classes"])
@@ -257,26 +262,27 @@ if __name__ == "__main__":
     # -----------------------------
     x_np, sr = _read_audio_mono(file)
 
-
-    mean_std = _load_norm_stats(paths.processed_dir)
+    # Use p_proc here
+    mean_std = _load_norm_stats(p_proc)
 
     x_in = inference_load(
-    x=x_np,
-    sr=sr,
-    pre_cfg=pre_cfg,
-    data_cfg=data_cfg,
-    norm_stats=mean_std,
-    device=device,
+        x=x_np,
+        sr=sr,
+        pre_cfg=pre_cfg,
+        data_cfg=data_cfg,
+        norm_stats=mean_std,
+        device=device,
     )
     print("Input shape:", x_in.shape)  # [B, 1, n_mels, frames]
 
     # -----------------------------
     # PREDICT
     # -----------------------------
+    # Use p_proc here
     out = predict_file(
         x=x_in,
         model=model,
-        processed_dir=paths.processed_dir,
+        processed_dir=p_proc,
         agg="vote",
     )
     print("Predicted:", out["label"], "| idx:", out["winner_idx"])

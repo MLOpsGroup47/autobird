@@ -6,4 +6,11 @@ workerPoolSpecs:
         acceleratorCount: 1
     replicaCount: 1
     containerSpec:
-        imageUri: europe-west1-docker.pkg.dev/autobird-484409/autobird-container/train-image:latest
+        imageUri: europe-west1-docker.pkg.dev/autobird-484409/autobird-container/trainer:v1-gpu
+        env:
+        - name: WANDB_MODE
+          value: "online"
+        - name: WANDB_API_KEY
+          value: "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" 
+        - name: WANDB_PROJECT
+          value: "autobird"
