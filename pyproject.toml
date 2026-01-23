@@ -51,6 +51,7 @@ dependencies = [
     "evidently>=0.7.20",
     "python-multipart>=0.0.21",
     "httpx>=0.28.1",
+    "locust>=2.43.1",
 ]
 
 [dependency-groups]
