@@ -637,7 +637,7 @@ curl -X 'POST' \
   'https://inference-api-1047655691608.europe-west1.run.app/classify/' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
-  -F 'audio=@dummy_audio.mp3;type=audio/mpeg'
+  -F 'audio=@audiofile.mp3;type=audio/mpeg'
 ´´´
 
 ### Question 25
