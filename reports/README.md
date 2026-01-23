@@ -193,7 +193,7 @@ We have filed out the following:
 - src: this includes 2 sub folders, "call_of_func" for modular/helper functions for both train, dataclasses, data and utils. the other subfolder "call_of_birds_autobird" for main functions eg. train.py, evaluate.py, api.py, model.py, visualize.py etc
 - configs: hydra config files with parameters etc. Subfolders for    data            hyperparams     optimizer       pathing         prof            scheduler       wandb
 - reports: subfolders include  eval_metrics    figures         report.py       torch_prof
-- notesbooks: data visualizations (raw and processed)
+- notesbooks: data visualizations (raw and processed), model tesing
 - models: subfolder "checkpoints" stores and metrics and model for last.pt and best.pt
 - docker: dockerfiles
 
@@ -502,7 +502,7 @@ We have setup W&B for experiment logging of our training and additionally setup 
 >
 > Answer:
 
-Debugging methods varied from groups members. Mostly print() was enough to debug the script. Profiling is included in train_engine.py, but we havent used it much. add more 
+Debugging methods varied from groups members. Mostly print() was enough to debug the script. Profiling (torch.profiler) is included in train_engine.py, our code is already fucking prime. We used the profiler to update train_engine, from always using spectogram augmentation to it being optional, through the profiler it was seen that it was very computations heavy and took long time to due. Plus our training accuracy increased.
 
 ## Working in the cloud
 
@@ -733,7 +733,14 @@ Yes, we did manage to implement monitoring to check drift in data. We did this l
 > *We have used ChatGPT to help debug our code. Additionally, we used GitHub Copilot to help write some of our code.*
 > Answer:
 
---- question 31 fill here ---
+Student s214776 was in charge of developing of setting up the initial cookie cutter project, model development, data preprocessing, training, distributed training, profiler implementation, amp/quantization, and configurations of yaml configs and dataclass configs.
+
+Student s224473
+
+Student s224022 
+
+Student s224031 
+
 
 
 
