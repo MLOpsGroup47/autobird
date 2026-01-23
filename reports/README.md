@@ -715,8 +715,10 @@ In the inference API we also managed to implement monitoring of input-output. He
 > *The biggest challenges in the project was using ... tool to do ... . The reason for this was ...*
 >
 > Answer:
+One of the biggest challenges in our project was handling packages and dependencies across different machines. Ensuring that all environments could run the same libraries consistently turned out to be difficult, especially due to hardware differences. In particular, an older Mac with an Intel chip could not support newer versions of PyTorch, which required us to adapt our setup accordingly. We also encountered persistent issues with the Librosa library, which failed to run reliably across machines and took considerable time to troubleshoot. Eventually, this issue was resolved by switching from Librosa to TorchAudio, which provided better compatibility and allowed all team members to run the same pipeline. Overall, managing dependencies and achieving a stable, reproducible environment was one of the most time-consuming aspects of the project.
 
---- question 30 fill here ---
+
+
 
 ### Question 31
 
@@ -735,6 +737,7 @@ In the inference API we also managed to implement monitoring of input-output. He
 > Answer:
 
 --- question 31 fill here ---
+Student s224473 was in charge of developing a parts of the source code, including the evaluation script. He also ensured that the codebase was fully compatible with TorchAudio after transitioning away from Librosa. He setup wandb configuration to track all training runs and implemented a hyperparameter sweep. Additionally he setup data drift monitoring (Evidently), both locally and as a deployed API in the cloud.
 
 
 
