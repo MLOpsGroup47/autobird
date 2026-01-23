@@ -1,8 +1,8 @@
 from typing import Optional
 
 import torch
-from omegaconf import DictConfig
 import torch.distributed as dist
+from omegaconf import DictConfig
 
 
 def accuracy(logits, y) -> float:
@@ -10,7 +10,7 @@ def accuracy(logits, y) -> float:
 
 ## ddp helper ##
 def _get_runtime(cfg: DictConfig) -> tuple[int, int, int]:
-    """Read runtime injucted by torchrun"""
+    """Read runtime injucted by torchrun."""
     rt = getattr(cfg, "runtime", None)
     if rt is None:
         return 0, 1, 0
@@ -20,7 +20,7 @@ def _get_runtime(cfg: DictConfig) -> tuple[int, int, int]:
     return rank, world_size, local_rank
 
 def _get_device(local_rank: int) -> torch.device:
-    """Select device. Cuda if availeble. MPS if on mac: else CPU"""
+    """Select device. Cuda if availeble. MPS if on mac: else CPU."""
     if torch.cuda.is_available():
         return torch.device(f"cuda:{local_rank}")
     if getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available():

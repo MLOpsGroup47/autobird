@@ -7,7 +7,7 @@ import hydra
 import torch
 import torch.nn as nn
 from call_of_func.train.get_dataloader import build_dataloader
-from call_of_func.train.train_helper import get_device
+from call_of_func.train.train_helper import _get_device, _get_runtime
 from omegaconf import DictConfig
 
 from call_of_birds_autobird.model import Model
@@ -69,7 +69,8 @@ def _macro_f1(preds: torch.Tensor, ys: torch.Tensor, n_classes: int) -> float:
 
 @hydra.main(version_base=None, config_path=str((Path(__file__).resolve().parents[2] / "configs")), config_name="config")
 def run_eval(cfg: DictConfig) -> None:
-    device = get_device()
+    _, _, local_rank = _get_runtime(cfg)
+    device = _get_device(local_rank)
     print(f"Eval on device: {device}")
     ckpt_path = Path(cfg.paths.ckpt_dir) / "best.pt"
 
@@ -81,7 +82,7 @@ def run_eval(cfg: DictConfig) -> None:
 
     # Build dataloader EXACTLY like training (incl. prune_rare)
     # For eval, we typically prune the same way as training did, so the label space matches.
-    _, val_loader, n_classes, class_names = build_dataloader(cfg=cfg, prune_rare=True)
+    _, val_loader, n_classes, class_names, _ = build_dataloader(cfg=cfg)
 
     # Load checkpoint (includes n_classes used during training)
     ckpt = torch.load(ckpt_path, map_location="cpu")
