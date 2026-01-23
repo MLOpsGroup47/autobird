@@ -261,7 +261,7 @@ We have 8 unit tests
 >
 > Answer:
 
---- question 8 fill here ---
+The total code coverage of the code i 33%, which includes all of our source code. 100% code coverage does not necessarily ensure an errorless coding-pipeline. The coverage is only representative of the tests built by the developers and these may themselves be full of errors. But even if the errors don't have errors, and the cover 100% of the code, there is no guarantee that the code will behave flawlessly on unexpected input data. So code coverage can be a helpful indicator, but cannot be solely relied on. 
 
 ### Question 9
 
