@@ -443,7 +443,11 @@ paths:
 >
 > Answer:
 
---- question 13 fill here ---
+We ensured reproducibility by using hydra configuration files to manage all experiemtns parameters. Each experiment is run with fully specified configs, including preprocessing settings, model architecture, training hyperparameters, and runtime options. When a run is launched, Hydra automatically creates a dedicated log directory under outputs/<date>/<time>/, which contains the exact configuration files used for that experiment. This guarantees that no parameter choices are lost, even when experimenting with multiple hyperparameter variations.
+
+During training, all active parameters are printed to the terminal and stored in the Hydra output directory. In addition, when train.hp.use_wandb=True, we log training and validation metrics, learning rates, and model performance statistics to a Weights & Biases project, providing a persistent and centralized experiment history.
+
+To reproduce a previous experiment, one can simply locate the Hydra output folder, inspect the saved configuration files, and rerun the training using those exact parameters. This setup ensures that preprocessing steps, training behavior, and results can be reproduced by others or at a later time.
 
 ### Question 14
 
@@ -721,6 +725,7 @@ Yes, we did manage to implement monitoring to check drift in data. We did this l
 > Answer:
 
 --- question 31 fill here ---
+
 
 
 
