@@ -102,7 +102,7 @@ def preprocess_cfg(
         rn_dir(p_raw)
         rn_mp3(p_raw)
 
-    items, classes = _index_dataset(paths.raw_dir)
+    items, classes = _index_dataset(p_raw)
     train_items, val_items, test_items = _split_by_groups(items=items, cfg=data_cfg)
 
     # build raw tensor splits
