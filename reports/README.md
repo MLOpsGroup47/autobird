@@ -531,7 +531,11 @@ Debugging methods varied from groups members. Mostly print() was enough to debug
 >
 > Answer:
 
---- question 17 fill here ---
+Compute Engine: Was used to create and run Virtual Machines "VMs".
+Vertex AI: Was used to automatically start, set up and end VMs for each experiment.
+Cloud Storage: We created a bucket to store our raw data, processed data, and trained models.
+Artifact Registry: Repository to hold our container images.
+CLoud run: Was used to deploy our model and allow interaction through FastAPI interface.
 
 ### Question 18
 
@@ -546,7 +550,13 @@ Debugging methods varied from groups members. Mostly print() was enough to debug
 >
 > Answer:
 
---- question 18 fill here ---
+We used the compute enginge through Vertex AI to run our experiments. Our experiments were carried out on machines with following hardware:
+vCPUs:  8 Virtual CPUs
+Memory: 30GB RAM
+Machine Family: N1
+GPU:  NVIDIA Tesla T4
+The CPUs and 30GB RAM ensured sufficient compute for data loading, while the GPU was critical for accelerating the training of our model.
+We launched these VMs through Vertex AI Custom Jobs using a custom Docker container stored in the Artifact Registry. This approach allowed us to ensure Compute Engine instances could execute our code consistently 
 
 ### Question 19
 
@@ -595,7 +605,38 @@ voice_of_birds/ contains folders for each species of bird, each containing
 >
 > Answer:
 
---- question 22 fill here ---
+We used Vertex AI to train our model as this eased the process of launcing, setting up and terminating VMs. Using the compute engine allowed us to train our model longer than training on our own computers ensuring better model performance. The experiments were started using our container images stored in the artifact registry by running following train-bash script in the terminal:
+```bash 
+gcloud ai custom-jobs create \
+  --region=europe-west1 \
+  --display-name=test-run-parallel \
+  --config=config_gpu.yaml \
+  --args="paths.processed_dir=gs://birdcage-bucket/data/processed" \
+  --args="paths.x_train=gs://birdcage-bucket/data/processed/train_x.pt" \
+  --args="paths.x_val=gs://birdcage-bucket/data/processed/val_x.pt" \
+  --args="paths.y_train=gs://birdcage-bucket/data/processed/train_y.pt" \
+  --args="paths.y_val=gs://birdcage-bucket/data/processed/val_y.pt" \
+  --args="train.hp.epochs=100" \ 
+```
+With config file:
+```bash
+workerPoolSpecs:
+    machineSpec:
+        machineType: n1-standard-8
+        acceleratorType: NVIDIA_TESLA_T4
+        acceleratorCount: 1
+    replicaCount: 1
+    containerSpec:
+        imageUri: europe-west1-docker.pkg.dev/autobird-484409/autobird-container/trainer:v1-gpu
+        env:
+        - name: WANDB_MODE
+          value: "online"
+        - name: WANDB_API_KEY
+          value: "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" 
+        - name: WANDB_PROJECT
+          value: "autobird"
+```
+Which submits a job to Vertex AI which launches a VM with the specifications listed before and terminates it after completion.
 
 ## Deployment
 
