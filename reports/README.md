@@ -248,7 +248,7 @@ Both of these concepts are important for coding projects (in particular group pr
 >
 > Answer:
 
-8 individual unit tests targeting API, data, model and training. We are primarily testing function level, meaning we are testing the functions to be used in larger procedures. For the API we test reading the root and using our classify endpoint which performs inference from a POST event. Data tests include confirming config class and its attributes along with a couple of tests of helper functions for the data processing. We test the model by forwading dummy data and thus confirming the model from the output received from the forward pass. Lastly we test the training by simulating 1 iteration of our training loop alongside testing a relevant helper function. 
+We made 8 individual unit tests targeting API, data, model and training, where we are primarily testing at a function level. For the API we test reading the root and using our classify endpoint which performs inference from a POST event. Data tests include confirming config class and its attributes and a couple of tests of helper functions for the data processing. We test the model by forwading dummy data and confirming the model from the output received from the forward pass. Lastly we test the training by simulating 1 iteration of training loop alongside testing a relevant helper function. 
 
 ### Question 8
 
@@ -263,7 +263,7 @@ Both of these concepts are important for coding projects (in particular group pr
 >
 > Answer:
 
-The total code coverage of the code i 33%, which includes all of our source code. 100% code coverage does not necessarily ensure an errorless coding-pipeline. The coverage is only representative of the tests built by the developers and these may themselves be full of errors. But even if the errors don't have errors, and the cover 100% of the code, there is no guarantee that the code will behave flawlessly on unexpected input data. So code coverage can be a helpful indicator, but cannot be solely relied on. 
+The total code coverage of the code i 33%, which includes all of our source code. We haven't tried to reach 100% since 100% code coverage does not necessarily ensure an errorless coding-pipeline. The coverage is only representative of the tests built by the developers and these may themselves be full of errors. But even if the errors don't have errors, and the cover 100% of the code, there is no guarantee that the code will behave flawlessly on unexpected input data - so called edge cases. So code coverage can be a helpful indicator, but cannot be solely relied on. 
 
 ### Question 9
 
@@ -314,7 +314,7 @@ It helped us improve the reproducibility of our project. Each of our git commman
 >
 > Answer:
 
-For our continuous intefration we have split it into 2 primary workflow files: one for doing tests and one for running linting, formatting and typecheck. 
+For our continuous integration we have split it into 2 primary workflow files: one for doing tests and one for running linting, formatting and typecheck. 
 
 Arguably the most important is our "Run tests" workflow located [here](../.github/workflows/tests.yaml). It runs all our pytest tests, but crucially it does so on 4 different platforms. Our group consists of users of windows, mac with M2/3 and mac with intel. Thus we set up our continuous integration to run pytests on all those 3 platforms in addition to ubuntu to ensure it would also run on a linux platform. Additionally we tested all platforms on python version 3.11 and 3.12 to ensure multiple working python versions for our project. An example of a triggered workflow can be seen here <https://github.com/MLOpsGroup47/autobird/actions/runs/21289542698>.  
 
@@ -340,7 +340,8 @@ We also tried to add a workflow for doing load testing of our API, but due to ti
 > Answer:
 
 We used hydra and typer, but hydra was mainly used, typer is optional. In the configs/ folder contain subfolder with configuration for training hyperparameters, distributed training, profiling, paths configurations, and preprocessing configuratiosns. 
-#### To run data preprocessing, use the following commands: 
+
+-To run data preprocessing, use the following commands: 
 ```bash
 uvr data processing.sr=16000
 uvr data data.train_split=0.8
@@ -474,9 +475,9 @@ To reproduce a previous experiment, one can simply locate the Hydra output folde
 
 We have setup W&B for experiment logging of our training and additionally setup a hyperparameter sweep.yaml file in our configs folder. We pass our Hydra/Omegaconf configuration to wandb when we initialize it which ensures that all hyperparams are store correclty for each run. The runs are logged to track model dimension, number of layers and attentionheads, bacth size, and learning rate (eg. dm64_L1_H2_bs16_lr0.003). We track the train/validations loss and accuracy metrics and learning rate, so that we can track/detect overfitting, convergence etc. 
 
-[This figure](figures/wandb_experiement_logs.png) shows the logging of all of our previous runs on the left hand side. On the right we see the train/validation loss and accuracy graphs and a learning rate over each epochs, and this allows us to track the performance of each run, and take note of which hyperparamter configurations yield the best results.
+![This figure](figures/wandb_experiement_logs.png) shows the logging of all of our previous runs on the left hand side. On the right we see the train/validation loss and accuracy graphs and a learning rate over each epochs, and this allows us to track the performance of each run, and take note of which hyperparamter configurations yield the best results.
 
-[This figure](figures/wandb_hyperparameter_sweep.png) shows a hyper parameter sweep which follows the configuration seen in configs/wandb/sweep.yaml. Here we run 10 experiments and vary the learning rate, epochs and batch sizes for each run, and this is done in order to find an optimal configuration of hyperparamters to minimize the validation and training loss of the model. The left sidepanel shows the 10 runs for the sweep, and the sweep graphs (top row of images) shows which runs yields the lowest validation loss, what parameters are most influential with respect to validation loss, and the rightmost graph shows a "pathway graph" which shows how the different configurations of batch_size + epochs + learning rate impact the validation loss. The remaining graphs are train/val loss and accuracy for the 10 runs.
+![This figure](figures/wandb_hyperparameter_sweep.png) shows a hyper parameter sweep which follows the configuration seen in configs/wandb/sweep.yaml. Here we run 10 experiments and vary the learning rate, epochs and batch sizes for each run, and this is done in order to find an optimal configuration of hyperparamters to minimize the validation and training loss of the model. The left sidepanel shows the 10 runs for the sweep, and the sweep graphs (top row of images) shows which runs yields the lowest validation loss, what parameters are most influential with respect to validation loss, and the rightmost graph shows a "pathway graph" which shows how the different configurations of batch_size + epochs + learning rate impact the validation loss. The remaining graphs are train/val loss and accuracy for the 10 runs.
 
 
 
@@ -581,8 +582,8 @@ data/ includes a subfolder processed/ which contains all processed data
 models/ contains .pt and .pth files of models
 voice_of_birds/ contains folders for each species of bird, each containing 
 
-[bucket image including processed data](figures/bucket.png)
-[bucket image including bird mp3 files](figures/bucket_2.png)
+![bucket image including processed data](figures/bucket.png)
+![bucket image including bird mp3 files](figures/bucket_2.png)
 
 ### Question 20
 
@@ -591,7 +592,7 @@ voice_of_birds/ contains folders for each species of bird, each containing
 >
 > Answer:
 
-[artifact registry](figures/artifact_registry.png)
+![artifact registry](figures/artifact_registry.png)
 
 ### Question 21
 
@@ -600,7 +601,7 @@ voice_of_birds/ contains folders for each species of bird, each containing
 >
 > Answer:
 
-[cloud build history](figures/cloud_build_history.png)
+![cloud build history](figures/cloud_build_history.png)
 
 ### Question 22
 
@@ -779,10 +780,18 @@ We ended up spending in total 10.3$ during the development of our project. The m
 
 - Starting point is our local setup where we develop code on our seperate machines. Here we built the source code (including, model, training, evaluation, data-preprocessing pipeline etc.), config files (hydra/dataclass), dockerfiles (train/data/api), DVC, tests, logging (wandb) and profiling (TorchProfiling), cloudbuild.yaml, all in the uv framework.  
 - A bucket is filled manually in GCP, which stores our data. 
+
+Essentially from here, there are two routes in the framework, either committing new code, or sending a docker image to GCP.
+
+Route 1 (committing new code) 
 - When we commit and push local changes and PRs, we have setup CI-pipeline via Github actions that tests code functionality and ensures proper code quaility. Additionally our cloudbuild.yaml is triggered via PRs which automatically builds docker images for data, train and api. We also make sure to push to DVC to track data versioning. 
 - The API image (which includes all of our src) is automatically deployed in Cloud Run, which acts as a serverless service which can perform inference using our trained model. 
+
+
+Route 2 (docker image to GCP)
 - Alternatively, we build a docker image, which we the push to GCP, where we train the model (VM or Vertex AI), and the best model is deployed for inference.
 
+A figure of our entire pipeline can be seen ![here](figures/pipeline.png). It is highly based on the inspiration figure. 
 
 ### Question 30
 
@@ -829,10 +838,10 @@ Student s214776 was in charge of setting up the initial cookie cutter project, m
 
 Student s224022 was in charge of setting up the cloud and train our models in the cloud, including building the docker images, developing a bash script to ease the job submission. As mentioned the I struggled with building the images in the cloud and ended up building them locally and push them afterwards. Also I ensured our code was runable both locally and in the cloud using the data stored in out bucket.
 
-Student s224031 was in charge of setting up all GitHub related tasks. This included setting up the repository, Dependabot, GitHub actions, branch rules and connecting it to Google Cloud Build. Related to this the student also set up the continuous integration by making the workflows and linking them to GitHub actions. In addition, the student also made all the pytest scripts to be triggered by the "Run tests" workflow. Furthermore the student made everything related to the inference API, including developing the FastAPI script, dockerfile and deploying the API both locally and in cloud via continuous deployment. To this the student also developed all the tests for API for both functionality and load testing. 
+Student s224031 was in charge of setting up all GitHub related tasks. This included setting up the repository, Dependabot, GitHub actions, branch rules and connecting it to Google Cloud Build. The student set up the continuous integration by making the workflows and linking them to GitHub actions. The student also made the pytest scripts to be triggered by the "Run tests" workflow. Furthermore, the student made inference API, including developing the FastAPI script, dockerfile and deploying the API both locally and in cloud via continuous deployment - and both functionality and load tests. 
 
 
-### Declaration on the Use of Artificial Intelligence Tools
+- Declaration on the Use of Artificial Intelligence Tools
 
 In this project, artificial intelligence (AI) tools were used as a supporting aid in the development process, including chatGPT, Gemini, Vertex AI and Grok. The use of AI was limited to assistance with programming-related tasks, including code structuring, debugging, optimization, and clarification of technical concepts.
 
