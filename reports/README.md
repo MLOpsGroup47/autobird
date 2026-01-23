@@ -553,12 +553,15 @@ CLoud run: Was used to deploy our model and allow interaction through FastAPI in
 > Answer:
 
 We used the compute enginge through Vertex AI to run our experiments. Our experiments were carried out on machines with following hardware:
-vCPUs:  8 Virtual CPUs
-Memory: 30GB RAM
-Machine Family: N1
-GPU:  NVIDIA Tesla T4
+| Component       | Specification                |
+|:----------------|:-----------------------------|
+| **VM Family** | N1 Series (`n1-standard-8`) |
+| **vCPUs** | 8 Virtual CPUs               |
+| **Memory** | 30GB RAM                     |
+| **Accelerator** | NVIDIA Tesla T4 (16GB VRAM) |
+\
 The CPUs and 30GB RAM ensured sufficient compute for data loading, while the GPU was critical for accelerating the training of our model.
-We launched these VMs through Vertex AI Custom Jobs using a custom Docker container stored in the Artifact Registry. This approach allowed us to ensure Compute Engine instances could execute our code consistently 
+We launched these VMs through Vertex AI Custom Jobs using a custom Docker container stored in the Artifact Registry. This approach allowed us to ensure Compute Engine instances could execute our code consistently
 
 ### Question 19
 
@@ -634,11 +637,11 @@ workerPoolSpecs:
         - name: WANDB_MODE
           value: "online"
         - name: WANDB_API_KEY
-          value: "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" 
+          value: "--INSERT_WANDB_API_KEY--" 
         - name: WANDB_PROJECT
           value: "autobird"
 ```
-Which submits a job to Vertex AI which launches a VM with the specifications listed before and terminates it after completion.
+Which submits a job to Vertex AI which launches a VM with the specifications listed before and terminates it after completion. The benefit of using the compute engine was to run multiple experiments simultanously making hyperparameter tuning easier and faster as they are just changed in the train-bash script. 
 
 ## Deployment
 
@@ -736,7 +739,7 @@ In the inference API we also managed to implement monitoring of input-output. He
 >
 > Answer:
 
---- question 27 fill here ---
+We ended up spending in total 10.3$ during the development of our project. The most costly service we used was by far Vertex AI/Compute Engine which we have spend 7.26$ on and the secod most costly service was Cloud storage on which we have used 2.55$. The Vertex AI/Compute Engine is charged by usage and is the service we have used the most since we have trained multiple models for multiple hours, including using GPU which increases the cost. It has been super helpful to use the cloud, especially for training as our model training takes very long even when using GPU thus training on our own computers would have been painful. Although parts of the cloud lead to many painful hours we could not have trained our models without.
 
 ### Question 28
 
@@ -791,8 +794,7 @@ In the inference API we also managed to implement monitoring of input-output. He
 One of the biggest challenges in our project was handling packages and dependencies across different machines. Ensuring that all environments could run the same libraries consistently turned out to be difficult, especially due to hardware differences. In particular, an older Mac with an Intel chip could not support newer versions of PyTorch, which required us to adapt our setup accordingly. We also encountered persistent issues with the Librosa library, which failed to run reliably across machines and took considerable time to troubleshoot. Eventually, this issue was resolved by switching from Librosa to TorchAudio, which provided better compatibility and allowed all team members to run the same pipeline. Overall, managing dependencies and achieving a stable, reproducible environment was one of the most time-consuming aspects of the project.
 
 
-
-Getting our training docker to run on GPU in gcloud.
+We ended up spending many hours to get our training docker to run in gcloud. When building the images on the cloud and running it, the data from the bucket could not load, or it could not load modules. Thus we ended up building images locally and push them to the Artifact Registry which worked without any changes in the code and still used data from the bucket.  
 
 
 Struggles of student s214776 - The preprocessing pipeline was difficult to implement correctly, and integrating Distributed Data Parallel (DDP) into `train_engine.py`. Ensuring no data leakage was a pain, as audio files had to be chunked while keeping all chunks from the same file within a single dataset split. This was necessary to prevent chunks from the same audio appearing in the training, validation, and test sets. Keeping track of which files were used during training also required careful handling.
@@ -818,9 +820,9 @@ Using DDP introduced additional pain. Understanding how to use multiple cores an
 
 Student s224473 was in charge of developing a parts of the source code, (including the evaluation script), ensuring that the codebase was fully compatible with TorchAudio after transitioning away from Librosa setting up wandb configuration to track all training runs and implemented a hyperparameter sweep, and setting up data drift monitoring (Evidently), both locally and as a deployed API in the cloud.
 
-Student s214776 was in charge of developing of setting up the initial cookie cutter project, model development, data preprocessing, training, distributed training, profiler implementation, amp/quantization, and configurations of yaml configs and dataclass configs.
+Student s214776 was in charge of setting up the initial cookie cutter project, model development, data preprocessing, training, distributed training, profiler implementation, amp/quantization, and configs for for all of the respectively, in configs/.
 
-Student s224022 
+Student s224022 was in charge of setting up the cloud and train our models in the cloud, including building the docker images, developing a bash script to ease the job submission. As mentioned the I struggled with building the images in the cloud and ended up building them locally and push them afterwards. Also I ensured our code was runable both locally and in the cloud using the data stored in out bucket.
 
 Student s224031 was in charge of setting up all GitHub related tasks. This included setting up the repository, Dependabot, GitHub actions, branch rules and connecting it to Google Cloud Build. Related to this the student also set up the continuous integration by making the workflows and linking them to GitHub actions. In addition, the student also made all the pytest scripts to be triggered by the "Run tests" workflow. Furthermore the student made everything related to the inference API, including developing the FastAPI script, dockerfile and deploying the API both locally and in cloud via continuous deployment. To this the student also developed all the tests for API for both functionality and load testing. 
 
@@ -832,5 +834,6 @@ In this project, artificial intelligence (AI) tools were used as a supporting ai
 The AI tools were used solely as a support for the authors’ own work. All design choices, implementations, experiments, analyses, and evaluations were carried out by the authors. Any AI-generated suggestions were critically assessed, tested, and, where necessary, modified before inclusion.
 
 AI tools were not used to generate experimental data, conduct analyses automatically, or produce results, interpretations, or conclusions. The authors take full responsibility for the academic content, correctness, originality, and integrity of the project.
+
 
 
