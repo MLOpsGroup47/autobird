@@ -12,10 +12,9 @@ COPY uv.lock uv.lock
 COPY pyproject.toml pyproject.toml
 COPY api/ ./api
 COPY src/ ./src
-COPY models/ ./models
 COPY configs/ configs/
 COPY README.md README.md
 
 RUN uv sync --locked --no-cache --no-install-project
 
-CMD exec uv run uvicorn api.app.drift:app --port $PORT --host 0.0.0.0 --workers 1
+CMD exec uv run uvicorn api.drift_api.drift:app --port $PORT --host 0.0.0.0 --workers 1
