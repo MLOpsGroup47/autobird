@@ -491,7 +491,15 @@ We have setup W&B for experiment logging of our training and additionally setup 
 >
 > Answer:
 
---- question 15 fill here ---
+In this project we developed multiple images: training, data preprocessing, inference, data drifting, and gcp test api.
+For example can one use the training docker by writing this in the terminal:
+```bash
+docker run train:latest lr=0.0003 batch_size=32
+```
+See <https://console.cloud.google.com/artifacts/docker/autobird-484409/europe-west1/autobird-container/train-image?authuser=1&project=autobird-484409>
+This training docker can take the same arguments as ```bash uvr train ```
+See readme.md in src/
+
 
 ### Question 16
 
@@ -719,7 +727,7 @@ Yes, we did manage to implement monitoring to check drift in data. We did this l
 >
 > Answer:
 
---- question 30 fill here ---
+Getting our training docker to run on GPU in gcloud. 
 
 ### Question 31
 
@@ -746,9 +754,10 @@ Student s224022
 Student s224031 
 
 
+### Declaration on the Use of Artificial Intelligence Tools
 
+In this project, artificial intelligence (AI) tools were used as a supporting aid in the development process, including chatGPT, Gemini, Vertex AI and Grok. The use of AI was limited to assistance with programming-related tasks, including code structuring, debugging, optimization, and clarification of technical concepts.
 
+The AI tools were used solely as a support for the authors’ own work. All design choices, implementations, experiments, analyses, and evaluations were carried out by the authors. Any AI-generated suggestions were critically assessed, tested, and, where necessary, modified before inclusion.
 
-
-
-
+AI tools were not used to generate experimental data, conduct analyses automatically, or produce results, interpretations, or conclusions. The authors take full responsibility for the academic content, correctness, originality, and integrity of the project.
