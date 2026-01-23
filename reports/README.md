@@ -297,7 +297,7 @@ We implemented both branches and pull requests throughout our project work. We h
 
 Yes, we implemented DVC to manage our data, to version and track datasets stored outside the Git repository. DVC was configured with a remote gcloud storage bucket, which allowed us to keep large data files outside our of Git, while maintaining a link between code, configuration, and data version used in new experiments. 
 
-It helped us to improve the reproducibility of our project. Each of our git commmands is associated with a specific version of the data in the DVC, making it easy to determine which data was used for train, validation and testing. 
+It helped us to improve the reproducibility of our project. Each of our git commmands is associated with a specific version of the data in the DVC, making it easy to determine which data was used for train, validation and testing. Also it helped us ensuring our models were trained on the newest versions of our data, especially as we had multiple changes in our data preprocessing script it was very useful to have a well structured version control.
 
 
 ### Question 11
