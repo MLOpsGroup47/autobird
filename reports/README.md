@@ -312,7 +312,7 @@ It helped us improve the reproducibility of our project. Each of our git commman
 >
 > Answer:
 
-For our continuous intefration we have split it into 2 primary workflow files: one for doing tests and one for running linting, formatting and typecheck. Arguably the most important is our "Run tests" workflow [here](../../.github/workflows/tests.yaml)
+For our continuous intefration we have split it into 2 primary workflow files: one for doing tests and one for running linting, formatting and typecheck. Arguably the most important is our "Run tests" workflow located [here](../.github/workflows/tests.yaml). It runs all our pytest tests, but crucially it does so on 4 different platforms. The group included
 
 We also tried to add a workflow for doing load testing of our API, but due to time constraints the workflow was not finished. 
 
