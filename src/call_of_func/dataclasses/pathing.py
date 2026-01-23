@@ -19,7 +19,7 @@ class PathConfig:
         # resolve project root first
         root = Path(self.root).expanduser().resolve()
 
-        def r(p: Path) -> Path:
+        def r(p: Path | str) -> Path:
             p = Path(p).expanduser()
             return p if p.is_absolute() else (root / p).resolve()
 
