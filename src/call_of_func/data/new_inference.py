@@ -193,7 +193,7 @@ if __name__ == "__main__":
     # -----------------------------
     # USER SETTINGS
     # -----------------------------
-    file = "data/voice_of_birds/Cauca_Guan_sound/Cauca_Guan16.mp3"
+    file = "data/voice_of_birds/Chaco_Chachalaca_sound/Chaco_Chachalaca17.mp3"
     ckpt_name = "best.pt"
 
     paths = PathConfig(
@@ -232,8 +232,6 @@ if __name__ == "__main__":
     # -----------------------------
     # BUILD PRE/DATA CFG (MUST MATCH TRAINING)
     # -----------------------------
-    # IMPORTANT: set these to the SAME values used in preprocessing/training.
-    # If your project stores them in Hydra cfg, you should load them from there.
     pre_cfg = PreConfig(
         sr=16000,
         clip_sec=5.0,
