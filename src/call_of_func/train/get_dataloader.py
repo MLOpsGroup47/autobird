@@ -74,6 +74,7 @@ def build_dataloader(
         print(f"----> Learning rate {hp.lr}")
         print(f"---> Batch size {hp.batch_size}")
         print(f"Loaded data: train={len(y_train)}, val={len(y_val)}")
+        print(f"Classes {len(torch.unique(y_train))}")
 
     class_names = _load_class_names(paths.processed_dir)
     new_names = class_names

@@ -4,16 +4,14 @@ from pathlib import Path
 
 import pandas as pd
 import torch
-from fastapi import FastAPI, Response
-from google.cloud import storage
-
 from evidently.legacy.metric_preset import (
     DataDriftPreset,
     DataQualityPreset,
     TargetDriftPreset,
 )
 from evidently.legacy.report import Report
-
+from fastapi import FastAPI, Response
+from google.cloud import storage
 
 BUCKET = os.getenv("GCP_BUCKET", "birdcage-bucket")
 PREFIX = os.getenv("PROCESSED_PREFIX", "data/processed").strip("/")

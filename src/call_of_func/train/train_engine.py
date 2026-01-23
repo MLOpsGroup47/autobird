@@ -122,17 +122,12 @@ def validate_one_epoch(
     return float(val_loss / total), float(val_acc / total)
 
 def training(cfg) -> None:
-
-    MODEL_DIR = Path("/gcs/birdcage-bucket/models")
-    MODEL_DIR.mkdir(parents=True, exist_ok=True)
-
-    # device = _get_device()
-    # print(f"Training on device: {device}")
-    # print(f"cwd: {Path.cwd()}")
+    # MODEL_DIR = Path("/gcs/birdcage-bucket/models")
+    # MODEL_DIR.mkdir(parents=True, exist_ok=True)" 
     rank, world_size, local_rank = _get_runtime(cfg)
     device = _get_device(local_rank)
     is_main = (rank == 0)
-
+    
     if is_main: # Only print this in rank == 0, so we dont get duplicates 
         print(f"Training on device: {device}")
         print(f"cwd: {Path.cwd()}")
@@ -255,10 +250,10 @@ def training(cfg) -> None:
                         f"val loss {va_loss:.4f} acc {va_acc:.4f}"
                     )
     finally:
-        save_path = MODEL_DIR / "model.pth"
-        if int(os.environ.get("RANK", 0)) == 0:
-            torch.save(model.state_dict(), save_path)
-            print("Master process saved the model.")
+        #save_path = MODEL_DIR / "model.pth"
+        # if int(os.environ.get("RANK", 0)) == 0:
+        #     torch.save(model.state_dict(), save_path)
+        #     print("Master process saved the model.")
         if prof is not None:
             prof.__exit__(None, None, None)
         if run is not None:
