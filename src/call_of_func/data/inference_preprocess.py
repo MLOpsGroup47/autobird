@@ -11,9 +11,9 @@ import torchaudio
 from call_of_birds_autobird.model import Model
 from fastapi import FastAPI, File, UploadFile
 
-from call_of_func.data.new_inference import _load_norm_stats
 from call_of_func.data.data_calc import _log_mel
 from call_of_func.data.get_data import _chunk_audio
+from call_of_func.data.new_inference import _load_norm_stats
 from call_of_func.dataclasses.pathing import PathConfig
 from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
 
@@ -80,7 +80,7 @@ def inference_load(
     if device is not None:
         x_out = x_out.to(device)
 
-    return x_out
+    return x_out.squeeze(1) if x_out.shape[1]==1 and x_out.shape[2] == 1 else x_out  # remove channel dim if model expects [B, n_mels, frames]
 
 @torch.no_grad()
 def predict_file(

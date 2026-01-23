@@ -10,7 +10,8 @@ import soundfile as sf
 import torch
 import torchaudio
 from call_of_birds_autobird.model import Model
-from call_of_func.data.inference_preprocess import inference_load, predict_file
+from call_of_func.data.inference_preprocess import inference_load
+from call_of_func.data.new_inference import predict_file
 from call_of_func.dataclasses.pathing import PathConfig
 from fastapi import BackgroundTasks, FastAPI, File, UploadFile
 
@@ -65,7 +66,7 @@ async def lifespan(app: FastAPI):
             y_val=Path("../../data/processed/val_y.pt"),
         )
 
-    paths = paths.resolve()
+    
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     ckpt_path = resolve_checkpoint_path(MODEL_NAME, paths)
@@ -169,7 +170,7 @@ async def caption(
             path_cfg=paths,
         )
 
-        out = predict_file(x, model=model, paths=paths, device=device, agg="vote")
+        out = predict_file(x, model=model, agg="vote", processed_dir=paths.processed_dir)
         now = str(datetime.now(tz=timezone.utc))
         background_tasks.add_task(add_to_database, now, str(audio.filename), str(out['label']))
 
@@ -200,12 +201,12 @@ def predict_step(file: str, model: Model, paths: PathConfig, device: torch.devic
         x = wav.squeeze(0).cpu().numpy().astype(np.float32)
         sr = int(sr)
 
-    x = inference_load(x, sr)
+    x = inference_load(x, sr, path_cfg=paths, device=device)
     print("Input shape:", x.shape)  # [B, 1, n_mels, frames]
 
 
 
-    out = predict_file(x, model=model, paths=paths, device=device, agg="vote")
+    out = predict_file(x, model=model, agg="vote", processed_dir=paths.processed_dir)
     return out
 
 
