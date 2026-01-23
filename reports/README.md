@@ -99,7 +99,7 @@ will check the repositories and the code to verify your answers.
 
 * [x] Check how robust your model is towards data drifting (M27)
 * [x] Setup collection of input-output data from your deployed application (M27)
-* [ ] Deploy to the cloud a drift detection API (M27)
+* [x] Deploy to the cloud a drift detection API (M27)
 * [ ] Instrument your API with a couple of system metrics (M28)
 * [ ] Setup cloud monitoring of your instrumented application (M28)
 * [ ] Create one or more alert systems in GCP to alert you if your app is not behaving correctly (M28)
@@ -261,7 +261,7 @@ Both of these concepts are important for coding projects (in particular group pr
 >
 > Answer:
 
---- question 8 fill here ---
+The total code coverage of the code i 33%, which includes all of our source code. 100% code coverage does not necessarily ensure an errorless coding-pipeline. The coverage is only representative of the tests built by the developers and these may themselves be full of errors. But even if the errors don't have errors, and the cover 100% of the code, there is no guarantee that the code will behave flawlessly on unexpected input data. So code coverage can be a helpful indicator, but cannot be solely relied on. 
 
 ### Question 9
 
@@ -658,7 +658,10 @@ We managed to write a working API for doing inference using our model. We made o
 >
 > Answer:
 
-Yes, we did manage to implement monitoring to check drift in data. We did this locally in a script src/call_of_func/data/data_drift.py, and this script essentially compares current data (our processed validation split) with reference data (the processed train split) across relevant sound metrics (mel_mean, mel_std, energy_mean, energy_std) and generates an Evidently html report that summarizes if there is data drifting or not. We also managed to implement this feature API on cloud run, ***FJERN DETTE HVIS IKKE VI NÅR FÆRDIG, OG TILFØJ DEL OM DEPLOYED MONITORING OGSÅ***
+Yes, to an extent. We did manage to implement monitoring to check drift in data. We did this locally in a script src/call_of_func/data/data_drift.py, and this script essentially compares current data (our processed validation split) with reference data (the processed train split) across relevant sound metrics (mel_mean, mel_std, energy_mean, energy_std) and generates an Evidently html report that summarizes if there is data drifting or not. This is important because it allows us to detect when new incoming data starts to differ from the data the model was trained on, which can lead to degraded model performance if not addressed in time. (In an industry setting we would substitute current data with new incoming data instead of just the validation data). We also managed to implement this feature in an API on cloud run (autobird-drift), which does precisely the same, but uses data directly from the bucket instead. The endpoints <url>/drift/report displays the report and <url>/drift/run returns a JSON object that determines whether drift is detected in the dataset, number of samples in current/ref and status for the run. 
+
+In the inference API we also managed to implement monitoring of input-output. Here we collect the time and name of the uploaded file to the and we output a prediction of the class. This is important because it enables basic traceability and observability of the inference pipeline, making it easier to debug incorrect predictions and understand how the model is being used in practice. For future steps, we could have logged prediction confidence, model version, response time etc, which would allow us to monitor performance and trigger retraining when necessary.
+
 
 
 
@@ -726,6 +729,9 @@ Yes, we did manage to implement monitoring to check drift in data. We did this l
 > *The biggest challenges in the project was using ... tool to do ... . The reason for this was ...*
 >
 > Answer:
+One of the biggest challenges in our project was handling packages and dependencies across different machines. Ensuring that all environments could run the same libraries consistently turned out to be difficult, especially due to hardware differences. In particular, an older Mac with an Intel chip could not support newer versions of PyTorch, which required us to adapt our setup accordingly. We also encountered persistent issues with the Librosa library, which failed to run reliably across machines and took considerable time to troubleshoot. Eventually, this issue was resolved by switching from Librosa to TorchAudio, which provided better compatibility and allowed all team members to run the same pipeline. Overall, managing dependencies and achieving a stable, reproducible environment was one of the most time-consuming aspects of the project.
+
+
 
 Getting our training docker to run on GPU in gcloud.
 
@@ -751,9 +757,10 @@ Using DDP introduced additional pain. Understanding how to use multiple cores an
 > *We have used ChatGPT to help debug our code. Additionally, we used GitHub Copilot to help write some of our code.*
 > Answer:
 
-Student s214776 was in charge of developing of setting up the initial cookie cutter project, model development, data preprocessing, training, distributed training, profiler implementation, amp/quantization, and configurations of yaml configs and dataclass configs.
+--- question 31 fill here ---
+Student s224473 was in charge of developing a parts of the source code, (including the evaluation script), ensuring that the codebase was fully compatible with TorchAudio after transitioning away from Librosa setting up wandb configuration to track all training runs and implemented a hyperparameter sweep, and setting up data drift monitoring (Evidently), both locally and as a deployed API in the cloud.
 
-Student s224473
+Student s214776 was in charge of developing of setting up the initial cookie cutter project, model development, data preprocessing, training, distributed training, profiler implementation, amp/quantization, and configurations of yaml configs and dataclass configs.
 
 Student s224022 
 
