@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Tuple, Optional, List
+from typing import List, Optional, Tuple
 
 import torch
 import typer

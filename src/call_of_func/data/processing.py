@@ -3,22 +3,17 @@ from pathlib import Path
 from typing import List
 
 import numpy as np
-import typer
 import torch
+import typer
 from omegaconf import DictConfig
 
 from call_of_func.data.data_helpers import (
-    rn_mp3,
-    rn_dir,
-    filter_data,
     _apply_mapping_with_meta,
+    filter_data,
+    rn_dir,
+    rn_mp3,
 )
-from call_of_func.data.get_data import (
-    _index_dataset,
-    _split_by_groups,
-    _build_split,
-    _compute_global_norm_stats
-)
+from call_of_func.data.get_data import _build_split, _compute_global_norm_stats, _index_dataset, _split_by_groups
 from call_of_func.dataclasses.pathing import PathConfig
 from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
 from call_of_func.utils.get_configs import _load_cfg
