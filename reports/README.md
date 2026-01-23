@@ -750,10 +750,10 @@ Student s224022
 Student s224031 
 
 
+### Declaration on the Use of Artificial Intelligence Tools
 
+In this project, artificial intelligence (AI) tools were used as a supporting aid in the development process, including chatGPT, Gemini, Vertex AI and Grok. The use of AI was limited to assistance with programming-related tasks, including code structuring, debugging, optimization, and clarification of technical concepts.
 
+The AI tools were used solely as a support for the authors’ own work. All design choices, implementations, experiments, analyses, and evaluations were carried out by the authors. Any AI-generated suggestions were critically assessed, tested, and, where necessary, modified before inclusion.
 
-
-
-
-
+AI tools were not used to generate experimental data, conduct analyses automatically, or produce results, interpretations, or conclusions. The authors take full responsibility for the academic content, correctness, originality, and integrity of the project.
