@@ -246,7 +246,7 @@ Both of these concepts are important for coding projects (in particular group pr
 > *application but also ... .*
 >
 > Answer:
-We have 8 unit tests
+8 individual unit tests targeting API, data, model and training. We are primarily testing function level, meaning we are testing the functions to be used in larger procedures. For the API we test reading the root and using our classify endpoint which performs inference from a POST event. Data tests include confirming config class and its attributes along with a couple of tests of helper functions for the data processing. We test the model by forwading dummy data and thus confirming the model from the output received from the forward pass. Lastly we test the training by simulating 1 iteration of our training loop alongside testing a relevant helper function. 
 
 ### Question 8
 
