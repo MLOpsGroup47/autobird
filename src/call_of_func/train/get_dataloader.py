@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 from typing import List, Optional, Tuple
+
 import fsspec
 import gcsfs
 import torch
@@ -9,6 +10,7 @@ from torch.utils.data import DataLoader, TensorDataset, WeightedRandomSampler
 from torch.utils.data.distributed import DistributedSampler
 
 from call_of_func.dataclasses.pathing import PathConfig
+
 
 def _load_tensor(path) -> torch.Tensor:
     # fsspec.open handles gs:// and local paths automatically

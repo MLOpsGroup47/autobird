@@ -13,6 +13,7 @@ from fastapi import FastAPI, File, UploadFile
 
 from call_of_func.data.data_calc import _log_mel
 from call_of_func.data.get_data import _chunk_audio
+from call_of_func.data.new_inference import _load_norm_stats
 from call_of_func.dataclasses.pathing import PathConfig
 from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
 
@@ -20,9 +21,9 @@ from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
 def inference_load(
     x: np.ndarray,
     sr: int,
+    path_cfg: PathConfig,
     pre_cfg: Optional[PreConfig] = None,
     data_cfg: Optional[DataConfig] = None,
-    norm_stats: Optional[Tuple[torch.Tensor, torch.Tensor]] = None, # Expecting Tensors from train
     device: Optional[torch.device] = None,
 ) -> torch.Tensor:
     """Load a single audio file and return a model-ready tensor."""
@@ -46,19 +47,40 @@ def inference_load(
     mel_batch = np.stack(mels, axis=0)[:, None, :, :]
     x_out = torch.from_numpy(mel_batch)
 
-    # 4) Normalization - Ensuring we use training mean/std correctly
-    if norm_stats is not None:
-        mean, std = norm_stats
-        # Broadcast mean/std if they are vectors [n_mels]
-        if mean.ndim == 1:
-            mean = mean.view(1, 1, -1, 1)
-            std = std.view(1, 1, -1, 1)
-        x_out = (x_out - mean) / std.clamp_min(1e-8)
+    # 5) add channel dim -> [B, 1, n_mels, frames]
+    mel_batch = mel_batch[:, None, :, :]
+
+    # 6) to torch
+    x_out = torch.from_numpy(mel_batch)  # float32
+
+    # 7) optional normalization (use SAME stats as training)
+    norm_stats = _load_norm_stats(processed_dir=Path(path_cfg.processed_dir))
+
+    # 7) normalize with TRAIN stats (supports scalar OR per-mel vector)
+    mean, std = norm_stats
+    mean_t = mean.to(dtype=torch.float32)
+    std_t = std.to(dtype=torch.float32).clamp_min(1e-8)
+
+    # x_out: [B, 1, n_mels, frames]
+    if mean_t.numel() == 1:
+        x_out = (x_out - mean_t) / std_t
+    else:
+        # assume per-mel stats: [n_mels]
+        if mean_t.ndim != 1:
+            mean_t = mean_t.view(-1)
+        if std_t.ndim != 1:
+            std_t = std_t.view(-1)
+
+        # reshape to broadcast over [B, 1, n_mels, frames]
+        mean_t = mean_t.view(1, 1, -1, 1)
+        std_t = std_t.view(1, 1, -1, 1)
+
+        x_out = (x_out - mean_t) / std_t
 
     if device is not None:
         x_out = x_out.to(device)
 
-    return x_out
+    return x_out.squeeze(1) if x_out.shape[1]==1 and x_out.shape[2] == 1 else x_out  # remove channel dim if model expects [B, n_mels, frames]
 
 @torch.no_grad()
 def predict_file(
@@ -118,7 +140,7 @@ def paths_from_hydra_cfg(cfg) -> PathConfig:
 
 
 if __name__ == "__main__":
-    file = "/Users/holgermaxfloelyng/Desktop/BioMed/MSc_Biomed/SEM_3/project/mlops_project/data/voice_of_birds/West_Mexican_Chachalaca_sound/West_Mexican_Chachalaca4.mp3"
+    file = "data/voice_of_birds/Brazilian_Tinamou_sound/Brazilian_Tinamou16.mp3"
     ckpt_name = "best.pt"
     
     paths = PathConfig(
@@ -167,7 +189,7 @@ if __name__ == "__main__":
         x_raw = wav.squeeze(0).cpu().numpy().astype(np.float32)
     
     # Process audio into mel-spectrogram chunks
-    x_tensor = inference_load(x_raw, sr)
+    x_tensor = inference_load(x_raw, sr, path_cfg=paths, device=device)
     print("Input shape:", x_tensor.shape)  # [B, 1, n_mels, frames]
 
     # Run prediction
