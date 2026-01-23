@@ -11,6 +11,7 @@ shuffle_train: true
 shuffle_val: false
 num_workers: 2
 amp: true
+specaug: false
 grad_clip: 1.0
 use_wandb: true
 use_ws: false

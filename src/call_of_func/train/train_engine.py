@@ -39,6 +39,7 @@ def train_one_epoch(
     fq_mask,
     time_mask,
     amp: bool,
+    specaug: bool,
     grad_clip: float,
     prof,
 ) -> Tuple[float, float]:
@@ -54,12 +55,13 @@ def train_one_epoch(
         x = x.to(device, non_blocking=True)
         y = y.to(device, non_blocking=True)
         
-        with record_function("specaugment"):
-            x = specaugment(
-                x, 
-                fq_mask=fq_mask, 
-                time_mask=time_mask,
-            )
+        if specaug: 
+            with record_function("specaugment"):
+                x = specaugment(
+                    x, 
+                    fq_mask=fq_mask, 
+                    time_mask=time_mask,
+                )
         
         optimizer.zero_grad(set_to_none=True)
 
@@ -191,6 +193,7 @@ def training(cfg) -> None:
                 fq_mask=fq_mask,
                 time_mask=time_mask,
                 amp=bool(hp.amp),
+                specaug=bool(hp.specaug),
                 grad_clip=float(hp.grad_clip),
                 prof= prof,
             )
