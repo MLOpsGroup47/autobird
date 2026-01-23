@@ -11,6 +11,7 @@ import torchaudio
 from call_of_birds_autobird.model import Model
 from fastapi import FastAPI, File, UploadFile
 
+from call_of_func.data.new_inference import _load_norm_stats
 from call_of_func.data.data_calc import _log_mel
 from call_of_func.data.get_data import _chunk_audio
 from call_of_func.dataclasses.pathing import PathConfig
@@ -20,9 +21,9 @@ from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
 def inference_load(
     x: np.ndarray,
     sr: int,
+    path_cfg: PathConfig,
     pre_cfg: Optional[PreConfig] = None,
     data_cfg: Optional[DataConfig] = None,
-    norm_stats: Optional[Tuple[float, float]] = None,  # (mean, std) from training
     device: Optional[torch.device] = None,
 ) -> torch.Tensor:
     """Load a single audio file and return a model-ready tensor: [B, 1, n_mels, frames] where B = number of chunks."""
@@ -59,10 +60,28 @@ def inference_load(
     x_out = torch.from_numpy(mel_batch)  # float32
 
     # 7) optional normalization (use SAME stats as training)
-    if norm_stats is not None:
-        mean, std = norm_stats
-        std = max(float(std), 1e-8)
-        x_out = (x_out - float(mean)) / std
+    norm_stats = _load_norm_stats(processed_dir=path_cfg.processed_dir)
+
+    # 7) normalize with TRAIN stats (supports scalar OR per-mel vector)
+    mean, std = norm_stats
+    mean_t = mean.to(dtype=torch.float32)
+    std_t = std.to(dtype=torch.float32).clamp_min(1e-8)
+
+    # x_out: [B, 1, n_mels, frames]
+    if mean_t.numel() == 1:
+        x_out = (x_out - mean_t) / std_t
+    else:
+        # assume per-mel stats: [n_mels]
+        if mean_t.ndim != 1:
+            mean_t = mean_t.view(-1)
+        if std_t.ndim != 1:
+            std_t = std_t.view(-1)
+
+        # reshape to broadcast over [B, 1, n_mels, frames]
+        mean_t = mean_t.view(1, 1, -1, 1)
+        std_t = std_t.view(1, 1, -1, 1)
+
+        x_out = (x_out - mean_t) / std_t
 
     # 8) optional device
     if device is not None:

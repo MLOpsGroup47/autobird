@@ -39,15 +39,29 @@ async def lifespan(app: FastAPI):
     paths = PathConfig( 
         root=Path("."),
         raw_dir=Path("data/voice_of_birds"),
-        processed_dir=Path("../../data/processed"),
+        processed_dir=Path("data/processed"),
         reports_dir=Path("reports/figures"),
         eval_dir=Path("reports/eval"),
-        ckpt_dir= Path("../../models/checkpoints"),
+        ckpt_dir= Path("models/checkpoints"),
         x_train=Path("data/processed/train_x.pt"),
         y_train=Path("data/processed/train_y.pt"),
         x_val=Path("data/processed/val_x.pt"),
         y_val=Path("data/processed/val_y.pt"),
     )
+    
+    if not (Path.cwd() / "pyproject.toml").exists():
+        paths = PathConfig( 
+            root=Path("."),
+            raw_dir=Path("../../data/voice_of_birds"),
+            processed_dir=Path("../../data/processed"),
+            reports_dir=Path("../../reports/figures"),
+            eval_dir=Path("../../reports/eval"),
+            ckpt_dir= Path("../../models/checkpoints"),
+            x_train=Path("../../data/processed/train_x.pt"),
+            y_train=Path("../../data/processed/train_y.pt"),
+            x_val=Path("../../data/processed/val_x.pt"),
+            y_val=Path("../../data/processed/val_y.pt"),
+        )
 
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -75,7 +89,6 @@ async def lifespan(app: FastAPI):
 
     model.load_state_dict(state["model_state"])
 
-    model.to(device)
 
     with open("prediction_database.csv", "w") as file:
         file.write("time, audio_file, prediction\n")
@@ -126,10 +139,10 @@ async def caption(
 ):
     try:
         try:
-            x, sr = sf.read(audio.file, always_2d=False)
-            if x.ndim == 2:
-                x = x.mean(axis=1)
-            x = x.astype(np.float32)
+            x_in, sr = sf.read(audio.file, always_2d=False)
+            if x_in.ndim == 2:
+                x_in = x_in.mean(axis=1)
+            x_in = x_in.astype(np.float32)
             sr = int(sr)
         except Exception as e:
             print(f"SF Read Error: {e}")
@@ -138,10 +151,15 @@ async def caption(
             wav, sr = torchaudio.load(audio.file)  # wav: [channels, time]
             if wav.shape[0] > 1:
                 wav = wav.mean(dim=0, keepdim=True)
-            x = wav.squeeze(0).cpu().numpy().astype(np.float32)
+            x_in = wav.squeeze(0).cpu().numpy().astype(np.float32)
             sr = int(sr)
 
-        x = inference_load(x, sr)
+        x = inference_load(
+            x=x_in,
+            sr=sr,
+            device=device,
+            path_cfg=paths,
+        )
 
         out = predict_file(x, model=model, paths=paths, device=device, agg="vote")
         now = str(datetime.now(tz=timezone.utc))
