@@ -1,5 +1,5 @@
 # @package train.slr
 
 _target_: torch.optim.lr_scheduler.StepLR
-step_size: 5
-gamma: 0.8
+step_size: 6
+gamma: 0.89
