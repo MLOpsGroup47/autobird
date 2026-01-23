@@ -36,11 +36,11 @@ steps:
   id: 'Build api image'
   args: [
     'build',
-    '.',
     '-t',
     'europe-west1-docker.pkg.dev/autobird-484409/autobird-container/inference_api:latest',
     '-f',
-    'api/inference_api.dockerfile'
+    'inference_api.dockerfile',
+    '.'
   ]
 - name: 'gcr.io/cloud-builders/docker'
   id: 'Push api image'
@@ -61,6 +61,10 @@ steps:
     '--platform',
     'managed',
     '--allow-unauthenticated',
+    # Define the volume
+    '--add-volume=name=bucket-volume,type=cloud-storage,bucket=birdcage-bucket',
+    # Mount it to a NEW path (don't overwrite /app/models)
+    '--add-volume-mount=volume=bucket-volume,mount-path=/gcs/birdcage-bucket'
     # optional argument if you want to inject secrets as environment variables (maybe later for WANDB API KEY)
     #'--update-secrets=<env-name-in-container>=<secret-name-in-secrets-manager>:latest'
   ]

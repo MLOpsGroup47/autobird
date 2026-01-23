@@ -135,9 +135,8 @@ def paths_from_hydra_cfg(cfg) -> PathConfig:
 
 
 if __name__ == "__main__":
-    file = "data/voice_of_birds/Andean_Guan_sound/Andean_Guan2.mp3"
-    ckpt_name = "last.pt"
-
+    file = "/Users/holgermaxfloelyng/Desktop/BioMed/MSc_Biomed/SEM_3/project/mlops_project/data/voice_of_birds/West_Mexican_Chachalaca_sound/West_Mexican_Chachalaca4.mp3"
+    ckpt_name = "best.pt"
     paths = PathConfig(
         root=Path("."),
         raw_dir=Path("data/voice_of_birds"),

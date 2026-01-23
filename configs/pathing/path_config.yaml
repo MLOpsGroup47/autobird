@@ -8,7 +8,8 @@ paths:
   eval_dir: reports/eval_metrics
   ckpt_dir: models/checkpoints
   profile_dir: reports/torch_prof
-  x_train: data/processed/train_x.pt
-  y_train: data/processed/train_y.pt
-  x_val: data/processed/val_x.pt
-  y_val: data/processed/val_y.pt
+  out_dir: ${paths.processed_dir}/shards
+  x_train: ${paths.processed_dir}/train_x.pt
+  y_train: ${paths.processed_dir}/train_y.pt
+  x_val: ${paths.processed_dir}/val_x.pt
+  y_val: ${paths.processed_dir}/val_y.pt
