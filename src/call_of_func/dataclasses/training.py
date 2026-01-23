@@ -15,7 +15,7 @@ class HyperParams:
     shuffle_val: bool = False
     num_workers: int = 2
     amp: bool = True
-    specaug: bool = True
+    specaug: bool = False
     grad_clip: float = 1.0
     use_wandb: bool = True
     use_ws: bool = False
