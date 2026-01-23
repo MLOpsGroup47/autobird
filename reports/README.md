@@ -612,7 +612,7 @@ voice_of_birds/ contains folders for each species of bird, each containing
 >
 > Answer:
 
-We managed to write a working API for doing inference using our model. We made our API script working both locally and in the cloud by adjusting path strings in order to use the native project paths when working locally, and a path to our Bucket when used in the cloud. Apart from the root we made 2 endpoint called "files" and "classify". The "files" endpoint uses a GET event to list the files located in our model folder, which depends on the platform. "classify" receives an audio file through a POST event and returns the predicted class as response. We used FastAPI the make the API.
+We managed to write a working API for doing inference using our model. We made our API script working both locally and in the cloud by adjusting path strings in order to use the native project paths when working locally, and a path to our Bucket when used in the cloud. Apart from the root we made 2 endpoint called "files" and "classify". The "files" endpoint uses a GET event to list the files located in our model folder, which depends on the platform. "classify" receives an audio file through a POST event and returns the predicted class as response. We used FastAPI the make the API. We added collection of input and output as a light form of monitoring of the API. 
 
 ### Question 24
 
@@ -628,7 +628,17 @@ We managed to write a working API for doing inference using our model. We made o
 >
 > Answer:
 
---- question 24 fill here ---
+We managed to deploy our API both locally and in the cloud. We first working on serving the model locall using uvicorn to make sure the python script worked. Afterwords we made a docker image containing the API and hosted it locally. Finally, we deployed in the cloud using Cloud Run, at first by pushing and deploying the locally built image, but in the end though continuous deployment, which triggered on all pull requests to our main branch. 
+
+To invoke our the service a user would call:
+
+´´´bash
+curl -X 'POST' \
+  'https://inference-api-1047655691608.europe-west1.run.app/classify/' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'audio=@dummy_audio.mp3;type=audio/mpeg'
+´´´
 
 ### Question 25
 
@@ -643,7 +653,7 @@ We managed to write a working API for doing inference using our model. We made o
 >
 > Answer:
 
---- question 25 fill here ---
+We peformed both unit testing and load testing. As explained in question 7, we performed unit tests of our API using pytest as part of our continuous integration. For load testing we used locust where we load tested with up to 1000 users at peak without it crashing, but with 99% percentile response time on around 6500-7000 for all endpoints. Both root and "files" endpoints had 0 failures but the "classify" endpoint has a failure rate of 100% due to non resovled issue with the locust script. Thus the load testing showed that we can serve 1000 concurrent users, but with subpar response times (~6.5s). This is without accounting for inference time, caused by the faulty script.
 
 ### Question 26
 
