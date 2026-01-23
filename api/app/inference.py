@@ -22,12 +22,14 @@ paths: PathConfig
 BUCKET_FOLDER = "/gcs/birdcage-bucket/"
 MODEL_NAME = "last.pt"
 
-def resolve_checkpoint_path(ckpt_name: str, paths: PathConfig) -> str | Path:
+def resolve_checkpoint_path(ckpt_name: str, paths: PathConfig) -> Path: # Return Path specifically
     """Resolve checkpoint path based on environment."""
     if os.getenv("K_SERVICE") or os.getenv("RUNNING_IN_GCP") == "1":
-        return os.path.join(BUCKET_FOLDER, "models", ckpt_name)
+        # Ensure the GCS path is also a Path object for consistency
+        return Path(BUCKET_FOLDER) / "models" / ckpt_name
     else:
-        return paths.ckpt_dir / ckpt_name
+        # Cast to Path to support the / operator
+        return Path(paths.ckpt_dir) / ckpt_name
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -49,7 +51,7 @@ async def lifespan(app: FastAPI):
         y_val=Path("data/processed/val_y.pt"),
     )
 
-    
+    paths = paths.resolve()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     ckpt_path = resolve_checkpoint_path(MODEL_NAME, paths)
@@ -111,9 +113,15 @@ def read_root():
 @app.get("/files/")
 def list_files():
     """List model files in the upload folder."""
-    base = os.path.join(BUCKET_FOLDER, "models") if (os.getenv("K_SERVICE") or os.getenv("RUNNING_IN_GCP") == "1") else paths.ckpt_dir
+    # Use os.fspath or Path conversion to satisfy Mypy
+    if os.getenv("K_SERVICE") or os.getenv("RUNNING_IN_GCP") == "1":
+        base = Path(BUCKET_FOLDER) / "models"
+    else:
+        base = Path(paths.ckpt_dir)
+    
     try:
-        files = sorted(os.listdir(base))
+        # os.listdir works best with str; .iterdir() is the Path alternative
+        files = sorted([f.name for f in base.iterdir() if f.is_file()])
     except Exception:
         files = []
     return {"files": files}

@@ -1,0 +1,38 @@
+# .gcloudignore for Cloud Build
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+.venv/
+env/
+venv/
+
+# Local data (you don't need to upload huge datasets)
+data/
+reports/
+models/
+
+# Torch / PyTorch artifacts
+*.pt
+*.pth
+
+# Logs
+*.log
+
+# OS / Editor files
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Build artifacts
+*.egg-info/
+dist/
+build/
+
+# Ignore git repo itself
+.git/

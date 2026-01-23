@@ -52,6 +52,10 @@ def preprocess_cfg(
             x_val=paths.x_val,
             y_val=paths.y_val,
         ).resolve()
+    
+    p_root = Path(paths.root)
+    p_raw = Path(paths.raw_dir)
+    p_proc = Path(paths.processed_dir)
 
     # Preprocessing config 
     pre_cfg = PreConfig(
@@ -77,6 +81,8 @@ def preprocess_cfg(
         pad_last=True,
     )
 
+
+
     print(f"Project root: {paths.root}")
     print(f"Raw data directory: {paths.raw_dir}")
     print(f"Processed data directory: {paths.processed_dir}")
@@ -87,15 +93,16 @@ def preprocess_cfg(
     )
     print(f"Pruning classes with < {pre_cfg.min_samples} train samples")
 
-    if not paths.raw_dir.exists() or not paths.raw_dir.is_dir():
-        raise typer.BadParameter(f"Raw data directory does not exist: {paths.raw_dir}")
-    paths.processed_dir.mkdir(parents=True, exist_ok=True)
+    if not p_raw.exists() or not p_raw.is_dir():
+        raise typer.BadParameter(f"Raw data directory does not exist: {p_raw}")
+    
+    p_proc.mkdir(parents=True, exist_ok=True)
 
     if renamed_files:
-        rn_dir(paths.raw_dir)
-        rn_mp3(paths.raw_dir)
+        rn_dir(p_raw)
+        rn_mp3(p_raw)
 
-    items, classes = _index_dataset(paths.raw_dir)
+    items, classes = _index_dataset(p_raw)
     train_items, val_items, test_items = _split_by_groups(items=items, cfg=data_cfg)
 
     # build raw tensor splits
@@ -129,36 +136,36 @@ def preprocess_cfg(
     print(f"After pruning/remap: train={len(train_y)} val={len(val_y)} test={len(test_y)} classes={len(new_class_names or [])}")
 
     # save labels.json 
-    with open(paths.processed_dir / "labels.json", "w", encoding="utf8") as fh:
+    with open(p_proc / "labels.json", "w", encoding="utf8") as fh:
         json.dump(new_class_names, fh, ensure_ascii=False)
 
-    # compute normalization from train only, save stats, normalize all splits
+    # 2. compute normalization from train only, save stats, normalize all splits
     mean, std = _compute_global_norm_stats(train_x)
-    torch.save(mean, paths.processed_dir / "train_mean.pt")
-    torch.save(std, paths.processed_dir / "train_std.pt")
+    torch.save(mean, p_proc / "train_mean.pt")
+    torch.save(std, p_proc / "train_std.pt")
 
     train_x = (train_x - mean) / std
     val_x = (val_x - mean) / std
     test_x = (test_x - mean) / std
 
-    # save tensors
-    torch.save(train_x, paths.processed_dir / "train_x.pt")
-    torch.save(train_y, paths.processed_dir / "train_y.pt")
-    torch.save(val_x, paths.processed_dir / "val_x.pt")
-    torch.save(val_y, paths.processed_dir / "val_y.pt")
-    torch.save(test_x, paths.processed_dir / "test_x.pt")
-    torch.save(test_y, paths.processed_dir / "test_y.pt")
+    # 3. save tensors
+    torch.save(train_x, p_proc / "train_x.pt")
+    torch.save(train_y, p_proc / "train_y.pt")
+    torch.save(val_x, p_proc / "val_x.pt")
+    torch.save(val_y, p_proc / "val_y.pt")
+    torch.save(test_x, p_proc / "test_x.pt")
+    torch.save(test_y, p_proc / "test_y.pt")
 
-    # 8) save meta files
-    with open(paths.processed_dir / "train_group.json", "w", encoding="utf8") as fh:
+    # 4. save meta files
+    with open(p_proc / "train_group.json", "w", encoding="utf8") as fh:
         json.dump(train_group, fh, ensure_ascii=False)
-    with open(paths.processed_dir / "val_group.json", "w", encoding="utf8") as fh:
+    with open(p_proc / "val_group.json", "w", encoding="utf8") as fh:
         json.dump(val_group, fh, ensure_ascii=False)
-    with open(paths.processed_dir / "test_group.json", "w", encoding="utf8") as fh:
+    with open(p_proc / "test_group.json", "w", encoding="utf8") as fh:
         json.dump(test_group, fh, ensure_ascii=False)
 
-    torch.save(torch.tensor(train_chunk_starts, dtype=torch.float32), paths.processed_dir / "train_chunk_starts.pt")
-    torch.save(torch.tensor(val_chunk_starts, dtype=torch.float32), paths.processed_dir / "val_chunk_starts.pt")
-    torch.save(torch.tensor(test_chunk_starts, dtype=torch.float32), paths.processed_dir / "test_chunk_starts.pt")
+    torch.save(torch.tensor(train_chunk_starts, dtype=torch.float32), p_proc / "train_chunk_starts.pt")
+    torch.save(torch.tensor(val_chunk_starts, dtype=torch.float32), p_proc / "val_chunk_starts.pt")
+    torch.save(torch.tensor(test_chunk_starts, dtype=torch.float32), p_proc / "test_chunk_starts.pt")
 
     print("Saved pruned+remapped+normalized splits + labels + meta.")
