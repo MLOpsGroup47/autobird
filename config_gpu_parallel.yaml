@@ -1,0 +1,17 @@
+# Worker Pool 0: The Master/Rank 0 node
+workerPoolSpecs:
+  - machineSpec:
+      machineType: n1-standard-8
+      acceleratorType: NVIDIA_TESLA_T4
+      acceleratorCount: 1
+    replicaCount: 1
+    containerSpec:
+      imageUri: europe-west1-docker.pkg.dev/autobird-484409/autobird-container/trainer:v2-gpu-parallel
+      args: ["--nproc_per_node=1"] 
+      env:
+      - name: WANDB_MODE
+        value: "online"
+      - name: WANDB_API_KEY
+        value: "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"
+      - name: WANDB_PROJECT
+        value: "autobird"
