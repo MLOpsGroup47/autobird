@@ -39,6 +39,7 @@ def train_one_epoch(
     fq_mask,
     time_mask,
     amp: bool,
+    specaug: bool,
     grad_clip: float,
     prof,
 ) -> Tuple[float, float]:
@@ -54,12 +55,13 @@ def train_one_epoch(
         x = x.to(device, non_blocking=True)
         y = y.to(device, non_blocking=True)
         
-        with record_function("specaugment"):
-            x = specaugment(
-                x, 
-                fq_mask=fq_mask, 
-                time_mask=time_mask,
-            )
+        if specaug: 
+            with record_function("specaugment"):
+                x = specaugment(
+                    x, 
+                    fq_mask=fq_mask, 
+                    time_mask=time_mask,
+                )
         
         optimizer.zero_grad(set_to_none=True)
 
@@ -120,6 +122,13 @@ def validate_one_epoch(
     return float(val_loss / total), float(val_acc / total)
 
 def training(cfg) -> None:
+
+    MODEL_DIR = Path("/gcs/birdcage-bucket/models")
+    MODEL_DIR.mkdir(parents=True, exist_ok=True)
+
+    # device = _get_device()
+    # print(f"Training on device: {device}")
+    # print(f"cwd: {Path.cwd()}")
     rank, world_size, local_rank = _get_runtime(cfg)
     device = _get_device(local_rank)
     is_main = (rank == 0)
@@ -191,6 +200,7 @@ def training(cfg) -> None:
                 fq_mask=fq_mask,
                 time_mask=time_mask,
                 amp=bool(hp.amp),
+                specaug=bool(hp.specaug),
                 grad_clip=float(hp.grad_clip),
                 prof= prof,
             )
@@ -245,6 +255,10 @@ def training(cfg) -> None:
                         f"val loss {va_loss:.4f} acc {va_acc:.4f}"
                     )
     finally:
+        save_path = MODEL_DIR / "model.pth"
+        if int(os.environ.get("RANK", 0)) == 0:
+            torch.save(model.state_dict(), save_path)
+            print("Master process saved the model.")
         if prof is not None:
             prof.__exit__(None, None, None)
         if run is not None:

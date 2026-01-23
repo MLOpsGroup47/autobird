@@ -1,0 +1,8 @@
+wandb_version: 1
+
+train.hp.batch_size:
+  value: 64
+train.hp.epochs:
+  value: 2
+train.hp.lr:
+  value: 2.0130982146170106e-05

@@ -1,0 +1,27 @@
+- name: Auth with GCP
+  uses: google-github-actions/auth@v2
+  with:
+    credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+- name: Set up Cloud SDK
+  uses: google-github-actions/setup-gcloud@v2
+
+- name: Extract deployed api URL
+  run: |
+    DEPLOYED_API_URL=$(gcloud run services describe inference-api \
+      --region=europe-west1 \
+      --format='value(status.url)')
+    echo "DEPLOYED_API_URL=$DEPLOYED_API_URL" >> $GITHUB_ENV
+
+- name: Run load test on deployed api
+  env:
+    DEPLOYED_API_URL: ${{ env.DEPLOYED_API_URL }}
+  run: |
+    locust -f tests/performancetests/locustfile.py \
+      --headless -u 100 -r 10 --run-time 10m --host=$DEPLOYED_API_URL --csv=/locust/results
+
+- name: Upload locust results
+  uses: actions/upload-artifact@v4
+  with:
+    name: locust-results
+    path: /locust

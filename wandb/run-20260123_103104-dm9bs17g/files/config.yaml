@@ -1,0 +1,136 @@
+_wandb:
+    value:
+        cli_version: 0.24.0
+        e:
+            09f977pmscko9k0g4pvwxjisnvdacfg6:
+                apple:
+                    ecpuCores: 4
+                    gpuCores: 16
+                    memoryGb: 16
+                    name: Apple M2 Pro
+                    pcpuCores: 6
+                    ramTotalBytes: "17179869184"
+                    swapTotalBytes: "4294967296"
+                args:
+                    - train.hp.batch_size=64
+                    - train.hp.epochs=3
+                    - train.hp.lr=0.00026856489092052605
+                cpu_count: 10
+                cpu_count_logical: 10
+                disk:
+                    /:
+                        total: "494384795648"
+                        used: "466420842496"
+                email: s214776@dtu.dk
+                executable: /Users/holgermaxfloelyng/Desktop/BioMed/MSc_Biomed/SEM_3/project/mlops_project/.venv/bin/python
+                git:
+                    commit: 1438314c5f8aa96ddb5563c1c8e1360e37a6ce8b
+                    remote: https://github.com/MLOpsGroup47/autobird.git
+                host: mac.students.clients.local
+                memory:
+                    total: "17179869184"
+                os: macOS-26.1-arm64-arm-64bit
+                program: -m call_of_birds_autobird.train
+                python: CPython 3.12.12
+                root: /Users/holgermaxfloelyng/Desktop/BioMed/MSc_Biomed/SEM_3/project/mlops_project
+                startedAt: "2026-01-23T09:31:04.571256Z"
+                writerId: 09f977pmscko9k0g4pvwxjisnvdacfg6
+        m: []
+        python_version: 3.12.12
+        t:
+            "1":
+                - 1
+                - 50
+                - 105
+            "2":
+                - 1
+                - 50
+                - 105
+            "3":
+                - 2
+                - 13
+                - 14
+                - 16
+            "4": 3.12.12
+            "5": 0.24.0
+            "12": 0.24.0
+            "13": darwin-arm64
+data:
+    value:
+        clip_sec: 5
+        pad_last: true
+        seed: 4
+        stride_sec: 2.5
+        test_split: 0.1
+        train_split: 0.8
+paths:
+    value:
+        ckpt_dir: models/checkpoints
+        eval_dir: reports/eval_metrics
+        out_dir: data/processed/shards
+        processed_dir: data/processed
+        profile_dir: reports/torch_prof
+        raw_dir: data/voice_of_birds
+        reports_dir: reports
+        root: .
+        x_train: data/processed/train_x.pt
+        x_val: data/processed/val_x.pt
+        y_train: data/processed/train_y.pt
+        y_val: data/processed/val_y.pt
+preprocessing:
+    value:
+        clip_sec: 5
+        fq_max: 8000
+        fq_min: 20
+        hop_length: 512
+        min_mel_std: 0.1
+        min_rms: 0.005
+        min_samples: 50
+        n_fft: 1024
+        n_mels: 64
+        sr: 16000
+runtime:
+    value:
+        local_rank: 0
+        rank: 0
+        world_size: 1
+train:
+    value:
+        hp:
+            amp: true
+            batch_size: 64
+            d_model: 64
+            epochs: 3
+            grad_clip: 1
+            lr: 0.00026856489092052605
+            n_heads: 2
+            n_layers: 1
+            num_workers: 2
+            pin_memory: false
+            shuffle_train: true
+            shuffle_val: false
+            use_wandb: true
+            use_ws: false
+        optim:
+            _target_: torch.optim.Adam
+            lr: 0.0003
+            weight_decay: 0.0001
+        prof:
+            active: 3
+            enabled: false
+            profile_memory: true
+            record_shapes: true
+            repeat: 1
+            wait: 1
+            warmup: 1
+            with_stack: false
+        slr:
+            _target_: torch.optim.lr_scheduler.StepLR
+            gamma: 0.5
+            step_size: 5
+train.hp.batch_size:
+    value: 64
+train.hp.epochs:
+    value: 3
+train.hp.lr:
+    value: 0.00026856489092052605

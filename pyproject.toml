@@ -32,8 +32,8 @@ dependencies = [
     "torch==2.2.2; sys_platform == 'darwin' and platform_machine == 'x86_64'",
     "torchaudio==2.2.2; sys_platform == 'darwin' and platform_machine == 'x86_64'",
     # Linux and Windows (CPU wheels via PyTorch index)
-    "torch==2.2.2+cpu; sys_platform == 'linux' or sys_platform == 'win32'",
-    "torchaudio==2.2.2+cpu; sys_platform == 'linux' or sys_platform == 'win32'",
+    "torch==2.2.2+cu121; sys_platform == 'linux' or sys_platform == 'win32'",
+    "torchaudio==2.2.2+cu121; sys_platform == 'linux' or sys_platform == 'win32'",
     "click<8.1",
     "typer==0.15.1",
     "uvicorn==0.34.0",
@@ -51,6 +51,7 @@ dependencies = [
     "evidently>=0.7.20",
     "python-multipart>=0.0.21",
     "httpx>=0.28.1",
+    "locust>=2.43.1",
 ]
 
 [dependency-groups]
@@ -76,15 +77,15 @@ test_train ="call_of_birds_autobird.test:app"
 
 [tool.uv.sources]
 torch = [
-  { index = "pytorch-cpu", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+  { index = "pytorch-cu121", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
 ]
 torchaudio = [
-  { index = "pytorch-cpu", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+  { index = "pytorch-cu121", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
 ]
 
 [[tool.uv.index]]
-name = "pytorch-cpu"
-url = "https://download.pytorch.org/whl/cpu"
+name = "pytorch-cu121"
+url = "https://download.pytorch.org/whl/cu121"
 explicit = true
 
 [tool.uv]
@@ -94,6 +95,10 @@ required-environments = [
   "sys_platform == 'linux' and python_version >= '3.11' and python_version < '3.13'",
   "sys_platform == 'win32' and python_version >= '3.11' and python_version < '3.13'",
 ]
+
+[tool.uv.build-backend]
+directory = "src"
+packages = ["call_of_birds_autobird", "call_of_func"]
 
 [tool.ruff]
 line-length = 120
