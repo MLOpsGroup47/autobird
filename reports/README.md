@@ -819,7 +819,7 @@ Using DDP introduced additional pain. Understanding how to use multiple cores an
 --- question 31 fill here ---
 Student s224473 was in charge of developing a parts of the source code, (including the evaluation script), ensuring that the codebase was fully compatible with TorchAudio after transitioning away from Librosa setting up wandb configuration to track all training runs and implemented a hyperparameter sweep, and setting up data drift monitoring (Evidently), both locally and as a deployed API in the cloud.
 
-Student s214776 was in charge of developing of setting up the initial cookie cutter project, model development, data preprocessing, training, distributed training, profiler implementation, amp/quantization, and configurations of yaml configs and dataclass configs.
+Student s214776 was in charge of setting up the initial cookie cutter project, model development, data preprocessing, training, distributed training, profiler implementation, amp/quantization, and configs for for all of the respectively, in configs/.
 
 Student s224022 
 
@@ -833,5 +833,6 @@ In this project, artificial intelligence (AI) tools were used as a supporting ai
 The AI tools were used solely as a support for the authors’ own work. All design choices, implementations, experiments, analyses, and evaluations were carried out by the authors. Any AI-generated suggestions were critically assessed, tested, and, where necessary, modified before inclusion.
 
 AI tools were not used to generate experimental data, conduct analyses automatically, or produce results, interpretations, or conclusions. The authors take full responsibility for the academic content, correctness, originality, and integrity of the project.
+
 
 
