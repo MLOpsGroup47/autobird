@@ -13,8 +13,8 @@ WORKDIR /app
 # Copy dependency files from the context
 COPY uv.lock pyproject.toml ./
 
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --locked --no-install-project
+
+RUN uv sync --locked --no-install-project --no-cache
 
 COPY api/ ./api
 COPY src/ ./src
