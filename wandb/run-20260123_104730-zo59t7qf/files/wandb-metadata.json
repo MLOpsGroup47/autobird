@@ -1,0 +1,22 @@
+{
+  "os": "macOS-26.1-arm64-arm-64bit",
+  "python": "CPython 3.12.12",
+  "startedAt": "2026-01-23T09:47:30.181443Z",
+  "args": [
+    "train.hp.lr=0.00163",
+    "train.hp.batch_size=16",
+    "train.hp.epochs=100"
+  ],
+  "program": "/Users/holgermaxfloelyng/Desktop/BioMed/MSc_Biomed/SEM_3/project/mlops_project/.venv/bin/train",
+  "codePath": ".venv/bin/train",
+  "codePathLocal": ".venv/bin/train",
+  "git": {
+    "remote": "https://github.com/MLOpsGroup47/autobird.git",
+    "commit": "4bf8a8e30cc20ad06a7577fc6e08c86c95f7443e"
+  },
+  "email": "s214776@dtu.dk",
+  "root": "/Users/holgermaxfloelyng/Desktop/BioMed/MSc_Biomed/SEM_3/project/mlops_project",
+  "host": "mac.students.clients.local",
+  "executable": "/Users/holgermaxfloelyng/Desktop/BioMed/MSc_Biomed/SEM_3/project/mlops_project/.venv/bin/python3",
+  "writerId": "i8943c15m718ljmzsxw8k1cx7loxi6ou"
+}
