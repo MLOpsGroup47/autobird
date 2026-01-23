@@ -1,19 +1,19 @@
 from dataclasses import dataclass
 from pathlib import Path
-
+from typing import Union
 
 @dataclass
 class PathConfig:
-    root: Path
-    raw_dir: Path
-    processed_dir: Path
-    reports_dir: Path
-    eval_dir: Path
-    ckpt_dir: Path
-    x_train: Path
-    y_train: Path
-    x_val: Path
-    y_val: Path
+    root: Union[Path, str]
+    raw_dir: Union[Path, str]
+    processed_dir: Union[Path, str]
+    reports_dir: Union[Path, str]
+    eval_dir: Union[Path, str]
+    ckpt_dir: Union[Path, str]
+    x_train: Union[Path, str]
+    y_train: Union[Path, str]
+    x_val: Union[Path, str]
+    y_val: Union[Path, str]
 
     def resolve(self) -> "PathConfig":
         # resolve project root first

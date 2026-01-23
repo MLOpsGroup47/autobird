@@ -1,5 +1,5 @@
+# Base Python image
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
-#FROM nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04
 LABEL maintainer="Holger Floelyng"
 
 RUN apt update && \
@@ -18,5 +18,6 @@ COPY tasks.py .
 
 
 RUN uv sync --locked --no-cache --no-install-project
-ENV PYTHONPATH=/app/src
+ENV PYTHONPATH="/app/src"
+ENV PATH="/app/.venv/bin:$PATH"
 ENTRYPOINT ["uv", "run", "python", "-m",  "call_of_birds_autobird.train"]

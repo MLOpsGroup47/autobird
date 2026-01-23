@@ -9,5 +9,6 @@ gcloud ai custom-jobs create \
   --args="paths.x_train=gs://birdcage-bucket/data/processed/train_x.pt" \
   --args="paths.x_val=gs://birdcage-bucket/data/processed/val_x.pt" \
   --args="paths.y_train=gs://birdcage-bucket/data/processed/train_y.pt" \
-  --args="paths.y_val=gs://birdcage-bucket/data/processed/val_y.pt" 
+  --args="paths.y_val=gs://birdcage-bucket/data/processed/val_y.pt" \
+  --args="train.hp.epochs=100" \
     

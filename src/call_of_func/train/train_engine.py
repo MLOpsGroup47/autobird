@@ -110,6 +110,10 @@ def validate_one_epoch(
     return run_loss / total, run_acc / total
 
 def training(cfg) -> None:
+
+    MODEL_DIR = Path("/gcs/birdcage-bucket/models")
+    MODEL_DIR.mkdir(parents=True, exist_ok=True)
+
     device = get_device()
     print(f"Training on device: {device}")
     print(f"cwd: {Path.cwd()}")
@@ -216,6 +220,9 @@ def training(cfg) -> None:
                 f"val loss {va_loss:.4f} acc {va_acc:.4f}"
             )
     finally:
+        save_path = MODEL_DIR / "model.pth"
+        torch.save(model.state_dict(), save_path)
+        print(f"Model saved directly to: {save_path}")
         if prof is not None:
             prof.__exit__(None, None, None)
         if run is not None:
