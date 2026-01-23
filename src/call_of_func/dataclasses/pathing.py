@@ -35,13 +35,9 @@ class PathConfig:
         self.y_val = r(self.y_val)
 
         # create dirs that should exist
-        self.processed_dir.mkdir(parents=True, exist_ok=True)
-        self.reports_dir.mkdir(parents=True, exist_ok=True)
-        self.eval_dir.mkdir(parents=True, exist_ok=True)
-        self.ckpt_dir.mkdir(parents=True, exist_ok=True)
-        self.x_train.mkdir(parents=True, exist_ok=True)
-        self.y_train.mkdir(parents=True, exist_ok=True)
-        self.x_val.mkdir(parents=True, exist_ok=True)
-        self.y_val.mkdir(parents=True, exist_ok=True)
+        for attr in ["processed_dir", "reports_dir", "eval_dir", "ckpt_dir", 
+                     "x_train", "y_train", "x_val", "y_val"]:
+            val = getattr(self, attr)
+            Path(val).mkdir(parents=True, exist_ok=True)
 
         return self
