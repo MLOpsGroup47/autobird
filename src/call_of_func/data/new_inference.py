@@ -191,7 +191,7 @@ if __name__ == "__main__":
     # -----------------------------
     # USER SETTINGS
     # -----------------------------
-    file = "data/voice_of_birds/Chaco_Chachalaca_sound/Chaco_Chachalaca17.mp3"
+    file = "data/voice_of_birds/Brazilian_Tinamou_sound/Brazilian_Tinamou16.mp3"
     ckpt_name = "best.pt"
 
     paths = PathConfig(
