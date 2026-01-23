@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import os
+from typing import Tuple
+
 import torch
 import torch.distributed as dist
-
-from typing import Tuple
 from omegaconf import DictConfig, OmegaConf
+
 from call_of_func.train.train_engine import training
-
-
 
 
 def ddp_setup() -> Tuple[int, int, int]:

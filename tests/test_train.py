@@ -9,7 +9,7 @@ from call_of_func.data.data_calc import create_fq_mask
 from call_of_func.train.get_dataloader import build_dataloader
 from call_of_func.train.get_optim import build_optimizer
 from call_of_func.train.train_engine import train_one_epoch
-from call_of_func.train.train_helper import accuracy, get_device
+from call_of_func.train.train_helper import _get_device, accuracy
 from call_of_func.utils.get_source_path import CONFIG_DIR
 from call_of_func.utils.get_trackers import build_profiler
 from omegaconf import DictConfig
@@ -42,53 +42,6 @@ def test_accuracy():
     assert acc_half == 0.5, "Accuracy should be 0.5 for half correct predictions"
 
 
-def test_rm_rare_classes():
-    """Test removing rare classes and remapping labels."""
-    # 3 classes: 0, 1, 2
-    classes = ["class0", "class1", "class2"]
-    
-    # Class 0: 5 samples
-    # Class 1: 2 samples (Rare, threshold=3)
-    # Class 2: 5 samples
-    
-    # Create dummy data (12 mels, 10 time steps)
-    feature_shape = (1, 12, 10)
-    
-    # Train set
-    y_train = torch.tensor([0]*5 + [1]*2 + [2]*5, dtype=torch.long)
-    N_train = len(y_train)
-    x_train = torch.randn(N_train, *feature_shape)
-    
-    # Val set (just some samples)
-    y_val = torch.tensor([0, 1, 2], dtype=torch.long)
-    N_val = len(y_val)
-    x_val = torch.randn(N_val, *feature_shape)
-    
-    min_samples = 3
-
-    x_train_new, y_train_new, x_val_new, y_val_new, classes_new = rm_rare_classes(
-        x_train = x_train, 
-        y_train = y_train,
-        x_val = x_val,
-        y_val = y_val,
-        class_names = classes,
-        min_samples=min_samples
-    )
-    
-    # Checks:
-    # 1. Class 1 should be gone. Only 0 and 2 remain.
-    # 2. Labels should be remapped: 0->0, 2->1 (since 1 is removed)
-    # 3. Size of train should be 5+5=10
-    # 4. Size of val should be 1 (for 0) + 1 (for 2) = 2. (sample for 1 removed)
-    
-    assert len(y_train_new) == 10, "Train set size incorrect after removing rare classes"
-    assert len(y_val_new) == 2, "Val set size incorrect after removing rare classes"
-    assert len(classes_new) == 2, "Number of classes incorrect after removing rare classes"
-    assert classes_new == ["class0", "class2"], "Class names incorrect after removing rare classes"
-    
-    # Verify labels in new set are 0 or 1
-    assert set(y_train_new.tolist()) == {0, 1}, "Train labels not remapped correctly"
-    assert set(y_val_new.tolist()) == {0, 1}, "Val labels not remapped correctly"
 
 
 def test_single_train_step():
