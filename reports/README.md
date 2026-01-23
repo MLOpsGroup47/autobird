@@ -639,7 +639,7 @@ workerPoolSpecs:
         - name: WANDB_PROJECT
           value: "autobird"
 ```
-Which submits a job to Vertex AI which launches a VM with the specifications listed before and terminates it after completion.
+Which submits a job to Vertex AI which launches a VM with the specifications listed before and terminates it after completion. The benefit of using the compute engine was to run multiple experiments simultanously making hyperparameter tuning easier and faster as they are just changed in the train-bash script. 
 
 ## Deployment
 
@@ -737,7 +737,7 @@ In the inference API we also managed to implement monitoring of input-output. He
 >
 > Answer:
 
---- question 27 fill here ---
+We ended up spending in total 10.3$ during the development of our project. The most costly service we used was by far Vertex AI/Compute Engine which we have spend 7.26$ on and the secod most costly service was Cloud storage on which we have used 2.55$. The Vertex AI/Compute Engine is charged by usage and is the service we have used the most since we have trained multiple models for multiple hours, including using GPU which increases the cost. It has been super helpful to use the cloud, especially for training as our model training takes very long even when using GPU thus training on our own computers would have been painful. Although parts of the cloud lead to many painful hours we could not have trained our models without.
 
 ### Question 28
 
@@ -792,8 +792,7 @@ In the inference API we also managed to implement monitoring of input-output. He
 One of the biggest challenges in our project was handling packages and dependencies across different machines. Ensuring that all environments could run the same libraries consistently turned out to be difficult, especially due to hardware differences. In particular, an older Mac with an Intel chip could not support newer versions of PyTorch, which required us to adapt our setup accordingly. We also encountered persistent issues with the Librosa library, which failed to run reliably across machines and took considerable time to troubleshoot. Eventually, this issue was resolved by switching from Librosa to TorchAudio, which provided better compatibility and allowed all team members to run the same pipeline. Overall, managing dependencies and achieving a stable, reproducible environment was one of the most time-consuming aspects of the project.
 
 
-
-Getting our training docker to run on GPU in gcloud.
+We ended up spending many hours to get our training docker to run in gcloud. When building the images on the cloud and running it, the data from the bucket could not load, or it could not load modules. Thus we ended up building images locally and push them to the Artifact Registry which worked without any changes in the code and still used data from the bucket.  
 
 
 Struggles of student s214776 - The preprocessing pipeline was difficult to implement correctly, and integrating Distributed Data Parallel (DDP) into `train_engine.py`. Ensuring no data leakage was a pain, as audio files had to be chunked while keeping all chunks from the same file within a single dataset split. This was necessary to prevent chunks from the same audio appearing in the training, validation, and test sets. Keeping track of which files were used during training also required careful handling.
@@ -822,7 +821,7 @@ Student s224473 was in charge of developing a parts of the source code, (includi
 
 Student s214776 was in charge of developing of setting up the initial cookie cutter project, model development, data preprocessing, training, distributed training, profiler implementation, amp/quantization, and configurations of yaml configs and dataclass configs.
 
-Student s224022 
+Student s224022 was in charge of setting up the cloud and train our models in the cloud, including building the docker images, developing a bash script to ease the job submission. As mentioned the I struggled with building the images in the cloud and ended up building them locally and push them afterwards. Also I ensured our code was runable both locally and in the cloud using the data stored in out bucket.
 
 Student s224031 
 
