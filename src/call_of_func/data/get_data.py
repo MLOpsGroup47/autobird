@@ -1,7 +1,7 @@
 import json
 import random
 from pathlib import Path
-from typing import List, Tuple, Dict
+from typing import Dict, List, Tuple
 
 import numpy as np
 import soundfile as sf
@@ -187,8 +187,7 @@ def _build_split(
     pre_cfg: PreConfig,
     data_cfg: DataConfig,
 ):
-    """
-    Build tensors for one split (no saving, no normalization).
+    """Build tensors for one split (no saving, no normalization).
 
     Returns:
         x_tensor: [N, 1, n_mels, time]
