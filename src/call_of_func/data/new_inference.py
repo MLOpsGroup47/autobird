@@ -9,8 +9,8 @@ import soundfile as sf
 import torch
 import torchaudio
 import torchaudio.functional as F
-
 from call_of_birds_autobird.model import Model
+
 from call_of_func.data.data_calc import _log_mel
 from call_of_func.data.get_data import _chunk_audio
 from call_of_func.dataclasses.pathing import PathConfig
@@ -18,10 +18,10 @@ from call_of_func.dataclasses.Preprocessing import DataConfig, PreConfig
 
 
 def _idx_to_name(idx_to_label, i: int) -> str:
-    """
-    labels.json may be either:
-      - list: [name0, name1, ...]
-      - dict: {"0": name0, "1": name1, ...}
+    """labels.json may be either.
+
+    - list: [name0, name1, ...]
+    - dict: {"0": name0, "1": name1, ...}
     """
     if isinstance(idx_to_label, list):
         return idx_to_label[i]
@@ -64,11 +64,11 @@ def inference_load(
     sr: int,
     pre_cfg: PreConfig,
     data_cfg: DataConfig,
-    norm_stats: Tuple[float, float],  # (mean, std) from training
+    norm_stats: Tuple[torch.Tensor, torch.Tensor],  # (mean, std) from training
     device: torch.device,
 ) -> torch.Tensor:
-    """
-    Build model-ready tensor: [B, 1, n_mels, frames] where B is number of chunks.
+    """Build model-ready tensor: [B, 1, n_mels, frames] where B is number of chunks.
+
     Ensures preprocessing matches training:
       - resample to pre_cfg.sr
       - same chunking settings (clip/stride/pad)
@@ -132,9 +132,7 @@ def predict_file(
     processed_dir: Path,
     agg: str = "vote",  # "vote" or "mean_prob"
 ) -> Dict[str, object]:
-    """
-    Predict on all chunks; aggregate to file-level label.
-    """
+    """Predict on all chunks; aggregate to file-level label."""
     model.eval()
 
     logits = model(x)                 # [B, C]
@@ -170,8 +168,8 @@ def predict_file(
 
 
 def _read_audio_mono(file: str) -> Tuple[np.ndarray, int]:
-    """
-    Read audio as mono float32 numpy + sr.
+    """Read audio as mono float32 numpy + sr.
+    
     Tries soundfile first, falls back to torchaudio.
     """
     try:

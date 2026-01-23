@@ -4,9 +4,9 @@ from typing import List, Optional, Tuple
 import fsspec
 import gcsfs
 import torch
+from omegaconf import DictConfig
 from torch.utils.data import DataLoader, TensorDataset, WeightedRandomSampler
 from torch.utils.data.distributed import DistributedSampler
-from omegaconf import DictConfig
 
 from call_of_func.dataclasses.pathing import PathConfig
 
@@ -35,7 +35,7 @@ def safe_path(p):
 
 def build_dataloader(
     cfg: DictConfig,
-) -> Tuple[DataLoader, DataLoader, int, Optional[List[str]]]:
+) -> tuple[DataLoader, DataLoader, int, Optional[List[str]], Optional[DistributedSampler]]:
     """Build dataloaders using the already composed Hydra cfg."""
     paths = PathConfig(
         root=safe_path(cfg.paths.root),

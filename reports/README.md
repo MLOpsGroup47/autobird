@@ -97,14 +97,14 @@ will check the repositories and the code to verify your answers.
 
 ### Week 3
 
-* [ ] Check how robust your model is towards data drifting (M27)
+* [x] Check how robust your model is towards data drifting (M27)
 * [ ] Setup collection of input-output data from your deployed application (M27)
 * [ ] Deploy to the cloud a drift detection API (M27)
 * [ ] Instrument your API with a couple of system metrics (M28)
 * [ ] Setup cloud monitoring of your instrumented application (M28)
 * [ ] Create one or more alert systems in GCP to alert you if your app is not behaving correctly (M28)
 * [ ] If applicable, optimize the performance of your data loading using distributed data loading (M29)
-* [ ] If applicable, optimize the performance of your training pipeline by using distributed training (M30)
+* [x] If applicable, optimize the performance of your training pipeline by using distributed training (M30)
 * [ ] Play around with quantization, compilation and pruning for you trained models to increase inference speed (M31)
 
 ### Extra
@@ -221,7 +221,14 @@ We have removed the following folders:
 >
 > Answer:
 
---- question 6 fill here ---
+We used ruff for linting and formatting, configured with a maximum line length of 120 characters and enabled the I (import sorting) and D (docstring) rule sets. For docstrings, we followed the Google style convention, while explicitly ignoring selected documentation rules (D100–D107) to avoid enforcing docstrings everywhere and instead focus on meaningful, higher-level documentation. We chose these settings because they ensure uniformity in the code but aren't too restrictive. 
+
+Additionally, we implemented mypy for type checking to catch type-related errors early and to make function interfaces and data structures more explicit.
+
+Both of these concepts are important for coding projects (in particular group projects) as they ensure uniformity/reproducibility in the code which makes the code more readable both for co-developers and for non-developers overlooking the code.  
+
+
+
 
 ## Version control
 
@@ -270,7 +277,9 @@ We have removed the following folders:
 >
 > Answer:
 
---- question 9 fill here ---
+We implemented both branches and pull requests throughout our project work. We had our main branch and a branch for each group member. When developing new src or implementing changes in repository, all members worked primarily on their own branch to avoid conflicts. When the changes were working on the given branch X (including passing all tests), and making sure that all of the newest commits in main were merged into X, we then open PRs from the branch X and merged the changes into main. We used a mix of git commands directly from the terminal (git add, git commit -m, git fetch, git merge etc) and using the Github desktop app. 
+
+
 
 ### Question 10
 
@@ -353,7 +362,10 @@ We have removed the following folders:
 >
 > Answer:
 
---- question 14 fill here ---
+We have setup W&B for experiment logging of our training and additionally setup a hyperparameter sweep.yaml file in our configs folder. 
+
+
+
 
 ### Question 15
 
@@ -520,7 +532,10 @@ We have removed the following folders:
 >
 > Answer:
 
---- question 26 fill here ---
+Yes, we did manage to implement monitoring to check drift in data. We did this locally in a script src/call_of_func/data/data_drift.py, and this script essentially compares current data (our processed validation split) with reference data (the processed train split) across relevant sound metrics (mel_mean, mel_std, energy_mean, energy_std) and generates an Evidently html report that summarizes if there is data drifting or not. We also managed to implement this feature API on cloud run, ***FJERN DETTE HVIS IKKE VI NÅR FÆRDIG, OG TILFØJ DEL OM DEPLOYED MONITORING OGSÅ***
+
+
+
 
 ## Overall discussion of project
 
@@ -605,3 +620,6 @@ We have removed the following folders:
 > Answer:
 
 --- question 31 fill here ---
+
+
+

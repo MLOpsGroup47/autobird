@@ -6,27 +6,26 @@ from pathlib import Path
 from typing import Any, Optional, Tuple, cast
 
 import torch
+import torch.distributed as dist
 import torch.nn as nn
 from call_of_birds_autobird.model import Model
 from omegaconf import OmegaConf
 from torch.cuda.amp import GradScaler, autocast
-from torch.profiler import ProfilerActivity, profile, record_function
-import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
+from torch.profiler import ProfilerActivity, profile, record_function
 
 import wandb
-
 from call_of_func.data.data_calc import create_fq_mask, specaugment
 from call_of_func.train.get_dataloader import build_dataloader
 from call_of_func.train.get_optim import build_optimizer, build_scheduler
 from call_of_func.train.train_checkpoint import save_checkpoints
-from call_of_func.utils.get_trackers import build_profiler
 from call_of_func.train.train_helper import (
-    accuracy,
-    _get_runtime,
-    _get_device,
     _ddp_is_active,
+    _get_device,
+    _get_runtime,
+    accuracy,
 )
+from call_of_func.utils.get_trackers import build_profiler
 
 
 ### epoch run
@@ -43,7 +42,7 @@ def train_one_epoch(
     grad_clip: float,
     prof,
 ) -> Tuple[float, float]:
-    """This function train one full epoch"""
+    """This function train one full epoch."""
     model.train()
     run_loss = 0
     run_acc = 0.0
@@ -169,7 +168,7 @@ def training(cfg) -> None:
         # dataloaders
         train_loader, val_loader, n_classes, class_names, train_sampler = build_dataloader(cfg)
 
-        model = Model(
+        model: nn.Module = Model(
             n_classes=n_classes,
             d_model=int(hp.d_model),
             n_heads=int(hp.n_heads),
