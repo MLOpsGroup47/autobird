@@ -731,7 +731,13 @@ Yes, we did manage to implement monitoring to check drift in data. We did this l
 > *We have used ChatGPT to help debug our code. Additionally, we used GitHub Copilot to help write some of our code.*
 > Answer:
 
---- question 31 fill here ---
+Student s214776 was in charge of developing of setting up the initial cookie cutter project, model development, data preprocessing, training, distributed training, profiler implementation, amp/quantization, and configurations of yaml configs and dataclass configs.
+
+Student s224473
+
+Student s224022 
+
+Student s224031 
 
 
 
