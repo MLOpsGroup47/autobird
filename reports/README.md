@@ -99,7 +99,7 @@ will check the repositories and the code to verify your answers.
 
 * [x] Check how robust your model is towards data drifting (M27)
 * [x] Setup collection of input-output data from your deployed application (M27)
-* [ ] Deploy to the cloud a drift detection API (M27)
+* [x] Deploy to the cloud a drift detection API (M27)
 * [ ] Instrument your API with a couple of system metrics (M28)
 * [ ] Setup cloud monitoring of your instrumented application (M28)
 * [ ] Create one or more alert systems in GCP to alert you if your app is not behaving correctly (M28)
@@ -644,7 +644,10 @@ voice_of_birds/ contains folders for each species of bird, each containing
 >
 > Answer:
 
-Yes, we did manage to implement monitoring to check drift in data. We did this locally in a script src/call_of_func/data/data_drift.py, and this script essentially compares current data (our processed validation split) with reference data (the processed train split) across relevant sound metrics (mel_mean, mel_std, energy_mean, energy_std) and generates an Evidently html report that summarizes if there is data drifting or not. We also managed to implement this feature API on cloud run, ***FJERN DETTE HVIS IKKE VI NÅR FÆRDIG, OG TILFØJ DEL OM DEPLOYED MONITORING OGSÅ***
+Yes, to an extent. We did manage to implement monitoring to check drift in data. We did this locally in a script src/call_of_func/data/data_drift.py, and this script essentially compares current data (our processed validation split) with reference data (the processed train split) across relevant sound metrics (mel_mean, mel_std, energy_mean, energy_std) and generates an Evidently html report that summarizes if there is data drifting or not. This is important because it allows us to detect when new incoming data starts to differ from the data the model was trained on, which can lead to degraded model performance if not addressed in time. (In an industry setting we would substitute current data with new incoming data instead of just the validation data). We also managed to implement this feature in an API on cloud run (autobird-drift), which does precisely the same, but uses data directly from the bucket instead. The endpoints <url>/drift/report displays the report and <url>/drift/run returns a JSON object that determines whether drift is detected in the dataset, number of samples in current/ref and status for the run. 
+
+In the inference API we also managed to implement monitoring of input-output. Here we collect the time and name of the uploaded file to the and we output a prediction of the class. This is important because it enables basic traceability and observability of the inference pipeline, making it easier to debug incorrect predictions and understand how the model is being used in practice. For future steps, we could have logged prediction confidence, model version, response time etc, which would allow us to monitor performance and trigger retraining when necessary.
+
 
 
 
